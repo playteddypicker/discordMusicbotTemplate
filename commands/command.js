@@ -62,7 +62,7 @@ module.exports = {
 
       )
 
-    const pages = [embed1, embed2];
+    const pages = [embed1, embed2, embed3];
 
     ReactionPages(message, pages, true);
   }
