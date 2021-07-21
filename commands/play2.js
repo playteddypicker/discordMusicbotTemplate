@@ -355,6 +355,7 @@ function stop_song(message, server_queue){
   message.channel.send(`${server_queue.songs.length}개의 음악을 지우고 플레이어를 멈췄어요.`);
   server_queue.connection.dispatcher.end();
   server_queue.songs = [];
+  queue = new Map();
 }
 
 function leavenow(message, server_queue, voiceChannel){
