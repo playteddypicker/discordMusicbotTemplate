@@ -26,12 +26,12 @@ module.exports = {
 
     switch(cmd){      
       case 'np':
-        np_song(message, server_queue, Discord);
+        np_song(message, Discord);
         break;
 
       case 'q':
       case 'queue':
-        viewqueue_song(message, server_queue, 1, Discord);
+        viewqueue_song(message, 1, Discord);
         break;
     }
 
@@ -375,7 +375,7 @@ function shufflequeue_song(message, server_queue){
     [server_queue.songs[i], server_queue.songs[j]] = [server_queue.songs[j], server_queue.songs[i]];
   }
   message.channel.send('🔀 큐에 있는 노래가 이렇게 섞였어요!');
-  viewqueue_song(message, server_queue, 0);
+  viewqueue_song(message, 0);
 }
 
 function deletequeue(message, server_queue, args){
@@ -531,8 +531,8 @@ function getduration(server_queue, i){
   }
 }
 
-function np_song(message, server_queue, Discord){
-  server_queue = queue.get(message.guild.id);
+function np_song(message, Discord){
+  let server_queue = queue.get(message.guild.id);
 
   if(!server_queue) return message.channel.send('아무 노래도 틀고 있지 않아요..');
   if(!server_queue.songs[0]) return message.channel.send('아무 노래도 틀고 있지 않아요..');
@@ -572,9 +572,9 @@ function np_song(message, server_queue, Discord){
     return server_queue.text_channel.send(embed);
 }
 
-async function viewqueue_song(message, server_queue, npmd){
+async function viewqueue_song(message, npmd){
 
-  server_queue = queue.get(message.guild.id);
+  let server_queue = queue.get(message.guild.id);
 
   if(!server_queue) return message.channel.send('큐에 아무 노래도 없어요..');
   const Discord = require('discord.js');
@@ -605,7 +605,7 @@ async function viewqueue_song(message, server_queue, npmd){
       .setThumbnail(Youtube.thumb(`${server_queue.songs[1].url}`, 'big'))
       .setFooter(`${nextsongdur}`)
 
-    await np_song(message, server_queue, Discord);
+    await np_song(message, Discord);
     await server_queue.text_channel.send(nextsong);
     return
   }else if(!server_queue.loopqueue){
@@ -635,10 +635,10 @@ async function viewqueue_song(message, server_queue, npmd){
         qMsg = '```' + qMsgtitle + '\n' + qMsg + '\n```';
         pages.push(qMsg);
       }
-      if(npmd == 1) np_song(message, server_queue, Discord);
+      if(npmd == 1) np_song(message, Discord);
       return ReactionPages(message, pages, true);
     }else{
-      if(npmd == 1) np_song(message, server_queue, Discord);
+      if(npmd == 1) np_song(message, Discord);
       return message.channel.send('큐에 대기 중인 곡이 하나도 없네요..');
     }
   }else{
