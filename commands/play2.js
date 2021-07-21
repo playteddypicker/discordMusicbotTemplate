@@ -189,7 +189,7 @@ async function play_song(client, message, cmd, args, Discord, voiceChannel, serv
       try{
         const connection = await voiceChannel.join();
         queue_constructor.connection = connection;
-        video_player(message.guild, queue_constructor.songs[0], message, voiceChannel, server_queue);
+        video_player(message.guild, queue_constructor.songs[0], message, voiceChannel);
       } catch (err){
         queue.delete(message.guild.id);
         message.channel.send('연결하는데 에러가 났어요..으으..');
@@ -207,7 +207,7 @@ async function activeplaylist(server_queue, voiceChannel, queue_constructor, mes
     try{
       const connection = await voiceChannel.join();
       queue_constructor.connection = connection;
-      await video_player(message.guild, queue_constructor.songs[0], message, voiceChannel, server_queue);
+      await video_player(message.guild, queue_constructor.songs[0], message, voiceChannel);
     }catch (err){
       queue.delete(message.guild.id);
       message.channel.send('연결하는데 에러가 났어요..으으..');
@@ -219,8 +219,8 @@ async function activeplaylist(server_queue, voiceChannel, queue_constructor, mes
   }
 }
 
-async function video_player(guild, song, message, voiceChannel, server_queue){
-  server_queue = queue.get(guild.id);
+async function video_player(guild, song, message, voiceChannel){
+  let server_queue = queue.get(guild.id);
   if(!song){
     queue.delete(guild.id);
     server_queue.text_channel.send(`큐에 노래가 다 떨어졌어요..`);
@@ -301,7 +301,7 @@ async function skip_song(message, server_queue){
   if(!server_queue){
     return message.channel.send(`스킵 할 노래가 없어요!`);
   }else if(server_queue.songs.length < 2){
-    return message.channelsend(`스킵 할 노래가 없어요!`);
+    return message.channel.send(`스킵 할 노래가 없어요!`);
   }else{
     message.channel.send(`${message.member}님이 스킵했어요!`);
     server_queue.connection.dispatcher.end();
