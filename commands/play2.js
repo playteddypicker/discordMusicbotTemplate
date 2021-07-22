@@ -348,7 +348,10 @@ function jump_song(message, server_queue, args){
 
 function stop_song(message, server_queue){
   server_queue = queue.get(message.guild.id)
-  if(!server_queue) return message.channel.send('음악은 이미 안나와요..');
+  if(!server_queue) {
+    return message.channel.send('음악은 이미 안나와요..');
+    queue = new Map();
+  } 
   server_queue.loopone = false;
   server_queue.loopqueue = false;
   server_queue.autoqueue = false;
