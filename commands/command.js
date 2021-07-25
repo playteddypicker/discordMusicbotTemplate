@@ -1,5 +1,4 @@
-const recon = require("reconlx");
-const ReactionPages = recon.ReactionPages;
+const ReactionPages = require('./reactionpages.js');
 const { MessageEmbed } = require("discord.js");
 
 module.exports = {
