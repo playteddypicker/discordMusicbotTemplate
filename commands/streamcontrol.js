@@ -1,8 +1,7 @@
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 const { getInfo } = require('ytdl-getinfo');
-const recon = require('reconlx');
-const ReactionPages = recon.ReactionPages;
+const ReactionPages = require('./reactionpages.js');
 const queueset = require('./queuelist.js');
 const Discord = require('discord.js');
 const queue = queueset.queue;
