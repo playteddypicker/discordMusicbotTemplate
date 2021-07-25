@@ -132,31 +132,37 @@ function playsong(message, queue, song){
   }
 
   const stream = ytdl(song.url, {filter : 'audioonly'});
-  try{queue.connection.play(stream, {seek: 0, volume: queue.setVolume})
-    .on('finish', () => {
-      async function nextsong(){ 
-        if(queue.loopmode == 'single'){
-          queue.looped++;
-        }else if(queue.loopmode == 'queue'){
-          queue.curq++
-          if(queue.curq == queue.songs.length) queue.curq = 0;
-        }else{
-          queue.songs.shift();
-          queue.looped = 0;
-        }
-        if(queue.loopmode == 'auto' && queue.songs.length == 1){
-          autoqueue(message, queue, 1);
-        }
+  try{
+    if(!queue.connection){
+      message.channel.send('봇의 연결 상태를 불러오는데 실패했어요. 다시 연결 중...');
+      return playsong(message, queue, song);
+      }else{
+        queue.connection.play(stream, {seek: 0, volume: queue.setVolume})
+          .on('finish', () => {
+            async function nextsong(){ 
+              if(queue.loopmode == 'single'){
+                queue.looped++;
+              }else if(queue.loopmode == 'queue'){
+                queue.curq++
+                if(queue.curq == queue.songs.length) queue.curq = 0;
+              }else{
+                queue.songs.shift();
+                queue.looped = 0;
+              }
+              if(queue.loopmode == 'auto' && queue.songs.length == 1){
+                  autoqueue(message, queue, 1);
+              }
+            }
+            nextsong().then( () => {
+            playsong(message, queue, queue.songs[queue.curq]);
+            });
+          });
+      if(!(queue.loopmode == 'single')) {
+        message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
+      }else{
+        message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
       }
-      nextsong().then( () => {
-        playsong(message, queue, queue.songs[queue.curq]);
-      });
-    });
-  if(!(queue.loopmode == 'single')) {
-  message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
-  }else{
-    message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
-  }
+    }
   }catch (err){
     throw err;
     queueset.initqueue();
@@ -199,6 +205,7 @@ async function enqueue(message, queue, args){
     }
 
   }else if(ytdl.validateURL(args[0])){
+    try{
     const song_info = await ytdl.getInfo(args[0]);
     song = {
       title: song_info.videoDetails.title,
@@ -209,8 +216,12 @@ async function enqueue(message, queue, args){
     }
     queue.songs.push(song);
     queue.isqueueempty = false;
-  }else{
-
+    }catch (error){
+      message.channel.send('노래를 추가하는데 실패했어요. 다시 한번 해주세요.');
+      throw error;
+    }
+    }else{
+    try{
     const videofinder = await ytSearch(args.join(' '));
     const video = (videofinder.videos.length > 1) ? videofinder.videos[0] : null;
 
@@ -227,7 +238,10 @@ async function enqueue(message, queue, args){
     } else {
       return message.channel.send('그런 노래는 없는 것 같아요..');
     }
-
+    }catch (error){
+      message.channel.send('음악을 검색하는데 에러가 났어요. 다시 한번 해주세요.');
+      throw error;
+    }
   }
   if (queue.isplaying && isplaylist == 0){
     message.channel.send(`**${song.title}** ${queue.songs.length - 1}번째 큐에 추가됐어요!`);
@@ -235,16 +249,21 @@ async function enqueue(message, queue, args){
 }
 
 function skipsong(message, queue){
-  if(queue.loopmode == 'single'){
-    queue.songs.shift();
-    queue.connection.dispatcher.end();
-    queue.looped = 0;
-    return message.channel.send(`${message.member}님이 스킵했어요!`);
-  }
   if(!queue.connection) return message.channel.send('일단 노래를 틀어주세요!');
-  if(queue.songs.length < 2) return message.channel.send('스킵 할 노래가 없어요!');
-  queue.connection.dispatcher.end();
-  message.channel.send(`${message.member}님이 스킵했어요!`);
+  if(queue.connection.dispatcher){
+    if(queue.songs.length < 2) return message.channel.send('스킵 할 노래가 없어요!');
+
+    if(queue.loopmode == 'single'){
+      queue.songs.shift();
+      queue.connection.dispatcher.end();
+      queue.looped = 0;
+      return message.channel.send(`${message.member}님이 스킵했어요!`);
+    }
+    queue.connection.dispatcher.end();
+      message.channel.send(`${message.member}님이 스킵했어요!`);
+    }else{
+    message.channel.send('스트리밍중이 아니에요. 만약 버그라면 ./stop으로 음악 플레이어를 초기화해주세요.');
+  }
 }
 
 function stopsong(message, queue){
@@ -255,6 +274,8 @@ function stopsong(message, queue){
     try{
       queue.connection.dispatcher.end();
     }catch (error){
+      message.guild.me.voice.channel.leave();
+      message.channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화하고 음성 채널을 나갔어요.')
       throw error;
     }
   }
@@ -342,7 +363,9 @@ function setloop(message, queue, args){
 }
 
 function disconnect(message, queue){
-  if(queue.songs.length > 0) stopsong(message, queue);
+  if(queue.songs.length > 0){
+    queueset.initqueue();
+  }
   try{
     message.guild.me.voice.channel.leave();
   }catch (err){
@@ -398,13 +421,19 @@ function deletequeue(message, queue, args){
     let j = args[1];
 
     if(i > j || j > queue.songs.length - 1) return message.channel.send('지우는 범위가 이상해요..헤윽..');
-    queue.songs.splice(i, j-1+1);
+    queue.songs.splice(i, j-i+1);
     return message.channel.send(`대기열 ${i}번부터 ${j}번까지 지웠어요!`);
     viewqueue(message, queue, 0);
+  }
+  if(queue.loopmode == 'auto'){
+    let qstatus = queue.songs.length;
+    if(qstatus == 1) autoqueue(message, queue);
   }
 }
 
 function jumpqueue(message, queue, args){
+  if(!queue.connection) return message.channel.send('먼저 노래를 틀어주세요!');
+  if(!queue.connection.dispatcher) return message.channel.send('스트리밍 중이 아니에요. 만약 버그라면 ./stop으로 플레이어를 초기화 해주세요.');
   if(queue.isqueueempty) return message.channel.send('대기열에 노래가 없어요!');
   if(!queue.isplaying) return message.channel.send('먼저 노래를 틀어주세요!');
   if(queue.songs.length < 2) return message.channel.send('대기열에 노래가 없어요!');
