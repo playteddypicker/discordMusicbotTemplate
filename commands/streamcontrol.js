@@ -36,7 +36,7 @@ module.exports = {
       switch(cmd){
         case 'p':
         case 'play':
-          if(!args[0]) return message.channel.send('무슨 노래를 틀건지는 쓰셔야죠..');
+          if(!args[0]) return message.channel.send(`무슨 노래를 틀건지는 쓰셔야죠..\n**./play <유튜브 영상 링크>**: 유튜브 링크에 있는 영상을 재생해요.\n**./play <유튜브 플레이리스트 링크>**: 유튜브 플레이리스트에 있는 노래를 플레이리스트에 추가해요.\n**./play <그냥 노래 제목>**: 유튜브에서 노래를 검색해서 재생해요.`);
           if(!queue.connection && queue.isqueueempty && !queue.isplaying) {
             //초기에 봇이 연결되지 않았을때.
             enqueue(message, queue, args)
