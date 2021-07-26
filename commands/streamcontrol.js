@@ -163,10 +163,10 @@ function playsong(message, queue, song){
           })
       if(!(queue.loopmode == 'single')) {
         message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
-        if(queue.isplayercreated) editnpplayer();
+        if(playermsg) editnpplayer();
       }else{
         if(!queue.isplayercreated) message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
-        if(queue.isplayercreated) editnpplayer();
+        if(playermsg) editnpplayer();
       }
       }
   }catch (err){
@@ -747,7 +747,7 @@ async function setupplayer(client, message, queue){
   let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === `슨상플레이어`);
 
   if(!findchannel) {
-    findchannel = await message.guild.channels.create('슨상', "text");
+    findchannel = await message.guild.channels.create('슨상플레이어', "text");
     console.log(findchannel);
     queue.isplayercreated = true;
   }else{
@@ -758,7 +758,6 @@ async function setupplayer(client, message, queue){
 
   let playermessage = await findchannel.send(embed);
   playermsg = playermessage;
-  editnpplayer();
 
   for(let i = 0; i < emoji.length; i++){
     await playermessage.react(emoji[i]);
@@ -847,10 +846,14 @@ function editnpplayer(){
   if(queue.loopmode == 'auto') loopstatus = `♾️ 자동 재생 모드`;
 
   let playstatus = '';
-  if(queue.connection.dispatcher.paused){
-    playstatus = '⏸️  일시정지됨!';
+  if(!queue.connection){
+    playstatus = '연결되지 않음';
   }else{
-    playstatus = '▶️  지금 재생 중!'
+    if(queue.connection.dispatcher.paused){
+      playstatus = '⏸️  일시정지됨!';
+    }else{
+      playstatus = '▶️  지금 재생 중!'
+    }
   }
 
   let embed = new Discord.MessageEmbed()
