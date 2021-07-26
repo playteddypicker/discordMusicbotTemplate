@@ -38,7 +38,7 @@ module.exports = {
       {name: './leave', value: '음성 채널을 나가요.', inline: false},
       {name: './queue | q', value: '대기열 리스트를 보여드려요.', inline: false},
       {name: './np', value: '지금 재생 중인 노래의 정보를 보여드려요.', inline: false},
-      {name: `~~./setup~~`, value: `~~음악 플레이어를 세팅해요. 다시 입력해서 음악 플레이어를 지울 수 있어요.~~\n지금은 사용 불가`, inline: false},
+      {name: './setup', value: '음악 플레이어를 세팅해요. 다시 입력해서 음악 플레이어를 지울 수 있어요.', inline: false},
     )
     .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
       .setFooter('그만 때리세요..')
