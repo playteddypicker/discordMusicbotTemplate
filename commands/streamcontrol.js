@@ -1,8 +1,7 @@
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 const { getInfo } = require('ytdl-getinfo');
-const recon = require('reconlx');
-const ReactionPages = recon.ReactionPages;
+const ReactionPages = require('./reactionpages.js');
 const queueset = require('./queuelist.js');
 const Discord = require('discord.js');
 const queue = queueset.queue;
@@ -244,7 +243,18 @@ async function enqueue(message, queue, args){
     }
   }
   if (queue.isplaying && isplaylist == 0){
-    message.channel.send(`**${song.title}** ${queue.songs.length - 1}번째 큐에 추가됐어요!`);
+    let totdur = 0;
+    for(let i = queue.curq; i < queue.songs.length -1; i++){
+      totdur += Number(getseconds(queue, i));
+    }
+    let newqueue = new Discord.MessageEmbed()
+      .setAuthor(`${queue.songs.length - 1}번째 큐에 추가됨`, message.author.avatarURL())
+      .setTitle(`${song.title}`)
+      .setURL(`${song.url}`)
+      .setThumbnail(Youtube.thumb(`${song.url}`, 'big'))
+      .setFooter(`노래 길이: ${getTimestamp(parseInt(song.duration))} | 재생까지 남은 시간: ${getTimestamp(Number(totdur))}`);
+
+    message.channel.send(newqueue);
   }
 }
 
@@ -578,8 +588,7 @@ function viewnp(message, queue){
       .addFields( { name: `타임라인 : ${cur} / ${lth}`, value: `루프 : ${curloopst} \n상태 : ${nowstatus} \n볼륨: ${queue.setVolume * 100}%`, inline: true},
                   { name: `신청인`, value:`${song.request}`, inline: false}, )
     .setThumbnail(thumb)
-
-  if(!queue.ispa)
+  if(queue.songs.length > 1) embed.addFields({name: '다음 곡', value:`${queue.songs[queue.curq + 1].title}`, inline: false});
   return message.channel.send(embed);
 }
 
@@ -645,7 +654,7 @@ async function viewqueue(message, queue, npmd){
         qMsg += `#${i} ${titlevalue} ${lthl} by ${queue.songs[i].request}\n`;
         let initpagenum = parseInt(i % 20);
         if(initpagenum == 0){
-          qMsgtitle = `:::노래 ${queuecounter - 1}개 대기 중:::`;
+          qMsgtitle = `:::노래 ${queuecounter - 1}개 대기 중:::\n`;
           qMsg = '```' + qMsgtitle + qMsg + '\n```';
           pages.push(qMsg);
           qMsg = '';
