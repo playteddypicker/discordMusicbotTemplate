@@ -6,7 +6,7 @@ module.exports = {
   description: '봇 기본 정보',
   execute(client, message, cmd, args, Discord){
     
-    const embed1 = new Discord.MessageEmbed()
+    const embed0 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
       .setTitle('슨상이 0.1.3 - pre v1')
       .setDescription('봇 기본 정보')
@@ -94,7 +94,7 @@ module.exports = {
       .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
 
 
-    const pages = [embed1, embed2, embed3, embedss1, embedss2];
+    const pages = [embed0, embed1, embed2, embed3, embedss1, embedss2];
 
     ReactionPages(message, pages, true);
 
