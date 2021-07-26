@@ -10,9 +10,9 @@ module.exports = {
   name: 'play',
   aliases: [
     'p', 'q', 'queue', 'np', 'skip', 's', 'stop', 'pause', 
-    'v', 'volume', 'l', 'loop', 'lp', 'leave',
+    'v', 'volume', 'loop', 'lp', 'leave',
     'shuffle', 'shuf', 'delq', 'dq', 'jump','j',
-    'move', 'mv', 'switch', 'sw'],
+    'move', 'mv', 'switch', 'sw', 'setup'],
   description: 'streaming control',
   execute(client, message, cmd, args, Discord){
     const voiceChannel = message.member.voice.channel;
@@ -35,7 +35,7 @@ module.exports = {
       switch(cmd){
         case 'p':
         case 'play':
-          if(!args[0]) return message.channel.send(`무슨 노래를 틀건지는 쓰셔야죠..\n**./play <유튜브 영상 링크>**: 유튜브 링크에 있는 영상을 재생해요.\n**./play <유튜브 플레이리스트 링크>**: 유튜브 플레이리스트에 있는 노래를 플레이리스트에 추가해요.\n**./play <그냥 노래 제목>**: 유튜브에서 노래를 검색해서 재생해요.`);
+          if(!args[0]) return message.channel.send('무슨 노래를 틀건지는 쓰셔야죠..');
           if(!queue.connection && queue.isqueueempty && !queue.isplaying) {
             //초기에 봇이 연결되지 않았을때.
             enqueue(message, queue, args)
@@ -115,6 +115,10 @@ module.exports = {
         case 'sw':
           switchqueue(message, queue, args);
           break;
+
+        case 'setup':
+          setupplayer(client, message, queue);
+          break;
       }
     }
   }
@@ -127,6 +131,7 @@ function playsong(message, queue, song){
     message.channel.send('큐에 노래가 다 떨어졌어요..');
     queue.isplaying = false;
     queue.isqueueempty = true;
+    playermsg.edit(initplayer());
     return;
   }
 
@@ -153,15 +158,17 @@ function playsong(message, queue, song){
               }
             }
             nextsong().then( () => {
-            playsong(message, queue, queue.songs[queue.curq]);
+              playsong(message, queue, queue.songs[queue.curq]);
             });
-          });
+          })
       if(!(queue.loopmode == 'single')) {
         message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
+        if(queue.isplayercreated) editnpplayer();
       }else{
-        message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
+        if(!queue.isplayercreated) message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
+        if(queue.isplayercreated) editnpplayer();
       }
-    }
+      }
   }catch (err){
     throw err;
     queueset.initqueue();
@@ -197,6 +204,7 @@ async function enqueue(message, queue, args){
       })
     console.log(`playlist found, ${playlistlength} songs added.`);
       message.channel.send(`플레이리스트에서 ${playlistlength}개의 노래를 찾았어요!\n현재 큐를 보시려면 ./q`);
+      if(playermsg) editnpplayer();
     queue.isqueueempty = false;
     }catch (error){
       message.channel.send('플레이리스트를 불러오는데 실패했어요.\n공개 상태인 플레이리스트만 추가 가능해요.');
@@ -243,11 +251,32 @@ async function enqueue(message, queue, args){
     }
   }
   if (queue.isplaying && isplaylist == 0){
-    message.channel.send(`**${song.title}** ${queue.songs.length - 1}번째 큐에 추가됐어요!`);
+    let totdur = 0;
+    for(let i = queue.curq; i < queue.songs.length -1; i++){
+      totdur += Number(getseconds(queue, i));
+    }
+    let newqueue = new Discord.MessageEmbed()
+      .setAuthor(`${queue.songs.length - 1}번째 큐에 추가됨`, message.author.avatarURL())
+      .setTitle(`${song.title}`)
+      .setURL(`${song.url}`)
+      .setThumbnail(Youtube.thumb(`${song.url}`, 'big'))
+      .setFooter(`노래 길이: ${getTimestamp(parseInt(song.duration))} | 재생까지 남은 시간: ${getTimestamp(Number(totdur))}`);
+
+    message.channel.send(newqueue);
+    if(playermsg) editnpplayer();
   }
 }
 
-function skipsong(message, queue){
+function getseconds(server_queue, i){
+  if(server_queue.songs[i].isurl == 0){
+    return Number(server_queue.songs[i].duration.seconds);
+  }else if(server_queue.songs[i].isurl == 1){
+    return Number(server_queue.songs[i].duration); 
+  }
+}
+
+function skipsong(message, queue, isbuttonreact){
+
   if(!queue.connection) return message.channel.send('일단 노래를 틀어주세요!');
   if(queue.connection.dispatcher){
     if(queue.songs.length < 2) return message.channel.send('스킵 할 노래가 없어요!');
@@ -256,16 +285,23 @@ function skipsong(message, queue){
       queue.songs.shift();
       queue.connection.dispatcher.end();
       queue.looped = 0;
-      return message.channel.send(`${message.member}님이 스킵했어요!`);
+      if(isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
+      return
     }
     queue.connection.dispatcher.end();
-      message.channel.send(`${message.member}님이 스킵했어요!`);
+    if(isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
+    return
     }else{
     message.channel.send('스트리밍중이 아니에요. 만약 버그라면 ./stop으로 음악 플레이어를 초기화해주세요.');
   }
 }
 
 function stopsong(message, queue){
+  if(playermsg){
+    queue.connection.dispatcher.end();
+    queueset.initqueue();
+    return
+  }
   if(!queue.isplaying) {
     message.channel.send('음악 플레이어를 초기화했어요.');
   }else{
@@ -301,6 +337,7 @@ function setvolume(message, queue, args){
   queue.setVolume = setvolume / 100;
   queue.connection.dispatcher.setVolume(queue.setVolume);
   return message.channel.send(`볼륨을 ${setvolume}%로 맞췄어요!`);
+  if(playermsg) editnpplayer();
 }
 
 function setloop(message, queue, args){
@@ -391,18 +428,19 @@ async function autoqueue(message, queue){
       }
       queue.songs.push(song);
       message.channel.send('유튜브에서 추천 노래를 찾았어요!');
-      viewqueue(message, queue);
+    viewqueue(message, queue);
+    editnpplayer();
   });
 }
 
-function shufflequeue(message, queue){
+function shufflequeue(message, queue, isbuttonreact){
   if(queue.songs.length < 2) return message.channel.send('큐에 노래를 두 개 이상 넣어주세요!');
   
   for(let i = queue.songs.length - 1; i > 0; i--){
     let j = Math.floor((Math.random() * i)) + 1;
     [queue.songs[i], queue.songs[j]] = [queue.songs[j], queue.songs[i]];
   }
-  message.channel.send('🔀 큐에 있는 노래가 이렇게 섞였어요!');
+  if(!isbuttonreact) message.channel.send('🔀 큐에 있는 노래가 이렇게 섞였어요!');
   viewqueue(message, queue, 0);
 }
 
@@ -413,6 +451,8 @@ function deletequeue(message, queue, args){
   let i = args[0];
   if(!args[1]){
     queue.songs.splice(i, 1);
+    if(playermsg) editnpplayer();
+    if(queue.songs.length == 1) autoqueue(message, queue);
     return message.channel.send(`대기열 ${i}번을 지웠어요!`);
   }else if(isNaN(args[1]) || args[1] <= 0){
     return message.channel.send('지우는 범위를 자연수로 입력해 주세요!');
@@ -421,6 +461,7 @@ function deletequeue(message, queue, args){
 
     if(i > j || j > queue.songs.length - 1) return message.channel.send('지우는 범위가 이상해요..헤윽..');
     queue.songs.splice(i, j-i+1);
+    if(playermsg) editnpplayer();
     return message.channel.send(`대기열 ${i}번부터 ${j}번까지 지웠어요!`);
     viewqueue(message, queue, 0);
   }
@@ -448,6 +489,7 @@ function jumpqueue(message, queue, args){
   }
   queue.connection.dispatcher.end();
   return message.channel.send(`대기열 ${j}번으로 점프했어요!`);
+  if(playermsg) editnpplayer();
 }
 
 function movequeue(message, queue, args){
@@ -481,6 +523,7 @@ function movequeue(message, queue, args){
   }
   message.channel.send(`대기열 ${m}번을 ${n}번으로 옮겼어요!`);
   viewqueue(message, queue, 0);
+  if(playermsg) editnpplayer();
 }
 
 function switchqueue(message, queue, args){
@@ -496,6 +539,7 @@ function switchqueue(message, queue, args){
 
   message.channel.send(`대기열 ${m}번과 ${n}번의 위치를 바꿨어요!`);
   viewqueue(message, queue, 0);
+  if(playermsg) editnpplayer();
   
 }
 
@@ -575,10 +619,11 @@ function viewnp(message, queue){
       .setURL(song.url)
       .setColor("#FF6F61")
       .addFields( { name: `타임라인 : ${cur} / ${lth}`, value: `루프 : ${curloopst} \n상태 : ${nowstatus} \n볼륨: ${queue.setVolume * 100}%`, inline: true},
-                  { name: `신청인`, value:`${song.request}`, inline: false}, )
+        { name: `신청인`, value:`${song.request}`, inline: false}, 
+      )
     .setThumbnail(thumb)
-
-  if(!queue.ispa)
+  
+  if(queue.songs.length > 1) embed.addFields({name: '다음 곡', value:`${queue.songs[queue.curq + 1].title}`, inline: false});
   return message.channel.send(embed);
 }
 
@@ -690,4 +735,138 @@ async function viewqueue(message, queue, npmd){
 
   if(!queue.isplaying) return message.channel.send('아무 노래도 틀고 있지 않아요..');
   if(queue.songs.length < 2) return message.channel.send('대기열에 노래가 없어요!');
+}
+
+let playermsg = null;
+
+async function setupplayer(client, message, queue){
+  let emoji = ["⏯️", "⏹️", "⏭️", "🔀", "🔂", "🔁", "♾️", "❌"];
+  let server = message.guild;
+  let embed = queue.isplaying ? editnpplayer() : initplayer();
+
+  let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === `슨상플레이어`);
+
+  if(!findchannel) {
+    findchannel = await message.guild.channels.create('슨상', "text");
+    console.log(findchannel);
+    queue.isplayercreated = true;
+  }else{
+    findchannel.delete();
+    message.channel.send('플레이어를 삭제했어요!');
+    return;
+  }
+
+  let playermessage = await findchannel.send(embed);
+  playermsg = playermessage;
+  editnpplayer();
+
+  for(let i = 0; i < emoji.length; i++){
+    await playermessage.react(emoji[i]);
+  }
+
+  const filter = (reaction, user) =>
+    emoji.includes(reaction.emoji.name)
+
+  const collector = playermessage.createReactionCollector(filter, {});
+  let i = 0;
+  collector.on("collect", async (reaction, user) => {
+    reaction.users.remove(user);
+      if(reaction.emoji.name == emoji[7]) {
+        message.channel.send('플레이어를 삭제했어요!');
+        return findchannel.delete();
+      }
+      if(!queue.isplaying){
+        let warningmsg = await findchannel.send('노래를 먼저 틀어주세요!');
+        setTimeout(function(){
+        warningmsg.delete();
+          }, 3000);
+      }else {
+      switch(reaction.emoji.name){
+        case emoji[0]:
+          await pausesong(message, queue);
+          await editnpplayer();
+          break;
+
+        case emoji[1]:
+          await stopsong(message, queue);
+          await initplayer();
+          break;
+
+        case emoji[2]:
+          await skipsong(message, queue, true);
+          await editnpplayer();
+          break;
+
+        case emoji[3]:
+          await shufflequeue(message, queue, true);
+          await editnpplayer();
+          break;
+
+        case emoji[4]:
+          if(!(queue.loopmode == 'single')){
+            queue.loopmode = 'single';
+          }else queue.loopmode = 'off';
+          await editnpplayer();
+          break;
+
+        case emoji[5]:
+          if(!(queue.loopmode == 'queue')) {
+            queue.loopmode = 'queue';
+          }else queue.loopmode = 'off';
+          await editnpplayer();
+          break;
+
+        case emoji[6]:
+          if(!(queue.loopmode == 'auto')) {
+            queue.loopmode = 'auto';
+            if(queue.songs.length == 1) autoqueue(message, queue);
+          }else queue.loopmode = 'off';
+          await editnpplayer();
+          break;
+      }
+    }
+  });
+}
+
+function initplayer(){
+
+  const embed = new Discord.MessageEmbed()
+    .setColor('#FF6F61')
+    .setTitle('아무 노래도 틀고 있지 않아요..')
+    .setDescription('다른 채널에서 ./play 명령어로 노래를 틀거나\n이곳에 노래 제목/링크를 써주세요.')
+    .setImage('https://story-img.kakaocdn.net/dn/kWE0N/hyKZWY3Jh6/FAK0m5sKEgvpXVNZk8zXgK/img_xl.jpg?width=662&height=454&avg=%2523ceaf6f&v=2');
+  let setqueuelist = '큐에 아무 노래도 없어요.';
+  if(playermsg) playermsg.edit(setqueuelist, embed);
+  return embed;
+}
+
+function editnpplayer(){
+  let loopstatus = '꺼짐';
+  if(queue.loopmode == 'single') loopstatus = `🔂 ${queue.looped}번 반복 됨`;
+  if(queue.loopmode == 'queue') loopstatus = `🔁 큐 반복 중`; 
+  if(queue.loopmode == 'auto') loopstatus = `♾️ 자동 재생 모드`;
+
+  let playstatus = '';
+  if(queue.connection.dispatcher.paused){
+    playstatus = '⏸️  일시정지됨!';
+  }else{
+    playstatus = '▶️  지금 재생 중!'
+  }
+
+  let embed = new Discord.MessageEmbed()
+    .setColor('#FF6F61')
+    .setDescription(`루프: ${loopstatus} | 상태: ${playstatus} | 볼륨: ${queue.setVolume * 100}%`)
+    .setTitle(`${queue.songs[queue.curq].title}`)
+    .setURL(queue.songs[queue.curq].url)
+    .setImage(Youtube.thumb(`${queue.songs[queue.curq].url}`, 'big'))
+
+  let setqueuelist = ``;
+  for(let i = queue.songs.length - 1; i > 0; i--){
+    const songlength = getduration(queue, i);
+    setqueuelist += `#${i}. [${songlength}] ${queue.songs[i].title}\n`
+  }
+
+  console.log(embed);
+  if(playermsg) playermsg.edit(setqueuelist, embed);
+  return embed;
 }
