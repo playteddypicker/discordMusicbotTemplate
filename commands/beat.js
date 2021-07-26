@@ -31,9 +31,9 @@ module.exports = {
       }else if (rand == 7){
         message.channel.send("",
           {files: ["https://story-img.kakaocdn.net/dn/V4Q7w/hyKZ35nuns/aqI6PBHYy5SyvzFuMn9iKk/img.gif?width=755&height=502&avg=%252340485c&length=8248142&ani=1&duration=3300&v=2"]});
+      }
     }else if(cmd == '애낌'){
       message.author.send("고마워요 박사님..헤헤..");
     }
-    
   }
 }
