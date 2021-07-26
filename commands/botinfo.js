@@ -8,7 +8,7 @@ module.exports = {
     
     const embed0 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
-      .setTitle('슨상이 0.1.3 - pre v1')
+      .setTitle('슨상이 0.1.3 - pre v2')
       .setDescription('봇 기본 정보')
       .addFields(
        {name: '제작자', value: 'Discord: TeddyPicker#0689 \nInstagram: takemyword_4it', inline: false},
@@ -19,10 +19,10 @@ module.exports = {
     
     const embed1 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
-      .setTitle('슨상이 0.1.3 - pre v1')
-      .setDescription('0.1.3 - pre v1 ')
+      .setTitle('슨상이 0.1.3 - pre v2')
+      .setDescription('0.1.3 - pre v2 ')
       .addFields(
-       {name: '패치노트 1', value: '음악 플레이어 기능이 추가되었습니다. 이제 버튼식 상호작용으로 노래를 컨트롤 할 수 있어요.\n아직은 베타라 버그가 많으니 아예 안쓰셔도 됩니다.', inline: false},
+       {name: '패치노트 1', value: `~~음악 플레이어 기능이 추가되었습니다. 이제 버튼식 상호작용으로 노래를 컨트롤 할 수 있어요.\n아직은 베타라 버그가 많으니 아예 안쓰셔도 됩니다.~~\현재 심각한 버그때매 사용 불가`, inline: false},
        {name: '패치노트 2', value: '큐에 노래를 추가할때 이 노래가 틀어지려면 얼마나 기다려야하는지 출력해줍니다.\n큐 추가할때 나오는 텍스트가 세련되게 바뀌었어요.', inline: false},
        {name: '패치노트 3', value: '줘팸 커맨드에 이벤트가 하나 더 추가됐습니다.', inline: false}, 
       )
