@@ -12,7 +12,7 @@ module.exports = {
 
     const embed1 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.2v')
+    .setTitle('슨상이 0.1.3 - pre v1')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('기본 명령어')
     .addFields(
@@ -27,7 +27,7 @@ module.exports = {
 
     const embed2 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.2v')
+    .setTitle('슨상이 0.1.3 - pre v1')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어: 기본 기능')
     .addFields(
@@ -38,13 +38,14 @@ module.exports = {
       {name: './leave', value: '음성 채널을 나가요.', inline: false},
       {name: './queue | q', value: '대기열 리스트를 보여드려요.', inline: false},
       {name: './np', value: '지금 재생 중인 노래의 정보를 보여드려요.', inline: false},
+      {name: './setup', value: '음악 플레이어를 세팅해요. 다시 임력해서 음악 플레이어를 지울 수 있어요.'. inline: false},
     )
     .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
       .setFooter('그만 때리세요..')
 
     const embed3 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.2v')
+    .setTitle('슨상이 0.1.3 - pre v1')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어 : 고급 기능')
     .addFields(
