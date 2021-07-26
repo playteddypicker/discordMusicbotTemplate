@@ -4,7 +4,7 @@ module.exports = {
   description: '줘팸',
   execute(client, message, cmd, args, Discord){
 
-    const rand = Math.floor(Math.random() * 7);
+    const rand = Math.floor(Math.random() * 8);
 
     if (cmd === '줘팸'){
       if(rand == 0){
@@ -25,10 +25,12 @@ module.exports = {
       }else if(rand == 5){
         message.channel.send("제발 그만...",
           {files: ["https://story-img.kakaocdn.net/dn/bROIkD/hyKVeZKlCl/FDMP6Rh09i60nnyyITOPnk/img_xl.jpg?width=1060&height=694&avg=%2523b5b5b5&v=2"]});
-      }else{
+      }else if(rand == 6){
         message.channel.send("", 
           {files: ["https://story-img.kakaocdn.net/dn/bft0eL/hyKVdmhnkp/WxD0bo6mx4i0MlmmIkDyvK/img_xl.jpg?width=202&height=196&avg=%2523a2a2a2&v=2"]});
-      }
+      }else if (rand == 7{
+        message.channel.send("",
+          {files: ["https://story-img.kakaocdn.net/dn/V4Q7w/hyKZ35nuns/aqI6PBHYy5SyvzFuMn9iKk/img.gif?width=755&height=502&avg=%252340485c&length=8248142&ani=1&duration=3300&v=2"]});
     }else if(cmd == '애낌'){
       message.author.send("고마워요 박사님..헤헤..");
     }
