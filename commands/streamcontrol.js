@@ -750,7 +750,7 @@ async function viewqueue(message, queue, npmd){
         qMsg += `#${i} ${titlevalue} ${lthl} by ${queue.songs[i].request}\n`;
         let initpagenum = parseInt(i % 20);
         if(initpagenum == 0){
-          qMsgtitle = `:::노래 ${queuecounter - 1}개 대기 중:::`;
+          qMsgtitle = `:::노래 ${queuecounter - 1}개 대기 중:::\n`;
           qMsg = '```' + qMsgtitle + qMsg + '\n```';
           pages.push(qMsg);
           qMsg = '';
