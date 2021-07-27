@@ -29,7 +29,7 @@ module.exports = {
        {name: '패치노트 3', value: '줘팸 커맨드에 이벤트가 하나 더 추가됐습니다.', inline: false}, 
        {name: '패치노트 4', value: '큐 루프 상태에서 shuf, mv, sw를 쓰면 현재 곡도 상호작용되는 버그를 고쳤습니다.', inline: false},
        {name: '패치노트 5', value: '이제 연결 관련 버그가 생기면 ./leave로 완전히 봇을 초기화할 수 있습니다.', inline: false},
-       {name: '패치노트 6', value: '서버 별 플레이리스트 큐를 구현해서 이제 다른 서버에서 동시에 노래 틀어도 플레이리스트가 서로 겹치지 않습니다.', inline: false",
+       {name: '패치노트 6', value: '서버 별 플레이리스트 큐를 구현해서 이제 다른 서버에서 동시에 노래 틀어도 플레이리스트가 서로 겹치지 않습니다.', inline: false),
       )
       .setThumbnail('https://static.wikia.nocookie.net/fantendo/images/d/d5/SMM2_Cape_Toadette.png/revision/latest/scale-to-width-down/250?cb=20190726170458')
       .setFooter('이히히');
