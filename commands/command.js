@@ -12,7 +12,7 @@ module.exports = {
 
     const embed1 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.3 - pre v1')
+    .setTitle('슨상이 0.1.3')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('기본 명령어')
     .addFields(
