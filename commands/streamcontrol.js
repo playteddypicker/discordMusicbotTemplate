@@ -507,7 +507,7 @@ function deletequeue(message, queue, args){
     if(!args[1]){
       queue.songs.splice(i, 1);
       if(queue.isplayercreated) editnpplayer(queue);
-      if(queue.songs.length == 1) autoqueue(message, queue);
+      if(queue.songs.length == 1 || queue.loopmode == 'auto') autoqueue(message, queue);
       return message.channel.send(`대기열 ${i}번을 지웠어요!`);
     }else if(isNaN(args[1]) || args[1] <= 0){
       return message.channel.send('지우는 범위를 자연수로 입력해 주세요!');
