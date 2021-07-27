@@ -6,7 +6,7 @@ client.events = new Discord.Collection();
 
 client.on("ready", () =>{
   console.log(`${client.user.tag}!로 로그인 완료!`);
-  client.user.setActivity("치명적 버그 관련 ./botinfo로 꼭 봐주세요.  | 명령어는 ./help", {
+  client.user.setActivity("헤헤..박사님... | 명령어는 ./help", {
     type: "PLAYING",
   });
   //client.channels.cache.find(channel => channel.name === '슨상이').send("이제 준비됐어요!");
