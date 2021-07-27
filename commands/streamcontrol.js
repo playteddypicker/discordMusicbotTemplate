@@ -2,21 +2,43 @@ const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 const { getInfo } = require('ytdl-getinfo');
 const ReactionPages = require('./reactionpages.js');
-const queueset = require('./queuelist.js');
 const Discord = require('discord.js');
-const queue = queueset.queue;
+const server_queue = new Map();
 
 module.exports = {
   name: 'play',
   aliases: [
-    'p', 'q', 'queue', 'np', 'skip', 's', 'stop', 'pause', 
-    'v', 'volume', 'loop', 'lp', 'leave',
-    'shuffle', 'shuf', 'delq', 'dq', 'jump','j',
-    'move', 'mv', 'switch', 'sw', 'setup'],
-  description: 'streaming control',
+    'p', 'leave', 'cq', 'skip', 's', 'stop', 'pause',
+    'v', 'volume', 'loop', 'lp', 'leave', 'shuffle',
+    'shuf', 'delq', 'dq', 'jump', 'j', 'move', 'mv',
+    'switch', 'sw', 'setup', 'q', 'np', 'queue'
+  ],
+  description: 'asdf',
   execute(client, message, cmd, args, Discord){
+
+    const initializequeue = {
+      server_id: '',
+      songs: [],
+      connection: null,
+      isplaying: false,
+      loopmode: 'off',
+      setVolume: 0.3,
+      isqueueempty: true,
+      isplayercreated: false,
+      curq: 0,
+      looped: 0
+    }
+    //setting preference of queue
     const voiceChannel = message.member.voice.channel;
-    if(!message.guild.me.voice.channel) queueset.initqueue();
+    //stores each server queues to server_queue using this parameter
+
+    let queue = server_queue.get(message.guild.id);
+    //initialize queue each servers and assign queue to each server. based on each server id.
+    if(!server_queue.has(message.guild.id)){
+      server_queue.set(message.guild.id, initializequeue);
+      server_queue.get(message.guild.id).server_id = message.guild.id;
+      queue = server_queue.get(message.guild.id);
+    }
 
     switch (cmd){
       case 'np':
@@ -29,52 +51,53 @@ module.exports = {
         break;
     }
 
-    if(!voiceChannel && cmd != 'np' && cmd != 'q' && cmd != 'queue'){
-      return message.channel.send('일단 음성 채널에 들어와 주세요!');
-    }else{
-      switch(cmd){
-        case 'p':
+    if(voiceChannel && cmd != 'np' && cmd != 'q' && cmd != 'queue'){
+    //commands-control funciton
+      switch (cmd){
         case 'play':
-          if(!args[0]) return message.channel.send('무슨 노래를 틀건지는 쓰셔야죠..');
+        case 'p':
           if(!queue.connection && queue.isqueueempty && !queue.isplaying) {
-            //초기에 봇이 연결되지 않았을때.
-            enqueue(message, queue, args)
-            .then( () => {
-            if(!queue.connection){
-              const connection = voiceChannel.join();
-              connection.then(function(connection) {
-                queue.connection = connection;
-              })
-                .then( () => {
-                  if(!queue.isplaying) return playsong(message, queue, queue.songs[0]);
-                }).catch(error => {
-                  message.guild.me.voice.chaannel.leave();
-                  message.channel.send('연결하는데 에러가 났어요.. 노래를 다시 틀어주세요.');
-                });
-              }
-            });
-          }else if(queue.connection && queue.isqueueempty && !queue.isplaying){
-            //봇이 연결되어있지만 큐에 노래가 없고 재생중이지 않을때.`
-            enqueue(message, queue, args)
-            .then( () => {
-              playsong(message, queue, queue.songs[0]);
-            });
-          }else{//봇이 노래를 틀고있을때
-            enqueue(message, queue, args);
-          }
+              //초기에 봇이 연결되지 않았을때.
+              enqueue(message, queue, args)
+              .then( () => {
+              if(!queue.connection){
+                const connection = voiceChannel.join();
+                connection.then(function(connection) {
+                  queue.connection = connection;
+                })
+                  .then( () => {
+                    if(!queue.isplaying) return playsong(message, queue, queue.songs[0]);
+                  })/*.catch(error => {
+                    message.channel.send('연결하는데 에러가 났어요.. 노래를 다시 틀어주세요.');
+                  });*/
+                }
+              });
+            }else if(queue.connection && queue.isqueueempty && !queue.isplaying){
+              //봇이 연결되어있지만 큐에 노래가 없고 재생중이지 않을때.`
+              enqueue(message, queue, args)
+              .then( () => {
+                playsong(message, queue, queue.songs[0]);
+              });
+            }else{//봇이 노래를 틀고있을때
+              enqueue(message, queue, args);
+            }
+          break;
+
+        case 'cq':
+          console.log(server_queue);
           break;
 
         case 'skip':
         case 's':
-          skipsong(message, queue);
+          skipsong(message, queue, 0);
           break;
 
         case 'stop':
-          stopsong(message, queue);
+          stopsong(message, queue, 0);
           break;
 
         case 'pause':
-          pausesong(message, queue);
+          pausesong(message, queue, 0);
           break;
 
         case 'v':
@@ -93,7 +116,7 @@ module.exports = {
 
         case 'shuf':
         case 'shuffle':
-          shufflequeue(message, queue);
+          shufflequeue(message, queue, 0);
           break;
 
         case 'delq':
@@ -120,6 +143,8 @@ module.exports = {
           setupplayer(client, message, queue);
           break;
       }
+    }else {
+      if(!voiceChannel) message.channel.send('먼저 음성 채널에 들어가주세요!')
     }
   }
 }
@@ -127,11 +152,9 @@ module.exports = {
 function playsong(message, queue, song){
   queue.isplaying = true;
   if(queue.isqueueempty || queue.songs.length == 0){
-    queueset.initqueue();
     message.channel.send('큐에 노래가 다 떨어졌어요..');
     queue.isplaying = false;
     queue.isqueueempty = true;
-    playermsg.edit(initplayer());
     return;
   }
 
@@ -143,7 +166,7 @@ function playsong(message, queue, song){
       }else{
         queue.connection.play(stream, {seek: 0, volume: queue.setVolume})
           .on('finish', () => {
-            async function nextsong(){ 
+            async function nextsong(){
               if(queue.loopmode == 'single'){
                 queue.looped++;
               }else if(queue.loopmode == 'queue'){
@@ -163,15 +186,14 @@ function playsong(message, queue, song){
           })
       if(!(queue.loopmode == 'single')) {
         message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
-        if(playermsg) editnpplayer();
+        if(queue.isplayercreated) editnpplayer(queue);
       }else{
         message.channel.send(`**${song.title}** ${queue.looped}번 재생 중이에요!`);
-        if(playermsg) editnpplayer();
+        if(queue.isplayercreated) editnpplayer(queue);
       }
       }
   }catch (err){
     throw err;
-    queueset.initqueue();
     message.channel.send('노래를 스트리밍하는데 에러가 났어요.. 다시 틀어주세요..');
   }
 }
@@ -204,7 +226,7 @@ async function enqueue(message, queue, args){
       })
     console.log(`playlist found, ${playlistlength} songs added.`);
       message.channel.send(`플레이리스트에서 ${playlistlength}개의 노래를 찾았어요!\n현재 큐를 보시려면 ./q`);
-      if(playermsg) editnpplayer();
+      if(queue.isplayercreated) editnpplayer(queue);
     queue.isqueueempty = false;
     }catch (error){
       message.channel.send('플레이리스트를 불러오는데 실패했어요.\n공개 상태인 플레이리스트만 추가 가능해요.');
@@ -262,8 +284,9 @@ async function enqueue(message, queue, args){
       .setThumbnail(Youtube.thumb(`${song.url}`, 'big'))
       .setFooter(`노래 길이: ${getTimestamp(parseInt(song.duration))} | 재생까지 남은 시간: ${getTimestamp(Number(totdur))}`);
 
+    if(queue.isplayercreated) editnpplayer(queue);
     message.channel.send(newqueue);
-    if(playermsg) editnpplayer();
+
   }
 }
 
@@ -271,9 +294,33 @@ function getseconds(server_queue, i){
   if(server_queue.songs[i].isurl == 0){
     return Number(server_queue.songs[i].duration.seconds);
   }else if(server_queue.songs[i].isurl == 1){
-    return Number(server_queue.songs[i].duration); 
+    return Number(server_queue.songs[i].duration);
   }
 }
+
+var Youtube = (function () {
+  'use strict';
+
+  var video, results;
+
+  var getThumb = function (url, size) {
+    if (url === null) {
+      return '';
+    }
+    size = (size === null) ? 'big' : size;
+    results = url.match('[\\?&]v=([^&#]*)');
+    video   = (results === null) ? url : results[1];
+
+    if (size === 'small') {
+      return 'http://img.youtube.com/vi/' + video + '/2.jpg';
+    }
+    return 'http://img.youtube.com/vi/' + video + '/0.jpg';
+  };
+
+  return {
+    thumb: getThumb
+  };
+}());
 
 function skipsong(message, queue, isbuttonreact){
 
@@ -285,47 +332,44 @@ function skipsong(message, queue, isbuttonreact){
       queue.songs.shift();
       queue.connection.dispatcher.end();
       queue.looped = 0;
-      if(isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
+      if(!isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
       return
     }
     queue.connection.dispatcher.end();
-    if(isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
+    if(!isbuttonreact) return message.channel.send(`${message.member}님이 스킵했어요!`);
     return
     }else{
     message.channel.send('스트리밍중이 아니에요. 만약 버그라면 ./stop으로 음악 플레이어를 초기화해주세요.');
   }
 }
 
-function stopsong(message, queue){
-  if(playermsg){
-    queue.connection.dispatcher.end();
-    queueset.initqueue();
-    return
-  }
+async function stopsong(message, queue, isbuttonreact){
+  await server_queue.delete(message.guild.id);
+  queue.isqueueempty = true;
   if(!queue.isplaying) {
-    message.channel.send('음악 플레이어를 초기화했어요.');
+    if(!isbuttonreact) message.channel.send('음악 플레이어를 초기화했어요.');
   }else{
-    message.channel.send(`${queue.songs.length}개의 노래를 지우고 음악 플레이어를 초기화했어요.`);
+    if(!isbuttonreact) message.channel.send(`${queue.songs.length}개의 노래를 지우고 음악 플레이어를 초기화했어요.`);
     try{
-      queue.connection.dispatcher.end();
+      await queue.connection.dispatcher.end();
     }catch (error){
       message.guild.me.voice.channel.leave();
       message.channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화하고 음성 채널을 나갔어요.')
       throw error;
     }
   }
-  queueset.initqueue();
 }
 
-function pausesong(message, queue){
+function pausesong(message, queue, isbuttonreact){
   if(!queue.isplaying) return message.channel.send(`노래를 틀고 있지 않아요..`);
   if(queue.conenction.dispatcher.paused){
-    message.channel.send('▶️  노래 다시 틀게요!');
-    server_queue.connection.dispatcher.resume();
+    if(!isbuttonreact) message.channel.send('▶️  노래 다시 틀게요!');
+    queue.connection.dispatcher.resume();
   }else{
-    server_queue.connection.dispatcher.pause();
-    message.channel.send('⏸️  노래를 일시정지했어요!');
+    queue.connection.dispatcher.pause();
+    if(!isbuttonreact) message.channel.send('⏸️  노래를 일시정지했어요!');
   }
+  if(queue.isplayercreated) editnpplayer(queue);
 }
 
 function setvolume(message, queue, args){
@@ -337,7 +381,7 @@ function setvolume(message, queue, args){
   queue.setVolume = setvolume / 100;
   queue.connection.dispatcher.setVolume(queue.setVolume);
   return message.channel.send(`볼륨을 ${setvolume}%로 맞췄어요!`);
-  if(playermsg) editnpplayer();
+  if(queue.isplayercreated) editnpplayer(queue);
 }
 
 function setloop(message, queue, args){
@@ -398,17 +442,22 @@ function setloop(message, queue, args){
   console.log(queue.loopmode);
 }
 
-function disconnect(message, queue){
+function disconnect(message, queue, isbuttonreact){
+  if(queue.isplayercreated) {
+    let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === '슨상플레이어');
+    findchannel.delete();
+  }  
   if(queue.songs.length > 0){
-    queueset.initqueue();
+    server_queue.delete(message.guild.id);
   }
   try{
     message.guild.me.voice.channel.leave();
   }catch (err){
-    message.channel.send('으..으.. 나가기 싫어요!!');
+    if (!isbuttonreact) message.channel.send('으..으.. 나가기 싫어요!!');
     throw err;
   }
-  return message.channel.send('이제 그만 가볼게요.. 헤헤..');
+  if(!isbuttonreact) return message.channel.send('이제 그만 가볼게요.. 헤헤..');
+  if(isbuttonreact) return message.channel.send('플레이어를 없애고 음악을 껐어요.');
 }
 
 async function autoqueue(message, queue){
@@ -429,45 +478,74 @@ async function autoqueue(message, queue){
       queue.songs.push(song);
       message.channel.send('유튜브에서 추천 노래를 찾았어요!');
     viewqueue(message, queue);
-    editnpplayer();
+    if(queue.isplayercreated) editnpplayer(queue);
   });
 }
 
 function shufflequeue(message, queue, isbuttonreact){
   if(queue.songs.length < 2) return message.channel.send('큐에 노래를 두 개 이상 넣어주세요!');
   
-  for(let i = queue.songs.length - 1; i > 0; i--){
+  for(let i = queue.songs.length - 1; i >= 0; i--){
+    if(i == queue.curq) continue;
     let j = Math.floor((Math.random() * i)) + 1;
+    if(j == queue.curq) continue;
     [queue.songs[i], queue.songs[j]] = [queue.songs[j], queue.songs[i]];
   }
-  if(!isbuttonreact) message.channel.send('🔀 큐에 있는 노래가 이렇게 섞였어요!');
-  viewqueue(message, queue, 0);
+  if(!isbuttonreact) {
+    message.channel.send('🔀 큐에 있는 노래가 이렇게 섞였어요!');
+    viewqueue(message, queue, 0);
+  }
+  if(queue.ispalyercreated) editnpplayer(queue);
 }
 
 function deletequeue(message, queue, args){
-  if(!args[0] || isNaN(args[0]) || args[0] <= 0) return messsage.channel.send('지울 큐의 번호를 자연수로 입력해주세요!');
-  if(args[0] > queue.songs.length) return message.channel.send('지울 범위를 벗어났어요!');
+  if(!(queue.loopmode == 'queue')){
+    if(!args[0] || isNaN(args[0]) || args[0] <= 0) return messsage.channel.send('지울 큐의 번호를 자연수로 입력해주세요!');
+    if(args[0] > queue.songs.length) return message.channel.send('지울 범위를 벗어났어요!');
 
-  let i = args[0];
-  if(!args[1]){
-    queue.songs.splice(i, 1);
-    if(playermsg) editnpplayer();
-    if(queue.songs.length == 1) autoqueue(message, queue);
-    return message.channel.send(`대기열 ${i}번을 지웠어요!`);
-  }else if(isNaN(args[1]) || args[1] <= 0){
-    return message.channel.send('지우는 범위를 자연수로 입력해 주세요!');
+    let i = args[0];
+    if(!args[1]){
+      queue.songs.splice(i, 1);
+      if(queue.isplayercreated) editnpplayer(queue);
+      if(queue.songs.length == 1) autoqueue(message, queue);
+      return message.channel.send(`대기열 ${i}번을 지웠어요!`);
+    }else if(isNaN(args[1]) || args[1] <= 0){
+      return message.channel.send('지우는 범위를 자연수로 입력해 주세요!');
+    }else{
+      let j = args[1];
+
+      if(i > j || j > queue.songs.length - 1) return message.channel.send('지우는 범위가 이상해요..헤윽..');
+      queue.songs.splice(i, j-i+1);
+      if(queue.isplayercreated) editnpplayer(queue);
+      message.channel.send(`대기열 ${i}번부터 ${j}번까지 지웠어요!`);
+      viewqueue(message, queue, 0);
+    }
+    if(queue.loopmode == 'auto'){
+      let qstatus = queue.songs.length;
+      if(qstatus == 1) autoqueue(message, queue);
+    }
   }else{
-    let j = args[1];
+    if(!args[0] || isNaN(args[0]) || args[0] <= 0) return message.channel.send('지울 큐의 번호를 자연수로 입력해 주세요!');
+    if(!args[0] > queue.songs.length + 1) return message.channel.send('지울 범위를 벗어났어요!');
 
-    if(i > j || j > queue.songs.length - 1) return message.channel.send('지우는 범위가 이상해요..헤윽..');
-    queue.songs.splice(i, j-i+1);
-    if(playermsg) editnpplayer();
-    return message.channel.send(`대기열 ${i}번부터 ${j}번까지 지웠어요!`);
-    viewqueue(message, queue, 0);
-  }
-  if(queue.loopmode == 'auto'){
-    let qstatus = queue.songs.length;
-    if(qstatus == 1) autoqueue(message, queue);
+    let i = args[0];
+    if(!args[1]){
+      queue.songs.splice(i-1, 1);
+      if(queue.isplayercreated) editnpplayer(queue);
+      return message.channel.send(`대기열 ${i}번을 지웠어요!`);
+    }else if(isNaN(args[1]) || args[1] <= 0) {
+      return message.channel.send('지우는 범위를 자연수로 입력해 주세요!');
+    }else{
+      let j = args[1];
+      
+      if(i > j || j > queue.songs.length) return message.channel.send('지우는 범위가 이상해요..헤윽..');
+      if(i == queue.curq + 1 || j == queue.curq + 1 || (queue.curq + 1 >= i && queue.curq + 1 <= j)) return message.channel.send('지금 틀고 있는 노래까지 지울 수는 없어요!');
+      queue.songs.splice(i-1, j-i+1);
+      if(i <= queue.curq + 1) queue.curq = j - i;
+      if(queue.isplayercreated) editnpplayer(queue);
+      message.channel.send(`대기열 ${i}번부터 ${j}번까지 지웠어요!`);
+      return viewqueue(message, queue, 0);
+    }
   }
 }
 
@@ -489,7 +567,7 @@ function jumpqueue(message, queue, args){
   }
   queue.connection.dispatcher.end();
   return message.channel.send(`대기열 ${j}번으로 점프했어요!`);
-  if(playermsg) editnpplayer();
+  if(queue.isplayercreated) editnpplayer(queue);
 }
 
 function movequeue(message, queue, args){
@@ -515,6 +593,7 @@ function movequeue(message, queue, args){
 
   let m = args[0];
   let n = args[1];
+  if(m == queue.curq || n == queue.curq) return message.channel.send('지금 재생 중인 노래의 위치를 옮길 수는 없어요!');
 
   if(queue.loopmode == 'queue'){
     queue.songs = movearray(queue.songs, m - 1, n - m);
@@ -523,7 +602,7 @@ function movequeue(message, queue, args){
   }
   message.channel.send(`대기열 ${m}번을 ${n}번으로 옮겼어요!`);
   viewqueue(message, queue, 0);
-  if(playermsg) editnpplayer();
+  if(queue.isplayercreated) editnpplayer(queue);
 }
 
 function switchqueue(message, queue, args){
@@ -532,40 +611,22 @@ function switchqueue(message, queue, args){
   let temp;
   let m = Number(args[0]);
   let n = Number(args[1]);
+  if(m == queue.curq || n == queue.curq) return message.channel.send('지금 재생 중인 노래의 위치를 옮길 수는 없어요!');
 
-  temp = queue.songs[n];
-  queue.songs[n] = queue.songs[m];
-  queue.songs[m] = temp;
-
+  if(queue.loopmode == 'queue'){
+    temp = queue.songs[n - 1]
+    queue.songs[n-1] = queue.songs[m-1];
+    queue.songs[m-1] = temp;
+  }else{
+    temp = queue.songs[n];
+    queue.songs[n] = queue.songs[m];
+    queue.songs[m] = temp;
+  }
   message.channel.send(`대기열 ${m}번과 ${n}번의 위치를 바꿨어요!`);
   viewqueue(message, queue, 0);
-  if(playermsg) editnpplayer();
+  if(queue.isplayercreated) editnpplayer(queue);
   
 }
-
-var Youtube = (function () {
-  'use strict';
-
-  var video, results;
-
-  var getThumb = function (url, size) {
-    if (url === null) {
-      return '';
-    }
-    size = (size === null) ? 'big' : size;
-    results = url.match('[\\?&]v=([^&#]*)');
-    video   = (results === null) ? url : results[1];
-
-    if (size === 'small') {
-      return 'http://img.youtube.com/vi/' + video + '/2.jpg';
-    }
-    return 'http://img.youtube.com/vi/' + video + '/0.jpg';
-  };
-
-  return {
-    thumb: getThumb
-  };
-}());
 
 function getTimestamp(seconds){
   var hr, min, sec;
@@ -590,6 +651,8 @@ function getduration(server_queue, i){
 
 function viewnp(message, queue){
   if(!queue.isplaying) return message.channel.send('아무 노래도 틀고 있지 않아요....');
+  if(!queue.connection) return message.channel.send('봇이 연결되어있지 않아요..');
+  if(!queue.connection.dispatcher) return message.channel.send('아무 노래도 틀고 있지 않아요..');
 
   let curq = queue.curq;
   let song = queue.songs[curq];
@@ -655,7 +718,6 @@ async function viewqueue(message, queue, npmd){
     .setThumbnail(Youtube.thumb(`${queue.songs[0].url}`, 'big'))
     .setFooter(`${cur} / ${cursongdur}`);
 
-
   if(queue.loopmode == 'auto' && queue.songs.length == 2){
     let nextsongdur = getduration(queue, 1);
 
@@ -671,7 +733,6 @@ async function viewqueue(message, queue, npmd){
     await message.channel.send(nextsong);
     return
   }
-
   if(!(queue.loopmode == 'queue')){
     if(queuecounter > 1){
       let qMsgtitle = '::: 큐 목록 :::\n'; 
@@ -738,34 +799,35 @@ async function viewqueue(message, queue, npmd){
 }
 
 let playermsg = null;
-
 async function setupplayer(client, message, queue){
   let emoji = ["⏯️", "⏹️", "⏭️", "🔀", "🔂", "🔁", "♾️", "❌"];
   let server = message.guild;
-  let embed = queue.isplaying ? editnpplayer() : initplayer();
+  let embed = queue.isplaying ? await editnpplayer(queue) : initplayer();
 
-  let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === `슨상이`);
+  let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === `슨상플레이어`);
 
+  queue.isplayercreated = true;
   if(!findchannel) {
-    findchannel = await message.guild.channels.create('슨상이', "text");
+    findchannel = await message.guild.channels.create('슨상플레이어', "text");
     console.log(findchannel);
-    queue.isplayercreated = true;
   }else{
     findchannel.delete();
     message.channel.send('플레이어를 삭제했어요!');
+    queue.isplayercreated = false;
     return;
   }
 
+  console.log(embed);
   let playermessage = await findchannel.send(embed);
   playermsg = playermessage;
-  editnpplayer();
+  await editnpplayer(queue);
 
   for(let i = 0; i < emoji.length; i++){
     await playermessage.react(emoji[i]);
   }
 
   const filter = (reaction, user) =>
-    emoji.includes(reaction.emoji.name)
+    emoji.includes(reaction.emoji.name);
 
   const collector = playermessage.createReactionCollector(filter, {});
   let i = 0;
@@ -773,62 +835,66 @@ async function setupplayer(client, message, queue){
     reaction.users.remove(user);
       if(reaction.emoji.name == emoji[7]) {
         message.channel.send('플레이어를 삭제했어요!');
+        queue.isplayercreated = false;
         return findchannel.delete();
       }
       if(!queue.isplaying){
         let warningmsg = await findchannel.send('노래를 먼저 틀어주세요!');
         setTimeout(function(){
         warningmsg.delete();
-          }, 3000);
-      }else {
-      switch(reaction.emoji.name){
-        case emoji[0]:
-          await pausesong(message, queue);
-          await editnpplayer();
-          break;
+        }, 3000);
+      }else{
+        switch (reaction.emoji.name){
+          case emoji[0]:
+            /*if(queue.connection.dispatcher.paused) await queue.connection.dispatcher.resume();
+            if(queue.connection.dispatcher.resume) await queue.connection.dispatcher.pause();
+            await editnpplayer(queue);
+            */
+            let warningmsg = await findchannel.send('모듈 자체 에러로 이 기능은 지금 못써요');
+              setTimeout(function() {warningmsg.delete();}, 3000);
+            break;
 
-        case emoji[1]:
-          await stopsong(message, queue);
-          await initplayer();
-          break;
+          case emoji[1]:
+            await stopsong(message, queue, 1);
+            await initplayer();
+            break;
 
-        case emoji[2]:
-          await skipsong(message, queue, true);
-          await editnpplayer();
-          break;
+          case emoji[2]:
+            await skipsong(message, queue, 1);
+            break;
 
-        case emoji[3]:
-          await shufflequeue(message, queue, true);
-          await editnpplayer();
-          break;
+          case emoji[3]:
+            await shufflequeue(message, queue, 1);
+            await editnpplayer(queue);
+            break;
 
-        case emoji[4]:
-          if(!(queue.loopmode == 'single')){
-            queue.loopmode = 'single';
-          }else queue.loopmode = 'off';
-          await editnpplayer();
-          break;
+          case emoji[4]:
+            if(!(queue.loopmode == 'single')){
+              queue.loopmode = 'single';
+            }else queue.loopmode = 'off';
+            await editnpplayer(queue);
+            break;
 
-        case emoji[5]:
-          if(!(queue.loopmode == 'queue')) {
-            queue.loopmode = 'queue';
-          }else queue.loopmode = 'off';
-          await editnpplayer();
-          break;
+          case emoji[5]:
+            if(!(queue.loopmode == 'queue')) {
+              queue.loopmode = 'queue';
+            }else queue.loopmode = 'off';
+            await editnpplayer(queue);
+            break;
 
-        case emoji[6]:
-          if(!(queue.loopmode == 'auto')) {
-            queue.loopmode = 'auto';
-            if(queue.songs.length == 1) autoqueue(message, queue);
-          }else queue.loopmode = 'off';
-          await editnpplayer();
-          break;
+          case emoji[6]:
+            if(!(queue.loopmode == 'auto')) {
+              queue.loopmode = 'auto';
+              if(queue.songs.length == 1) autoqueue(message, queue);
+            }else queue.loopmode = 'off';
+            await editnpplayer(queue);
+            break;
+        }
       }
-    }
   });
 }
 
-function initplayer(){
+function initplayer(queue){
 
   const embed = new Discord.MessageEmbed()
     .setColor('#FF6F61')
@@ -840,27 +906,42 @@ function initplayer(){
   return embed;
 }
 
-function editnpplayer(){
+async function editnpplayer(queue){
   if(!queue.isplaying) return initplayer();
   let loopstatus = '꺼짐';
   if(queue.loopmode == 'single') loopstatus = `🔂 ${queue.looped}번 반복 됨`;
   if(queue.loopmode == 'queue') loopstatus = `🔁 큐 반복 중`; 
   if(queue.loopmode == 'auto') loopstatus = `♾️ 자동 재생 모드`;
 
+  let playstatus = '';
+  if(!queue.connection){
+    playstatus = '⏹️  재생 중이 아님';
+  }else{
+    if(queue.connection.dispatcher.paused) playstatus = '⏸️  일시정지됨';
+    if(queue.connection.dispatcher.resume) playstatus = '▶️  지금 재생 중!';
+  }
+
   let embed = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setDescription(`루프: ${loopstatus} | 볼륨: ${queue.setVolume * 100}%`)
+    .setDescription(`상태 : ${playstatus} | 루프: ${loopstatus} | 볼륨: ${queue.setVolume * 100}%`)
     .setTitle(`${queue.songs[queue.curq].title}`)
     .setURL(queue.songs[queue.curq].url)
     .setImage(Youtube.thumb(`${queue.songs[queue.curq].url}`, 'big'))
 
   let setqueuelist = ``;
-  for(let i = queue.songs.length - 1; i > 0; i--){
-    const songlength = getduration(queue, i);
-    setqueuelist += `#${i}. [${songlength}] ${queue.songs[i].title}\n`
+  if(!(queue.loopmode == 'queue')){
+    for(let i = queue.songs.length - 1; i > 0; i--){
+      const songlength = getduration(queue, i);
+      setqueuelist += `#${i}. [${songlength}] ${queue.songs[i].title}\n`
+    }
+  }else{
+    for(let i = queue.songs.length - 1; i >= 0; i--){
+      const songlength = getduration(queue, i);
+      if(i == queue.curq) setqueuelist += '>>>';
+      setqueuelist += `#${i}. [${songlength}] ${queue.songs[i].title}\n`
+    }
   }
 
-  console.log(embed);
-  if(playermsg) playermsg.edit(setqueuelist, embed);
+  if(playermsg && queue.isplayercreated) await playermsg.edit(setqueuelist, embed);
   return embed;
 }
