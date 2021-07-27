@@ -27,7 +27,7 @@ module.exports = {
 
     const embed2 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.3 - pre v1')
+    .setTitle('슨상이 0.1.3')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어: 기본 기능')
     .addFields(
@@ -45,7 +45,7 @@ module.exports = {
 
     const embed3 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.1.3 - pre v1')
+    .setTitle('슨상이 0.1.3')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어 : 고급 기능')
     .addFields(
