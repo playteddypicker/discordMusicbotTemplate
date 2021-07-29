@@ -34,7 +34,7 @@ module.exports = {
 
     let queue = server_queue.get(message.guild.id);
     //initialize queue each servers and assign queue to each server. based on each server id.
-    if(!server_queue.has(message.guild.id)){
+    if(!queue){
       server_queue.set(message.guild.id, initializequeue);
       server_queue.get(message.guild.id).server_id = message.guild.id;
       queue = server_queue.get(message.guild.id);
