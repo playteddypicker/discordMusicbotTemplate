@@ -1,7 +1,29 @@
 const cooldowns = new Map();
+const setuppedchannel = require('../../commands/musiccontrol/setupplayer.js');
+const queuepack = require('../../commands/musiccontrol/setqueue.js');
+const stream = require('../../commands/stream.js');
 
-module.exports = (Discord, client, message) => {
+module.exports = async (Discord, client, message) => {
   const prefix = './';
+
+  if(!message.guild) return;
+  let playerchannel = setuppedchannel.server_player.get(message.guild.id);
+
+  if(playerchannel && !message.content.startsWith(prefix)){ 
+    if(message.author.bot) return;//서버에 플레이어가 있고 그 플레이어 채널에 입력한 채팅이라면
+    if(message.channel == playerchannel) {
+      if(!queuepack.server_queue.get(message.guild.id)){
+        queuepack.setqueue(message.guild.id);
+      }
+      let queue = queuepack.server_queue.get(message.guild.id);
+      let search = message.content.split(" ");
+      if(message.member.voice.channel) {
+        await stream.startstream(message, queue, search, message.member.voice.channel);
+        setuppedchannel.editnpplayer(message.channel);
+      }
+      if(!message.member.voice.channel) return message.channel.send('먼저 음성 채널에 들어가 주세요!');
+    }
+  }
 
   if(!message.content.startsWith(prefix) || message.author.bot) return;
 
