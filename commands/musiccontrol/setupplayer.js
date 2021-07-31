@@ -32,6 +32,7 @@ async function syncchannel(channel){
     .setImage('https://story-img.kakaocdn.net/dn/kWE0N/hyKZWY3Jh6/FAK0m5sKEgvpXVNZk8zXgK/img_xl.jpg?width=662&height=454&avg=%2523ceaf6f&v=2');
   let setqueuelist = '큐에 아무 노래도 없어요.';
 
+  let background = await channel.send('', {files: ["https://story-img.kakaocdn.net/dn/bNQRyW/hyK4GnpfHm/LnvZ5CXTFKfKGSLl3Rykd0/img_xl.jpg?width=1259&height=624&avg=%2523b87462&v=2"]});
   queue.player = await channel.send(setqueuelist, initembed);
   await server_playermsg.set(channel.guild.id, queue.player);
   setupplayer(channel);
@@ -39,7 +40,7 @@ async function syncchannel(channel){
   const collector = channel.createMessageCollector(filter, {});
 
   collector.on("collect", message => {
-    if(message != queue.player) {
+    if(message != queue.player || message != background) {
       message.delete({timeout: 3000});
     }
   });
