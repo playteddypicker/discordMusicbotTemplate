@@ -210,17 +210,12 @@ function skipforbutton(channel, queue){
 async function stopforbutton(channel, queue){
   await server_queue.delete(channel.guild.id);
   queue.isqueueempty = true;
-  if(!queue.isplaying) {
-    if(!isbuttonreact) channel.send('음악 플레이어를 초기화했어요.');
-  }else{
-    if(!isbuttonreact) channel.send(`${queue.songs.length}개의 노래를 지우고 음악 플레이어를 초기화했어요.`);
-    try{
-      await queue.connection.dispatcher.end();
-    }catch(error){
-      channel.guild.me.voice.channel.leave();
-      channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화 하고 음성 채널을 나갔어요.');
-      throw error;
-    }
+  try{
+    await queue.connection.dispatcher.end();
+  }catch(error){
+    channel.guild.me.voice.channel.leave();
+    channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화 하고 음성 채널을 나갔어요.');
+    throw error;
   }
 }
 
