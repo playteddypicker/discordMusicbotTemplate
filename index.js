@@ -8,7 +8,7 @@ client.events = new Discord.Collection();
 
 client.on("ready", () =>{
   console.log(`${client.user.tag}!로 로그인 완료!`);
-  client.user.setActivity("뭐 좀 도와줄까? | 명령어는 ;;help", {
+  client.user.setActivity("헤헤..박사님... | 명령어는 ;;help", {
     type: "PLAYING",
   });
   const findplayer = client.channels.cache.filter(channel => channel.name == '슨상플레이어');
