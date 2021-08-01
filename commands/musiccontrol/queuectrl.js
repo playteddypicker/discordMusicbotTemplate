@@ -119,8 +119,10 @@ async function autoqueue(message, queue){
         thumbnail: Youtube.thumb(`${info.items[0].webpage_url}`, 'big')
       }
       queue.songs.push(song);
+    if(message.channel != player.server_player.get(message.guild.id)){
       message.channel.send('유튜브에서 추천 노래를 찾았어요!');
-    viewqueue(message, queue);
+      viewqueue(message, queue);
+    }else{player.editnpplayer(message.channel)}
   });
 }
 
