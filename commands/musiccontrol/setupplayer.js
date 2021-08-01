@@ -248,7 +248,7 @@ async function autoqueueforbutton(channel, queue){
   related = related.related_videos[0].id;
   let song = {};
 
-  getInfo(related).then(info => {
+  await getInfo(related).then(info => {
     song = {
       title: info.items[0].title,
       url: info.items[0].webpage_url,
@@ -258,6 +258,7 @@ async function autoqueueforbutton(channel, queue){
       }
       queue.songs.push(song);
       channel.send('유튜브에서 추천 노래를 찾았어요!');
+      editnpplayer(channel);
   });
 }
 
