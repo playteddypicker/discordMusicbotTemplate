@@ -47,7 +47,6 @@ async function syncchannel(channel){
 }
 
 async function setupplayer(channel){
-  const queue = await server_queue.get(channel.guild.id);
   const playermsg = await server_playermsg.get(channel.guild.id);
   const player = await server_player.get(channel.guild.id);
 
@@ -64,6 +63,7 @@ async function setupplayer(channel){
   let i = 0;
 
   collector.on("collect", async(reaction, user) => {
+    const queue = await server_queue.get(channel.guild.id);
     reaction.users.remove(user);
     if(!queue.isplaying){
         let warningmsg = await channel.send('노래를 먼저 틀어주세요!');
@@ -208,14 +208,16 @@ function skipforbutton(channel, queue){
 }
 
 async function stopforbutton(channel, queue){
-  await server_queue.delete(channel.guild.id);
+  await queuepack.initqueue(channel.guild.id);
   queue.isqueueempty = true;
-  try{
-    await queue.connection.dispatcher.end();
-  }catch(error){
-    channel.guild.me.voice.channel.leave();
-    channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화 하고 음성 채널을 나갔어요.');
-    throw error;
+  if(queue.songs.length > 0){
+    try{
+      await queue.connection.dispatcher.end();
+    }catch(error){
+      channel.guild.me.voice.channel.leave();
+      channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화 하고 음성 채널을 나갔어요.');
+      throw error;
+    }
   }
 }
 
@@ -283,6 +285,5 @@ var Youtube = (function () {
   };
 }());
 
-
-const player = {server_player, setupchannel, syncchannel, editnpplayer, initplayer};
+const player = {server_player, server_playermsg, setupchannel, syncchannel, editnpplayer, initplayer};
 module.exports = player;
