@@ -8,7 +8,7 @@ module.exports = {
     
     const embed0 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
-      .setTitle('현재 버전 : 슨상이 0.2.0v')
+      .setTitle('현재 버전 : 슨상이 0.2.1v')
       .setDescription('봇 기본 정보')
       .addFields(
        {name: '제작자', value: 'Discord: TeddyPicker#0689 \nInstagram: takemyword_4it', inline: false},
@@ -20,8 +20,8 @@ module.exports = {
 
     const embed020 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
-      .setTitle('슨상이 0.2.0')
-      .setDescription('0.2.0')
+      .setTitle('슨상이 0.2.1')
+      .setDescription('0.2.1')
       .addFields(
         {name: '패치노트 1', value: 'Image커맨드 삭제. 모듈이 에러나서 아예 못써서 그냥 삭제했습니다.', inline: false},
         {name: '패치노트 2', value: '코드를 이전보다 매우매우매우 최적화했습니다.. 아예 구조 자체를 바꾸는 작업이라 매우 힘들었습니다,, 이제 검색으로 큐 넣을때도 덜 끊김 << 개씹중요', inline: false},
@@ -30,6 +30,7 @@ module.exports = {
         {name: '패치노트 5', value: 'search커맨드 추가. 유튜브에서 노래 검색 후 추가 가능합니다. help로 확인해보세요', inline: false},
         {name: '패치노트 6', value: '플레이어 기능 완성. help로 확인해보세요.', inline: false},
         {name: '패치노트 7', value: 'np커맨드에서 이제 타임라인 진행 바를 볼수 있어요.', inline: false},
+        {name: '패치노트 8', value: 'stop으로 초기화하거나 초기화된 봇 상태에서 다시 플레이어를 사용할떄 플레이어가 먹통이 되는 버그를 수정했어요.', inline :false},
       )
       .setThumbnail('https://static.wikia.nocookie.net/fantendo/images/d/d5/SMM2_Cape_Toadette.png/revision/latest/scale-to-width-down/250?cb=20190726170458')
       .setFooter('이히히');
