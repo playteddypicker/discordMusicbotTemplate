@@ -1,11 +1,11 @@
 const ytdl = require('ytdl-core');
 const ReactionPages = require('./reactionpages.js');
 const Discord = require('discord.js');
-const server_queue = new Map();
 const queuectrl = require('./musiccontrol/queuectrl.js');
 const search = require('./musiccontrol/searchsong.js');
 const player = require('./musiccontrol/setupplayer.js');
 const queuepack = require('./musiccontrol/setqueue.js');
+const server_queue = queuepack.server_queue;
 const searchsong = search.enqueue;
 const searchlist = search.searchlist;
 const autoqueue = queuectrl.autoqueue;
@@ -27,7 +27,7 @@ module.exports = {
   execute(client, message, cmd, args, Discord){
     const voiceChannel = message.member.voice.channel;
 
-    let queue = queuepack.setqueue(message.guild.id);
+    let queue = queuepack.setqueue(message.guild.id, message.channel);
 
     if(cmd == 'play' || cmd == 'p'){
       if(!voiceChannel) return message.channel.send('먼저 음성 채널에 들어가 주세요!');
@@ -146,14 +146,15 @@ async function selectresult(message, queue, args, voiceChannel){
 }
 
 function startstream(message, queue, args, voiceChannel){
-  console.log(queue);
-  if(!queue.connection && queue.isqueueempty && !queue.isplying){
+  queue.player = player.server_playermsg.get(message.guild.id);
+  if(!queue.connection && !queue.isplaying && queue.songs.length == 0){
     searchsong(message, queue, args)
       .then(()=> {
-        if(!queue.connection){
+        if(!message.guild.me.voice.channel || !queue.connection){
           const connection = voiceChannel.join();
           connection.then(function(connection) {
             queue.connection = connection;
+            queuepack.setqueue(message.guild.id, message.channel);
           })
             .then(()=>{
               if(!queue.isplaying) playsong(message, queue, queue.songs[0]);
@@ -161,16 +162,18 @@ function startstream(message, queue, args, voiceChannel){
             })
         }
       });
-  }else if(queue.connection && queue.isqueueempty && !queue.isplaying){
+  }else if(queue.connection && queue.songs.length == 0 && !queue.isplaying){
     searchsong(message, queue, args)
       .then(() => {
         playsong(message, queue, queue.songs[0]);
         if(queue.player) player.editnpplayer(message.channel);
       });
-  }else{
+  }else if(queue.connection && queue.songs.length != 0 && queue.isplaying){
     searchsong(message, queue, args).then(()=>{
       if(queue.player) player.editnpplayer(message.channel);
     })
+  }else{
+    message.channel.send('봇 상태에 에러가 있어요. ./stop으로 초기화시켜주세요.');
   }
 }
 
@@ -253,7 +256,7 @@ function skipsong(message, queue, isbuttonreact){
 }
 
 async function stopsong(message, queue, isbuttonreact){
-  await server_queue.delete(message.guild.id);
+  await queuepack.initqueue(message.guild.id);
   queue.isqueueempty = true;
   if(!queue.isplaying) {
     if(!isbuttonreact) message.channel.send('음악 플레이어를 초기화했어요.');
@@ -281,12 +284,8 @@ function pausesong(message, queue, isbuttonreact){
 }
 
 function disconnect(message, queue, isbuttonreact){
-  if(queue.isplayercreated) {
-    let findchannel = message.channel.guild.channels.cache.find((channel) => channel.name.toLowerCase() === '슨상플레이어');
-    findchannel.delete();
-  }  
   if(queue.songs.length > 0){
-    server_queue.delete(message.guild.id);
+    queuepack.initqueue(message.guild.id);
   }
   try{
     message.guild.me.voice.channel.leave();
@@ -297,3 +296,4 @@ function disconnect(message, queue, isbuttonreact){
   if(!isbuttonreact) return message.channel.send('이제 그만 가볼게요.. 헤헤..');
   if(isbuttonreact) return message.channel.send('플레이어를 없애고 음악을 껐어요.');
 }
+
