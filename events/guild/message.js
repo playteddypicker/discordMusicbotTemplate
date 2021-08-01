@@ -1,28 +1,20 @@
 const cooldowns = new Map();
-const setuppedchannel = require('../../commands/musiccontrol/setupplayer.js');
+const server_playerchannel = require('../../commands/musiccontrol/setupplayer.js');
 const queuepack = require('../../commands/musiccontrol/setqueue.js');
 const stream = require('../../commands/stream.js');
 
 module.exports = async (Discord, client, message) => {
-  const prefix = './';
+  const prefix = ';;';
 
-  if(!message.guild) return;
-  let playerchannel = setuppedchannel.server_player.get(message.guild.id);
 
-  if(playerchannel && !message.content.startsWith(prefix)){ 
-    if(message.author.bot) return;//서버에 플레이어가 있고 그 플레이어 채널에 입력한 채팅이라면
-    if(message.channel == playerchannel) {
-      if(!queuepack.server_queue.get(message.guild.id)){
-        queuepack.setqueue(message.guild.id);
-      }
-      let queue = queuepack.server_queue.get(message.guild.id);
-      let search = message.content.split(" ");
-      if(message.member.voice.channel) {
-        await stream.startstream(message, queue, search, message.member.voice.channel);
-        setuppedchannel.editnpplayer(message.channel);
-      }
-      if(!message.member.voice.channel) return message.channel.send('먼저 음성 채널에 들어가 주세요!');
-    }
+  const playerchannel = server_playerchannel.server_player.get(message.guild.id);
+  if(!message.author.bot && message.channel == playerchannel && playerchannel && !message.content.startsWith(prefix)){ //플레이어 채널에 그냥 메시지 입력한 상태일때
+    if(!message.guild.me.voice.channel) queuepack.server_queue.delete(message.guild.id); //음성채널에 없는 상태일때 시작하기 전 초기화
+    if(!message.member.voice.channel) return message.member.send('먼저 음성 채널에 들어가 주세요!'); //음성채널 안들어간 상태에서 노래 틀려고 할때
+    
+    const queue = await queuepack.setqueue(message.guild.id, message.channel);
+    const search = message.content.slice(0).split(" ");
+    stream.startstream(message, queue, search, message.member.voice.channel);
   }
 
   if(!message.content.startsWith(prefix) || message.author.bot) return;
