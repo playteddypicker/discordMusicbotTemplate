@@ -4,7 +4,7 @@ const queuepack = require('../../commands/musiccontrol/setqueue.js');
 const stream = require('../../commands/stream.js');
 
 module.exports = async (Discord, client, message) => {
-  const prefix = ';;';
+  const prefix = './';
 
 
   const playerchannel = server_playerchannel.server_player.get(message.guild.id);
