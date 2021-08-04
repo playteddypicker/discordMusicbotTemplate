@@ -12,7 +12,6 @@ module.exports = {
 
     const embed1 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.2.0')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('기본 명령어')
     .addFields(
@@ -26,14 +25,14 @@ module.exports = {
 
     const embed2 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.2.0')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어: 기본 기능')
     .addFields(
       {name: './play | p', value: '노래를 재생해요. \n제목, 링크, 플레이리스트로 추가할 수 있어요.', inline: false},
       {name: './pause', value: '노래를 일시정지해요. 다시 쳐서 재개해요.', inline: false},
       {name: './skip | s', value: '노래를 스킵해요.', inline: false},
-      {name: './stop', value: '노래를 멈추고 대기중인 모든 노래를 지워요.', inline: false},
+      {name: './stop', value: '모든 노래를 지우고 음성 채널을 나가요.', inline: false},
+      {name: './inq | initqueue', value: '노래를 멈추고 큐를 초기화해요.', inline: false},
       {name: './leave', value: '음성 채널을 나가요.', inline: false},
       {name: './queue | q', value: '대기열 리스트를 보여드려요.', inline: false},
       {name: './np', value: '지금 재생 중인 노래의 정보를 보여드려요.', inline: false},
@@ -43,7 +42,6 @@ module.exports = {
 
     const embed3 = new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.2.0')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어 : 고급 기능')
     .addFields(
@@ -63,12 +61,11 @@ module.exports = {
 
     const embed4= new Discord.MessageEmbed()
     .setColor('#FF6F61')
-    .setTitle('슨상이 0.2.0')
     .setURL('https://www.youtube.com/watch?v=VcWKjl61lpk')
     .setDescription('음악 명령어 : 플레이어 기능')
     .addFields(
       {name: './setup', value: '음악 플레이어를 세팅해요. 다시 입력해서 플레이어를 지울 수 있어요.', inline: false},
-      {name: '기본 사용법', value: "'슨상플레이어'라는 채널에 채팅으로 명령어 접두사 없이 그냥 쌩으로 노래제목/링크/플레이리스트를 치면 노래가 재생돼요.\n\n 버튼 상호작용은 \n⏯️:: 노래 일시정지 | 다시재생 \n⏹️ : 노래 정지 | 큐 초기화 \n⏭️ :노래 스킵 \n🔀 : 큐 셔플 \n🔂 : 싱글 루프 \n🔁 : 큐 루프 \n♾️ : 자동 재생 모드", inline: false},
+      {name: '기본 사용법', value: "'슨상플레이어'라는 채널에 채팅으로 명령어 접두사 없이 그냥 쌩으로 노래제목/링크/플레이리스트를 치면 노래가 재생돼요.\n\n 버튼 상호작용은 \n⏯️:: 노래 일시정지 | 다시재생 \n⏏️: 큐 초기화\n⏹️ : 큐 초기화, 음성 채널 나감\n⏭️ :노래 스킵 \n🔀 : 큐 셔플 \n🔂 : 싱글 루프 \n🔁 : 큐 루프 \n♾️ : 자동 재생 모드", inline: false},
       {name: '주의사항', value: '만약 플레이어가 말을 듣지 않는다면 setup커맨드를 두번 쳐서 플레이어 채널을 삭제했다가 다시 만들어주세요.\n\n절대로 슨상플레이어 채널을 임의로 이름을 바꾸거나, 삭제하시거나, 새로 만드시면 안됩니다! 나중에 이름을 바꿀 수 있게 패치할 에정입니다.', inline: false},
     )
     .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
