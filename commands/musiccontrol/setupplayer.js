@@ -65,6 +65,11 @@ async function setupplayer(channel){
   collector.on("collect", async(reaction, user) => {
     const queue = await server_queue.get(channel.guild.id);
     reaction.users.remove(user);
+    if(reaction.emoji.name == emoji[1]){
+      await stopforbutton(channel, queue);
+      initplayer(channel);
+      break;
+    }
     if(!queue.isplaying){
         let warningmsg = await channel.send('노래를 먼저 틀어주세요!');
       }else{
@@ -72,11 +77,6 @@ async function setupplayer(channel){
           case emoji[0]:
             await pauseforbutton(channel, queue);
             editnpplayer(channel);
-            break;
-
-          case emoji[1]:
-            await stopforbutton(channel, queue);
-            initplayer(channel);
             break;
             
           case emoji[2]:
