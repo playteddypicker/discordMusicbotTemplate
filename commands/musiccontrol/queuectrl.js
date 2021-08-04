@@ -276,6 +276,7 @@ function getTimestamp(seconds){
 }
 
 async function viewqueue(message, queue, npmd){
+  if(!queue.songs.length) return message.channel.send('큐에 아무 노래도 없어요..');
   console.log(queue.isplaying)
   function textLengthCheck(str, len){
     var returnValue = "";
