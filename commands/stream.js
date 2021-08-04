@@ -41,7 +41,6 @@ module.exports = {
 async function command(message, cmd, args, Discord, queue){
     const voiceChannel = message.member.voice.channel;
 
-
     switch (cmd){
       case 'np':
         await queuectrl.viewnp(message, queue);
@@ -59,15 +58,15 @@ async function command(message, cmd, args, Discord, queue){
       case 'searched':
         if(queue.searchedpages.length == 0) return message.channel.send('검색한 이력이 없어요!');
         await ReactionPages(message, queue.searchedpages);
-        break
+        break;
+        
+      case 'stop':
+        await stopsong(message, queue, 0);
+        break;
     }
 
     if(voiceChannel && cmd != 'np' && cmd != 'q' && cmd != 'queue'){
       switch (cmd){
-        case 'stop':
-          await stopsong(message, queue, 0);
-          break;
-
         case 'pause':
           await pausesong(message, queue, 0);
           break;
