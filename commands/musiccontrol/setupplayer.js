@@ -50,7 +50,7 @@ async function setupplayer(channel){
   const playermsg = await server_playermsg.get(channel.guild.id);
   const player = await server_player.get(channel.guild.id);
 
-  const emoji = ["⏯️", "⏹️", "⏭️", "🔀", "🔂", "🔁", "♾️"];
+  const emoji = ["⏯️", "⏹️", "⏏️", "⏭️", "🔀", "🔂", "🔁", "♾️"];
   
   for(let i = 0; i < emoji.length; i++){
     await playermsg.react(emoji[i]);
@@ -78,24 +78,29 @@ async function setupplayer(channel){
             await stopforbutton(channel, queue);
             initplayer(channel);
             break;
-
+            
           case emoji[2]:
+            await initializequeue(channel, queue);
+            initplayer(channel);
+            break;
+                       
+          case emoji[3]:
             await skipforbutton(channel, queue);
             break;
 
-          case emoji[3]:
+          case emoji[4]:
             await shuffleforbutton(channel, queue);
             editnpplayer(channel);
             break;
 
-            case emoji[4]:
+          case emoji[5]:
             if(!(queue.loopmode == 'single')){
               queue.loopmode = 'single';
             }else queue.loopmode = 'off';
             await editnpplayer(channel);
             break;
 
-          case emoji[5]:
+          case emoji[6]:
             if(!(queue.loopmode == 'queue')) {
               queue.loopmode = 'queue';
             }else {
@@ -108,7 +113,7 @@ async function setupplayer(channel){
             await editnpplayer(channel);
             break;
 
-          case emoji[6]:
+          case emoji[7]:
             if(!(queue.loopmode == 'auto')) {
               queue.loopmode = 'auto';
               if(queue.songs.length == 1) await autoqueueforbutton(channel, queue);
@@ -208,17 +213,23 @@ function skipforbutton(channel, queue){
 }
 
 async function stopforbutton(channel, queue){
+  await queue.connection.disconnect();
   await queuepack.initqueue(channel.guild.id);
+}
+
+function initializequeue(channel, queue){
+  queue.songs = [];
+  queue.connection.dispatcher.end();
+  queue.searchedpages = [];
+  queue.searched = [];
+  queue.recentsearchkeyword = '';
+  queue.isplaying = false;
+  queue.loopmode = 'off';
   queue.isqueueempty = true;
-  if(queue.songs.length > 0){
-    try{
-      await queue.connection.dispatcher.end();
-    }catch(error){
-      channel.guild.me.voice.channel.leave();
-      channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화 하고 음성 채널을 나갔어요.');
-      throw error;
-    }
-  }
+  queue.setVolume = 0.3;
+  queue.curq = 0;
+  queue.looped = 0;
+  queue.goallooped = undefined;
 }
 
 function pauseforbutton(channel, queue){
