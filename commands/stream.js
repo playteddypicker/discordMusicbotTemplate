@@ -17,11 +17,11 @@ module.exports = {
   stopsong,
   name: 'play',
   aliases: [ 
-    'p', 'leave', 'cq', 'skip', 's', 'stop', 'pause',
+    'p', 'cq', 'skip', 's', 'stop', 'pause',
     'v', 'volume', 'loop', 'lp', 'leave', 'shuffle',
     'shuf', 'delq', 'dq', 'jump', 'j', 'move', 'mv',
     'switch', 'sw', 'setup', 'q', 'np', 'queue', 'search', 
-    'sch', 'select', 'sl', 'searched'
+    'sch', 'select', 'sl', 'searched', 'initqueue', 'inq',
   ],
   description: 'asdf',
   execute(client, message, cmd, args, Discord){
@@ -77,10 +77,6 @@ async function command(message, cmd, args, Discord, queue){
           await skipsong(message, queue, 0);
           break;
 
-        case 'leave':
-          await disconnect(message, queue);
-          break;
-
         case 'v':
         case 'volume':
           await queuectrl.setvolume(message, queue, args);
@@ -128,6 +124,12 @@ async function command(message, cmd, args, Discord, queue){
 
         case 'setup':
           await player.setupchannel(message, queue, voiceChannel);
+          break;
+          
+        case 'inq':
+        case 'initqueue':
+          await initializequeue(message, queue);
+          break;
       }
     }else{
       if(!voiceChannel) message.channel.send('먼저 음성 채널에 들어가주세요!');
@@ -256,20 +258,10 @@ function skipsong(message, queue, isbuttonreact){
 }
 
 async function stopsong(message, queue, isbuttonreact){
-  await queuepack.initqueue(message.guild.id);
-  queue.isqueueempty = true;
-  if(!queue.isplaying) {
-    if(!isbuttonreact) message.channel.send('음악 플레이어를 초기화했어요.');
-  }else{
-    if(!isbuttonreact) message.channel.send(`${queue.songs.length}개의 노래를 지우고 음악 플레이어를 초기화했어요.`);
-    try{
-      await queue.connection.dispatcher.end();
-    }catch (error){
-      message.guild.me.voice.channel.leave();
-      message.channel.send('스트리밍하는데 에러가 나서 음악 플레이어를 초기화하고 음성 채널을 나갔어요.')
-      throw error;
-    }
-  }
+  if(queue.connection == null) return message.channel.send('봇이 음성 채널에 연결이 되어있지 않아요!');
+  queue.connection.disconnect();
+  queuepack.initqueue(message.guild.id);
+  message.channel.send('음악 플레이어를 초기화하고 음성 채널을 나갔어요.');
 }
 
 function pausesong(message, queue, isbuttonreact){
@@ -283,17 +275,19 @@ function pausesong(message, queue, isbuttonreact){
   }
 }
 
-function disconnect(message, queue, isbuttonreact){
-  if(queue.songs.length > 0){
-    queuepack.initqueue(message.guild.id);
-  }
-  try{
-    message.guild.me.voice.channel.leave();
-  }catch (err){
-    if (!isbuttonreact) message.channel.send('으..으.. 나가기 싫어요!!');
-    throw err;
-  }
-  if(!isbuttonreact) return message.channel.send('이제 그만 가볼게요.. 헤헤..');
-  if(isbuttonreact) return message.channel.send('플레이어를 없애고 음악을 껐어요.');
+function initializequeue(message, queue){
+  queue.songs = [];
+  queue.connection.dispatcher.end();
+  queue.searchedpages = [];
+  queue.searched = [];
+  queue.recentsearchkeyword = '';
+  queue.isplaying = false;
+  queue.loopmode = 'off';
+  queue.isqueueempty = true;
+  queue.setVolume = 0.3;
+  queue.curq = 0;
+  queue.looped = 0;
+  queue.goallooped = undefined;
+  message.channel.send('큐를 초기화했어요.');
 }
 
