@@ -8,15 +8,21 @@ module.exports = {
     
     const embed0 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
-      .setTitle('현재 버전 : 슨상이 0.2.2v')
+      .setTitle('현재 버전 : 슨상이 0.2.3v')
       .setDescription('봇 기본 정보')
       .addFields(
        {name: '제작자', value: 'Discord: TeddyPicker#0689 \nInstagram: takemyword_4it', inline: false},
        {name: '기능', value: '간단한 봇 상호작용과 음악 플레이어 봇 기능이 있는 다기능성 봇입니다.', inline: false},
-        
       )
       .setThumbnail('https://static.wikia.nocookie.net/fantendo/images/d/d5/SMM2_Cape_Toadette.png/revision/latest/scale-to-width-down/250?cb=20190726170458')
       .setFooter('이히히');
+
+    const embed023 = new Discord.MessageEmbed()
+      .setColor('#FF6F61')
+      .setTitle('슨상이 0.2.3v')
+      .addFields(
+        {name: '패치노트', value: "- pause명령어 및 플레이어의 일시정지/재생 버튼이 이제 잘 작동합니다. \n- 플레이어기능 버튼 추가 : help로 확인해보세요. \n- 버그 수정, 코드 최적화했습니다. \n- 아무말 커맨드에 대사 추가했습니다.", inline: false}
+      )
 
     const embed020 = new Discord.MessageEmbed()
       .setColor('#FF6F61')
@@ -117,7 +123,7 @@ module.exports = {
       .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
 
 
-    const pages = [embed0, embed020, embed013, embed012, embed011, embedss1, embedss2];
+    const pages = [embed0, embed023, embed020, embed013, embed012, embed011, embedss1, embedss2];
 
     ReactionPages(message, pages, true);
 
