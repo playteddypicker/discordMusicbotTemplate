@@ -21,7 +21,7 @@ module.exports = {
       .setColor('#FF6F61')
       .setTitle('슨상이 0.2.3v')
       .addFields(
-        {name: '패치노트', value: "- pause명령어 및 플레이어의 일시정지/재생 버튼이 이제 잘 작동합니다. \n- 플레이어기능 버튼 추가 : help로 확인해보세요. \n- 버그 수정, 코드 최적화했습니다. \n- 아무말 커맨드에 대사 추가했습니다.", inline: false}
+        {name: '패치노트', value: "- pause명령어 및 플레이어의 일시정지/재생 버튼이 이제 잘 작동합니다. \n- 플레이어기능 버튼 추가 : help로 확인해보세요. \n- 버그 수정, 코드 최적화했습니다. \n- 아무말 커맨드에 대사 추가했습니다. \n- 플레이어 가이드를 추가했습니다.", inline: false}
       )
 
     const embed020 = new Discord.MessageEmbed()
