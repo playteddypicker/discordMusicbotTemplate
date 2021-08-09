@@ -31,9 +31,10 @@ async function syncchannel(channel){
     .setTitle('아무 노래도 틀고 있지 않아요..')
     .setDescription('다른 채널에서 ./play 명령어로 노래를 틀거나\n이곳에 노래 제목/링크를 써주세요.')
     .setImage('https://story-img.kakaocdn.net/dn/kWE0N/hyKZWY3Jh6/FAK0m5sKEgvpXVNZk8zXgK/img_xl.jpg?width=662&height=454&avg=%2523ceaf6f&v=2');
-  let setqueuelist = '큐에 아무 노래도 없어요.';
+  let setqueuelist = '<여기에 큐 리스트 표시됨>';
 
-  let background = await channel.send('', {files: ["https://story-img.kakaocdn.net/dn/bNQRyW/hyK4GnpfHm/LnvZ5CXTFKfKGSLl3Rykd0/img_xl.jpg?width=1259&height=624&avg=%2523b87462&v=2"]});
+  const remoteguide = await channel.send(`**플레이어 사용법**\n\n이 채널에 채팅으로 명령어 접두사 없이 그냥 쌩으로 노래제목/링크/플레이리스트를 치면 노래가 재생돼요.\n\n⏯️ : 노래 일시정지 | 다시재생 \n⏏️ : 노래 멈추고 모든 노래 제거, 초기화, 음성 채널 나감 \n⏹️ : 노래 멈추고 대기 중인 모든 노래 제거, 모든 상태(루프 등) 초기화\n⏭️ : 노래 스킵 \n🔀 : 큐 셔플 \n🔂 : 싱글 루프 \n🔁 : 큐 루프 \n♾️ : 자동 재생 모드\n\n📶 눌러서 추가 버튼 기능을 사용해요.\nㄴ🔈 : 볼륨 10% 감소 \nㄴ🔊 : 볼륨 10% 증가 \nㄴ❌ : 대기열 맨 마지막 노래 지우기 \nㄴ⤴️ : 다음 곡을 대기열 맨 뒤로 옮기기 \nㄴ⤵️ : 대기열 맨 마지막 노래를 맨 앞으로 옮기기`);
+  const background = await channel.send('', {files: ["https://story-img.kakaocdn.net/dn/bNQRyW/hyK4GnpfHm/LnvZ5CXTFKfKGSLl3Rykd0/img_xl.jpg?width=1259&height=624&avg=%2523b87462&v=2"]});
   queue.player = await channel.send(setqueuelist, initembed);
   let remote = await channel.send('[🪙]');
 
@@ -44,7 +45,7 @@ async function syncchannel(channel){
   const collector = channel.createMessageCollector(filter, {});
 
   collector.on("collect", message => {
-    if(message != queue.player || message != background) {
+    if(message != queue.player || message != background || message != remoteguide) {
       message.delete({timeout: 3000});
     }
   });
