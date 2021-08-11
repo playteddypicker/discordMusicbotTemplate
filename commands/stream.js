@@ -22,6 +22,7 @@ module.exports = {
     'shuf', 'delq', 'dq', 'jump', 'j', 'move', 'mv',
     'switch', 'sw', 'setup', 'q', 'np', 'queue', 'search', 
     'sch', 'select', 'sl', 'searched', 'initqueue', 'inq',
+    'eject',
   ],
   description: 'asdf',
   execute(client, message, cmd, args, Discord){
@@ -256,11 +257,17 @@ function skipsong(message, queue, isbuttonreact){
   }
 }
 
-async function stopsong(message, queue, isbuttonreact){
+async function disconnect(message, queue){
   if(queue.connection == null) return message.channel.send('봇이 음성 채널에 연결이 되어있지 않아요!');
   queue.connection.disconnect();
   queuepack.initqueue(message.guild.id);
   message.channel.send('음악 플레이어를 초기화하고 음성 채널을 나갔어요.');
+}
+async function stopsong(message, queue, isbuttonreact){
+  message.channel.send('노래를 멈추고 큐를 초기화헀어요.');
+  queue.songs = [];
+  queue.connection.dispatcher.end();
+  queuepack.initqueue(message.guild.id);
 }
 
 function pausesong(message, queue, isbuttonreact){
