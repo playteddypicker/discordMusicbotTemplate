@@ -14,6 +14,7 @@ module.exports = {
       {name: './아무말', value: '아무말이나 해드려요..', inline: true},
       {name: './줘팸', value: '그러지 마세요 박사님 ㅠㅠ', inline: true},
       {name: './help', value: '제가 할 수 있는 것을 보여드려요..', inline: true},
+      {name: './exp', value: '경험치 계산기 사용법을 보여드려요.', inline: false},
       {name: './botinfo', value: '슨상이 봇에 대한 기본 정보와 지금까지의 패치 노트를 보여드립니다.', inline: false},
     )
     .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
