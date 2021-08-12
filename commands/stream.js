@@ -21,7 +21,7 @@ module.exports = {
     'v', 'volume', 'loop', 'lp', 'leave', 'shuffle',
     'shuf', 'delq', 'dq', 'jump', 'j', 'move', 'mv',
     'switch', 'sw', 'setup', 'q', 'np', 'queue', 'search', 
-    'sch', 'select', 'sl', 'searched', 'initqueue', 'inq',
+    'sch', 'select', 'sl', 'searched', 'eject',
   ],
   description: 'asdf',
   execute(client, message, cmd, args, Discord){
@@ -61,7 +61,7 @@ async function command(message, cmd, args, Discord, queue){
         await ReactionPages(message, queue.searchedpages);
         break;
 
-      case 'stop':
+      case 'eject':
         await stopsong(message, queue, 0);
         break;
     }
@@ -126,8 +126,7 @@ async function command(message, cmd, args, Discord, queue){
           await player.setupchannel(message, queue, voiceChannel);
           break;
           
-        case 'inq':
-        case 'initqueue':
+        case 'stop':
           await initializequeue(message, queue);
           break;
       }
