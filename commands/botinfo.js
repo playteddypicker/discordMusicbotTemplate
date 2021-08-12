@@ -131,7 +131,7 @@ module.exports = {
       .setThumbnail('https://pbs.twimg.com/profile_images/1300805768778854401/bYRL-rMO_400x400.jpg')
 
 
-    const pages = [embed0, embed023, embed020, embed013, embed012, embed011, embedss1, embedss2];
+    const pages = [embed0, embed024, embed023, embed020, embed013, embed012, embed011, embedss1, embedss2];
 
     ReactionPages(message, pages, true);
 
