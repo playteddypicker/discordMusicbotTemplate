@@ -13,6 +13,7 @@ module.exports = {
       .addFields(
        {name: '제작자', value: 'Discord: TeddyPicker#0689 \nInstagram: takemyword_4it', inline: false},
         {name: '기능', value: '간단한 봇 상호작용과 음악 플레이어 봇 기능이 있는 다기능성 봇입니다.', inline: false},
+        {name: '기타 정보', value: `현재 슨상이가 초대되어있는 서버 수 : ${client.guilds.cache.size}`},
         {name: '개발자의 한마디', value: ' 아직 1학년이라 공부해야할 것도 많고, 연말 직전까지 개인 사정때문에 굉장히 바쁘기때문에 슨상이 봇 개발할 여유가 없을 것 같습니다. 앞으로 슨상이 업데이트는 버그 제보만 받아 디버깅만 하고 추가적인 기능은 0.2.4버전을 끝으로 당분간 추가하지 않을 예정입니다. 그래도 나중에 12월쯤 가면 여유가 생기니 그때는 개인 서버도 구축하고 지금까지 보은 버그도 잘 정리하고 같이 개발할 사람도 구해서 배포할 것을 계획하고 있습니다.  그냥 언어 하나 더 배워보자고 독학으로 시작한건데 제 부족한 실력으로 짠 봇인데도 잘 써주셔서 감사합니다.', inline: false},
       )
       .setThumbnail('https://static.wikia.nocookie.net/fantendo/images/d/d5/SMM2_Cape_Toadette.png/revision/latest/scale-to-width-down/250?cb=20190726170458')
