@@ -22,7 +22,6 @@ module.exports = {
     'shuf', 'delq', 'dq', 'jump', 'j', 'move', 'mv',
     'switch', 'sw', 'setup', 'q', 'np', 'queue', 'search', 
     'sch', 'select', 'sl', 'searched', 'initqueue', 'inq',
-    'eject',
   ],
   description: 'asdf',
   execute(client, message, cmd, args, Discord){
@@ -42,6 +41,7 @@ module.exports = {
 async function command(message, cmd, args, Discord, queue){
     const voiceChannel = message.member.voice.channel;
 
+
     switch (cmd){
       case 'np':
         await queuectrl.viewnp(message, queue);
@@ -60,7 +60,7 @@ async function command(message, cmd, args, Discord, queue){
         if(queue.searchedpages.length == 0) return message.channel.send('검색한 이력이 없어요!');
         await ReactionPages(message, queue.searchedpages);
         break;
-        
+
       case 'stop':
         await stopsong(message, queue, 0);
         break;
@@ -137,7 +137,6 @@ async function command(message, cmd, args, Discord, queue){
   if(queue.player) player.editnpplayer(message.channel);
 }
 
-
 async function selectresult(message, queue, args, voiceChannel){
   if(queue.searched.length == 0) return;
   if(isNaN(args[0]) || args[0] < 1) return message.channel.send('선택하신 영상을 자연수로 입력해 주세요!');
@@ -191,48 +190,61 @@ function playsong(message, queue, song){
 
   const stream = ytdl(song.url, {filter : 'audioonly'});
   try{
-    if(!queue.connection){
-      message.channel.send('봇의 연결 상태를 불러오는데 실패했어요. 다시 연결 중...');
-      return playsong(message, queue, song);
+    queue.connection.play(stream, {seek: 0, volume: queue.setVolume})
+    .on('finish', () => {
+    async function nextsong(message){
+      if(queue.loopmode == 'single'){
+        queue.looped++;
+        if(queue.goallooped){
+          if(queue.looped == queue.goallooped) {
+            queue.loopmode = 'off';
+            message.channel.send('싱글 루프 모드를 껐어요.');
+            queue.songs.shift();
+            queue.goallooped = undefined;
+          }
+        }
+      }else if(queue.loopmode == 'queue'){
+        queue.curq++
+        if(queue.curq == queue.songs.length) queue.curq = 0;
       }else{
-        queue.connection.play(stream, {seek: 0, volume: queue.setVolume})
-          .on('finish', () => {
-            async function nextsong(message){
-              if(queue.loopmode == 'single'){
-                queue.looped++;
-                if(queue.goallooped){
-                  if(queue.looped == queue.goallooped) {
-                    queue.loopmode = 'off';
-                    message.channel.send('싱글 루프 모드를 껐어요.');
-                    queue.songs.shift();
-                    queue.goallooped = undefined;
-                  }
-                }
-              }else if(queue.loopmode == 'queue'){
-                queue.curq++
-                if(queue.curq == queue.songs.length) queue.curq = 0;
-              }else{
-                queue.songs.shift();
-                queue.looped = 0;
-              }
-              if(queue.loopmode == 'auto' && queue.songs.length == 1){
-                  autoqueue(message, queue, 1);
-              }
-            }
-            nextsong(message).then( () => {
-              playsong(message, queue, queue.songs[queue.curq]);
-              if(queue.player) player.editnpplayer(message.channel);
-            });
-          })
-      if(!(queue.loopmode == 'single')) {
-        if(message.channel != player.server_player.get(message.guild.id)) message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
-      }else{
-        if(message.channel != player.server_player.get(message.guild.id)) message.channel.send(`**${song.title}** ${queue.looped+1}번 재생 중이에요!`);
+        queue.songs.shift();
+        queue.looped = 0;
       }
+      if(queue.loopmode == 'auto' && queue.songs.length == 1){
+        autoqueue(message, queue, 1);
       }
+    }
+    nextsong(message).then( () => {
+      playsong(message, queue, queue.songs[queue.curq]);
+      if(queue.player) player.editnpplayer(message.channel);
+    });
+    })
+
+    try{
+      if(queue.connection.dispatcher.error){
+        message.channel.send('스트리밍하는데 에러가 났어요. 다시 틀어볼게요..');
+        return playsong(message, queue, queue.songs[queue.curq]);
+      }
+    }catch (error){
+      throw error;
+      try{
+        if(!queue.connection.dispatcher){
+          message.channel.send('스트리밍하는데 에러가 났어요. 다시 틀어볼게요..');
+          return playsong(message, queue, queue.songs[queue.curq]);
+        }
+      }catch (error){
+        throw error;
+      }
+    }
+    if(!(queue.loopmode == 'single')) {
+      if(message.channel != player.server_player.get(message.guild.id)) message.channel.send(`🎶 **${song.title}** 현재 재생 중이에요!`);
+    }else{
+      if(message.channel != player.server_player.get(message.guild.id)) message.channel.send(`**${song.title}** ${queue.looped+1}번 재생 중이에요!`);
+    }
   }catch (err){
     throw err;
-    message.channel.send('노래를 스트리밍하는데 에러가 났어요.. 다시 틀어주세요..');
+    message.channel.send('노래를 스트리밍하는데 에러가 났어요.. 다시 틀어볼게요..');
+    return playsong(message, queue, queue.songs[queue.curq]);
   }
 }
 
@@ -257,17 +269,11 @@ function skipsong(message, queue, isbuttonreact){
   }
 }
 
-async function disconnect(message, queue){
+async function stopsong(message, queue, isbuttonreact){
   if(queue.connection == null) return message.channel.send('봇이 음성 채널에 연결이 되어있지 않아요!');
   queue.connection.disconnect();
   queuepack.initqueue(message.guild.id);
   message.channel.send('음악 플레이어를 초기화하고 음성 채널을 나갔어요.');
-}
-async function stopsong(message, queue, isbuttonreact){
-  message.channel.send('노래를 멈추고 큐를 초기화헀어요.');
-  queue.songs = [];
-  queue.connection.dispatcher.end();
-  queuepack.initqueue(message.guild.id);
 }
 
 function pausesong(message, queue, isbuttonreact){
