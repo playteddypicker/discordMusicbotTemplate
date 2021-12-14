@@ -17,7 +17,8 @@ const publicPlaylistSchema = new shangus.Schema({
 	items: [new shangus.Schema({
 		title: String,
 		url: String,
-		duration: String
+		duration: String,
+		thumbnail: String,
 	})],
 });
 
@@ -69,6 +70,7 @@ const privatePlaylistSchema = new shangus.Schema({
 		title: String,
 		url: String,
 		duration: String,
+		thumbnail: String,
 	})]
 });
 const privatePlaylistModel = shangus.model('privatePlaylists', privatePlaylistSchema);

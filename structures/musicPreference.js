@@ -12,7 +12,6 @@ const {
 const autoRecommandSearch = require('./autoRecommandSearch.js').autoRecommandSearch;
 const guildPlayer = require('../musicdata/syncplayer.js').guildPlayer;
 
-
 class serverMusicInfo {
 	constructor(guild){
 		this.id = guild.id;
@@ -22,17 +21,16 @@ class serverMusicInfo {
 			playinfo: {
 				playmode: '반복 모드 꺼짐',
 				volume: 0.3,
-				curq: 0,
 			},
 			songs: [],
-			channel: null,
+			channel: null, //player channel이 아니여야함
 			prevsongUrl: '',
 		};		
 		this.connectionHandler = {
 			connection: null,
-			audioplayer: null,
+			audioPlayer: null,
 			audioResource: null,
-			connectionStatus: '',
+			connectionStatus: '⏹️ 재생 중이 아님',
 			paused: false,
 		};
 		this.playerInfo = {
@@ -61,7 +59,7 @@ class serverMusicInfo {
 					.setTitle(`${queue.songs[0].title}`)
 					.setURL(`${queue.songs[0].url}`)
 					.setDescription(`${this.connectionHandler.connectionStatus} | ${queue.playinfo.playmode} | 🔉: ${Math.round(queue.playinfo.volume * 100)}% | [${curtime} / ${queue.songs[0].duration}]`)
-					.setFooter(`requested by ${queue.songs[0].requestedby}`, `${queue.songs[0].requestedbyAvatarURL}`)
+					.setFooter(`requested by ${queue.songs[0].request.name}`, `${queue.songs[0].request.avatarURL}`)
 					.setThumbnail(`${queue.songs[0].thumbnail}`)
 
 		if(queue.songs.length > 1) npEmbed.addFields({
@@ -89,7 +87,7 @@ class serverMusicInfo {
 			if(i == queue.playinfo.curq){
 				title = `#NowPlaying>> ${queue.songs[i].title}`;
 				queueembed.addFields({
-					name: title, value: `[${queue.songs[i].duration}] | ${queue.songs[i].url}\nrequested by ${queue.songs[i].requestedby}`, inline: false
+					name: title, value: `[${queue.songs[i].duration}] | ${queue.songs[i].url}\nrequested by ${queue.songs[i].request.name}`, inline: false
 				});
 			}else{
 				queueembed.addFields({
@@ -114,10 +112,11 @@ class serverMusicInfo {
 	pause(interaction){ //interaction을 Button인지 CommandMessage인지 나눠야함 
 		let paused = this.connectionHandler.paused;
 		if(paused){
-			this.connectionHandler.audioplayer.unpause();
+			this.connectionHandler.audioPlayer.unpause();
 			paused = false;
 		}else{
-			this.connectionHandler.audioplayer.pause(true);
+			this.connectionHandler.audioPlayer.pause();
+			paused = true;
 		}
 
 		const editmsg = !paused ? '▶️ 노래를 다시 틀었어요' : '⏸️ 노래를 일시정지했어요';
@@ -128,24 +127,20 @@ class serverMusicInfo {
 	}
 
 	async skip(interaction){
-		await this.connectionHandler.audioplayer.stop();
+		await this.connectionHandler.audioPlayer.stop();
 		if(interaction.isCommand()) interaction.editReply('⏭ 노래를 스킵했어요');
 	}
 
 	async stop(interaction){
-		this.queue.songs = await [];
-		await this.connectionHandler.audioplayer.stop(true);
+		await this.enterstop();
+		await this.connectionHandler.audioPlayer.stop(true);
 		if(interaction.isCommand()) interaction.editReply('⏹ 대기열을 초기화하고 노래를 멈췄어요');
 	}
 
 	async eject(interaction){
-		this.queue.songs = [];
-		if(this.connectionHandler.audioplayer) await this.connectionHandler.audioplayer.stop(true);
-		if(this.connectionHandler.connection) {
-			await this.connectionHandler.connection.destroy();
-		} else if(interaction.guild.me.voice.channel) await interaction.guild.me.voice.channel.disconnect();
-		this.connectionHandler.audioplayer = null;
-		this.connectionHandler.audioResource = null;
+		await this.connectionHandler.connection.destroy();
+		await this.enterstop();
+		if(this.connectionHandler.audioPlayer) await this.connectionHandler.audioPlayer.stop(true);
 		if(interaction.isCommand()) interaction.editReply('⏏️ 대기열을 초기화하고 음성 채널을 나갔아요.');
 	}
 
@@ -313,7 +308,7 @@ class serverMusicInfo {
 		}else{
 			this.queue.songs.splice(1, goto-1);
 		}
-		await this.connectionHandler.audioplayer.stop();
+		await this.connectionHandler.audioPlayer.stop();
 	}
 
 	async removequeue(interaction, target1, endpoint){ //얘도
@@ -330,7 +325,7 @@ class serverMusicInfo {
 			if(target1 == 1){ //한곡만 지움
 				DeletedSingleEmbed
 					.addFields({
-						name: `#NowPlaying>> ${this.queue.songs[0].title}`, value: `[${this.queue.songs[0].duration}] | ${this.queue.songs[0].url}\n${this.queue.songs[0].requestedby}`, inline: false
+						name: `#NowPlaying>> ${this.queue.songs[0].title}`, value: `[${this.queue.songs[0].duration}] | ${this.queue.songs[0].url}\n${this.queue.songs[0].request.name}`, inline: false
 						})
 					.addFields({
 						name: `~~#1. ${this.queue.songs[1].title}~~`, value: `~~[${this.queue.songs[1].duration}] | ${this.queue.songs[1].url}~~`, inline: false
@@ -457,10 +452,24 @@ class serverMusicInfo {
 		this.queue.songs = movearray(this.queue.songs, target, locate - target);
 	}
 
+	enterstop(){
+		this.connectionHandler.connectionStatus = '⏹️ 재생 중이 아님';
+		this.connectionHandler.paused = false;
+		this.connectionHandler.audioResource = null;
+		this.queue = {
+			playinfo: {
+				playmode: '반복 모드 꺼짐',
+				volume: 0.3,
+				isplaying: false,
+			},
+			songs: [],
+			prevsongUrl: '',
+			channel: null,
+		}
+	}
 }
 
 module.exports = {
 	musicserverList,
 	serverMusicInfo
 }
-

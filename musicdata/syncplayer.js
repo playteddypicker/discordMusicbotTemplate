@@ -218,7 +218,7 @@ async function syncChannel(channel){
 		messageCollector.on('collect', async (message) => {
 			const wait = require('util').promisify(setTimeout);
 
-			if(message.author.id == '919288477516967957'){
+			if(message.author.id == '858927584652820542'){
 				await wait(10000);
 				if(message.deletable) message.delete(); //일단 킵해두자 개씨발 좆같은개발자 애미찾으러감
 			}else{ //씬봇 감지용

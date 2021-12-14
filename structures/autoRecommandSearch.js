@@ -23,7 +23,7 @@ async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction
 	}
 	let cnt = 0;
 	for(let i = 0; i < recommandResult.length; i++){
-		if(filterTitle(recommandResult[i].title.toLowerCase()) && Number(recommandResult[i].length_seconds) < 5400){
+		if(filterTitle(recommandResult[i].title.toLowerCase()) && Number(recommandResult[i].length_seconds) < 900){
 			idresult = recommandResult[i].id;
 			break;
 		}
@@ -55,13 +55,15 @@ async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction
 		title: song.videoDetails.title,
 		url: song.videoDetails.video_url,
 		duration: require('../structures/timestampcalculator.js').getTimestamp(song.videoDetails.lengthSeconds),
-		thumbnail: song.videoDetails.thumbnails[0].url,
-		requestedby: interaction.member.displayName,
-		requestedbyAvatarURL: interaction.member.user.avatarURL(),
+		thumbnail: `https://i.ytimg.com/vi/${song.videoDetails.videoId}/hqdefault.jpg`,
+		request:{
+			name: '자동 재생 모드',
+			avatarURL: 'https://images.emojiterra.com/twitter/v13.1/512px/267e.png',
+			id: '0',
+			tag: '0'
+		}
 	}
-
 	interaction.channel.send(`추천 노래: **${searchedsong.title}** 대기열에 추가했어요`);
-
 	return searchedsong;
 }
 
