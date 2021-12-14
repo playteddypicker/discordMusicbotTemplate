@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@discordjs/builders": "^0.8.2",
+    "@discordjs/opus": "^0.7.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
+    "discord-api-types": "^0.24.0",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-static": "^4.4.0",
+    "libsodium-wrappers": "^0.7.9",
+    "lodash": "^4.17.21",
+    "lodash.clonedeep": "^4.5.0",
+    "mongoose": "^6.0.13",
+    "ytdl-core": "^4.9.1",
+    "ytpl": "^2.2.3",
+    "ytsr": "^3.5.3"
+  },
+  "name": "snowsantbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+		"start": "node index.js",
+    "test": "node assignSlashCommands.js"
+  },
+  "author": "teddypicker",
+  "license": "ISC",
+  "devDependencies": {},
+  "description": ""
+}
