@@ -25,7 +25,7 @@ module.exports = {
 					curserver.recentmessage = null;
 				curserver.connectionHandler = {
 					connection: null,
-					audioplayer: null,
+					audioPlayer: null,
 					audioResource: null,
 					connectionStatus: '⏹ 재생 중이 아님',
 					paused: false,
