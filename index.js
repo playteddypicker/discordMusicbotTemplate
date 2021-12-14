@@ -90,7 +90,9 @@ client.once('ready', async () => {
 	await console.log(`${client.guilds.cache.size} guilds found.`);
 	await console.log(`syncing informations to each guilds...`);
 
-	for(let guild of client.guilds.cache){
+	//for(let guild of client.guilds.cache){
+		const testguild = client.guilds.cache.find(g => g.id === '841337761431814165');
+	{ const guild = ['841337761431814165', testguild];
 		//Slash Commands Loading
 		try{
 			await console.log(`----${guild[0]}@${guild[1].name} Loading Started----`);
@@ -124,10 +126,10 @@ client.once('ready', async () => {
 					Getserver.playerInfo.playerChannelId = syncPlayer.channelId;
 					Getserver.playerInfo.isSetupped = true;
 					channel = await guild[1].channels.cache.find(ch => ch.id == syncPlayer.channelId);
-					Getserver.playerInfo.playermsg = await channel.messages.cache.find(msg => msg.id == syncPlayer.playermsgId);
+					Getserver.playerInfo.playermsg = channel.messages.cache.find(m => m.id == syncPlayer.playermsgId);
 					//console.log(pch);
 				}else{
-					continue;
+					//continue;
 				}
 			}
 			await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
@@ -146,6 +148,5 @@ module.exports = {
 	commands,
 	rest
 }
-
 shangus.connect(`mongodb+srv://neoxenesis:${process.env.DBPASSWORD}@snowsantbottestcl.havf9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`);
 client.login(process.env.DISCORD_TOKEN);

@@ -25,8 +25,7 @@ class serverMusicInfo {
 				curq: 0,
 			},
 			songs: [],
-			recentmsg: null, //이거 interaction인데 잘못적음 바꾸기 존나귀찮노 시발
-			recentmessage: null, //player에 enqueue할때만 갱신. 얘는 무조건 playerChannel에 있음
+			channel: null,
 			prevsongUrl: '',
 		};		
 		this.connectionHandler = {
