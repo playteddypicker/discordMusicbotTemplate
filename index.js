@@ -55,7 +55,7 @@ const wait = require('util').promisify(setTimeout);
 const rest = new REST({
 		version: "9"
 	}).setToken(process.env.DISCORD_TOKEN);
-const announce = '점검';
+const announce = '헤헤...';
 
 //DB Handling section
 client.on('guildCreate', async (guild) => {

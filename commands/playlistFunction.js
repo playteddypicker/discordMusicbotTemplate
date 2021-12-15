@@ -41,7 +41,6 @@ module.exports = {
 		switch(interaction.options.getSubcommand()){
 			case 'private':
 				const userDB = await privatePlaylistModel.find({userid: interaction.member.id}, {_id: 0});
-				console.log(userDB);
 				if(userDB.length != 0){
 					const assignPlaylistArray = new privatePlaylist(interaction.member);
 						assignPlaylistArray.playlistArray = userDB;
@@ -51,7 +50,6 @@ module.exports = {
 					await privatePlaylistLibraryMap.set(interaction.member.id, assignPlaylistArray);
 				}
 				const userLibrary = await privatePlaylistLibraryMap.get(interaction.member.id);
-				console.log(userLibrary);
 				if(!userLibrary){
 					await assignUserPlaylistLibrary(interaction);
 				}else{
@@ -429,8 +427,6 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 											.setDescription(`플레이리스트 수 : ${library.playlistArrayEditTemp.length}\n상태: 변경됨(저장 안됨)`);
 										Pages = await editPlaylistEmbed(library.playlistArrayEditTemp);
 										
-										console.log(Pages);
-
 										selectModeButtons.components[0].disabled = false;
 										selectModeButtons.components[3].disabled = false;
 										selectModeButtons.components[4].disabled = false;
@@ -565,7 +561,6 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 							break;
 
 								case 'addsong':
-									console.log(playlistlocate);
 									libraryUIEmbed.setTitle('추가할 노래의 제목/링크/플레이리스트 링크를 채팅으로 써 주세요');
 									selectModeButtons.components[0].disabled = true;
 									selectModeButtons.components[1].disabled = true;
@@ -856,6 +851,8 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 						selectModeButtons.components[1].disabled = false;
 						selectModeButtons.components[2].disabled = false;
 						selectModeButtons.components[3].disabled = false;
+						await wait(5000);
+						await interaction.deleteReply();
 					}catch(error){
 						console.log(error);
 						libraryUIEmbed.setTitle('작업을 선택해주세요').setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n상태: ❗️ 상호작용 실패. 오류 : ${error}`);  

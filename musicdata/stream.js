@@ -84,7 +84,6 @@ async function trigger(interaction, text, requestType){
 async function startstream(server, interaction){
 	const queue = server.queue;
 	const connection = server.connectionHandler.connection;
-	const player = server.connectionHandler.player;
 	const wait = require('util').promisify(setTimeout);
 	let errorhandling = 0;
 	//first playing
@@ -113,7 +112,6 @@ async function startstream(server, interaction){
 			]);	
 		}catch(error){
 			connection.destroy();
-			player.destroy();
 			server.enterstop();
 		}
 	});

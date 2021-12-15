@@ -53,7 +53,6 @@ async function searchandReturn(text){
 	}else if(text.match(/https:?\/\/(www.youtube.com|youtube.com|youtu.be)/)){
 		try{
 			const res = await ytdl.getInfo(text);
-			console.log(res);
 			const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(res.videoDetails.lengthSeconds));
 			searchedSong = {
 				author: {
