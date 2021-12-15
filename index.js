@@ -95,6 +95,7 @@ client.once('ready', async () => {
 	//{ const guild = ['841337761431814165', testguild];
 		//Slash Commands Loading
 		try{
+			await wait(500);
 			await console.log(`----${guild[0]}@${guild[1].name} Loading Started----`);
 			await rest.put(
 				Routes.applicationGuildCommands(process.env.CLIENT_ID, guild[1].id),
@@ -129,12 +130,12 @@ client.once('ready', async () => {
 					Getserver.playerInfo.playermsg = channel.messages.cache.find(m => m.id == syncPlayer.playermsgId);
 					//console.log(pch);
 				}else{
+					await console.log(`---- ${guild[1].name} successfully synced(player doesnt exist) ----`);
 					continue;
 				}
 			}
 			await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
 			await console.log(`syncing done.`);
-			await wait(500);
 		}catch(error){
 			console.log('sync failed.');
 			console.log(error)
