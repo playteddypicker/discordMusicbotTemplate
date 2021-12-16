@@ -135,12 +135,12 @@ client.once('ready', async () => {
 				}
 			}
 			await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
-			await console.log(`└---- syncing done.`);
+			await console.log(`syncing done.`);
 		}catch(error){
-			await console.log('└---sync failed.----');
+			await console.log('sync failed.');
 			await console.log(error)
 		}	
-		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n\n`);
+		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	}
 });
 
