@@ -111,7 +111,7 @@ client.once('ready', async () => {
 		//musicserver init section
 		const musicserverShard = new musicserver.serverMusicInfo(guild[1]);
 		await musicserver.musicserverList.set(guild[0], musicserverShard);
-		await console.log(`| musicserver info Loaded.`)''
+		await console.log(`| musicserver info Loaded.`);
 		//player-sync section
 		try{
 			await console.log(`| Syncing player channel...`);
