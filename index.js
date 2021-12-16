@@ -130,7 +130,7 @@ client.once('ready', async () => {
 					Getserver.playerInfo.playermsg = channel.messages.cache.find(m => m.id == syncPlayer.playermsgId);
 					//console.log(pch);
 				}else{
-					await console.log(`└---- ${guild[1].name} successfully synced(player doesnt exist) ----`);
+					await console.log(`└---- ${guild[1].name} successfully synced(player doesnt exist) ----\n`);
 					continue;
 				}
 			}
