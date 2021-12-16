@@ -96,25 +96,25 @@ client.once('ready', async () => {
 		//Slash Commands Loading
 		try{
 			await wait(500);
-			await console.log(`----${guild[0]}@${guild[1].name} Loading Started----`);
+			await console.log(`┌---${guild[0]}@${guild[1].name} Loading Started----`);
+			await console.log('| Refresing slash commands...')
 			await rest.put(
 				Routes.applicationGuildCommands(process.env.CLIENT_ID, guild[1].id),
 					{body: commands}
 				);
-			await console.log('Slash Commands are Refreshed.');
+			await console.log('| Successfully refreshed.');
 		}catch (error){
-				await console.log(`Slash Commands are not loaded at ${guild[1].name}`);
+				await console.log(`| Refresh failed.`);
 				await console.log(error);
 		}
 
 		//musicserver init section
 		const musicserverShard = new musicserver.serverMusicInfo(guild[1]);
 		await musicserver.musicserverList.set(guild[0], musicserverShard);
-		await console.log(`musicserver info Loaded => ${guild[0]} & ${guild[1].name} `);
-
+		await console.log(`| musicserver info Loaded.`)''
 		//player-sync section
 		try{
-			await console.log(`${guild[1].name} syncing player channel...`);
+			await console.log(`| Syncing player channel...`);
 			let channel = await guild[1].channels.cache.find(
 				(ch) => ch.type === "GUILD_TEXT" && !!guild[1].client.user && ch.name == '슨상플레이어'
 			);
@@ -130,17 +130,17 @@ client.once('ready', async () => {
 					Getserver.playerInfo.playermsg = channel.messages.cache.find(m => m.id == syncPlayer.playermsgId);
 					//console.log(pch);
 				}else{
-					await console.log(`---- ${guild[1].name} successfully synced(player doesnt exist) ----`);
+					await console.log(`└---- ${guild[1].name} successfully synced(player doesnt exist) ----`);
 					continue;
 				}
 			}
 			await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
-			await console.log(`syncing done.`);
+			await console.log(`└---- syncing done.`);
 		}catch(error){
-			console.log('sync failed.');
-			console.log(error)
+			await console.log('└---sync failed.----');
+			await console.log(error)
 		}	
-		await console.log(`---- ${guild[1].name} successfully synced ----`);
+		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n\n`);
 	}
 });
 
