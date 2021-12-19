@@ -13,6 +13,7 @@
     "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "mongoose": "^6.0.13",
+    "soundcloud-downloader": "^1.0.0",
     "ytdl-core": "^4.9.1",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"
@@ -21,11 +22,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-		"start": "node index.js",
+    "start": "node index.js",
     "test": "node assignSlashCommands.js"
   },
   "author": "teddypicker",
   "license": "ISC",
-  "devDependencies": {},
   "description": ""
 }
