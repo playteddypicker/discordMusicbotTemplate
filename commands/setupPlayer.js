@@ -10,7 +10,7 @@ module.exports = {
 
 		if(!server.playerInfo.isSetupped){
 			//플레이어 채널 만들고 sync
-			const createdChannel = await interaction.guild.channels.create('슨상플레이어', {
+			const createdChannel = await interaction.guild.channels.create(`${process.env.PLAYERCHANNEL_NAME}`, {
 				type: 'GUILD_TEXT',
 			}); //나중에 슨상플레이어로 변경
 			
