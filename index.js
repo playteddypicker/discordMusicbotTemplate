@@ -10,6 +10,8 @@ require('dotenv').config();
  * DBPASSWORD = asdf
  * ANNOUNCE = '대충 상메'
  * PLAYERCHANNEL_NAME = '대충 기본 플레이어채널 이름'
+ * PLAYEREMBED_IMAGEURL = '플레이어 대기 이미지 주소'
+ * DEFAULT_COLOR = '봇별 기본 컬러'
  *
  */
 const fs = require('fs');
@@ -29,7 +31,6 @@ const Intents = Discord.Intents;
 const client = new Discord.Client({ 
 	intents: [
 		Intents.FLAGS.GUILDS,
-		Intents.FLAGS.GUILD_MEMBERS,
 		Intents.FLAGS.GUILD_VOICE_STATES,
 		Intents.FLAGS.GUILD_MESSAGES,
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,

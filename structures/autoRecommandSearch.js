@@ -1,8 +1,11 @@
 const ytdl = require('ytdl-core');
+const scReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 
 async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction 일수도 message일수도 둘다 가능
 
+	if(scReg.test(url)) return interaction.channel.send(`${interaction.member.user}, 사운드클라우드 노래는 아직 자동 재생 기능을 사용할 수 없어요.`);
 	interaction.channel.send('유튜브에서 추천 노래 검색하는 중...');
+	
 
 	let idresult = '';
 

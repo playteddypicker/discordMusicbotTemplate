@@ -1010,7 +1010,7 @@ function editPlaylistEmbed(playlistArray){
 		for(let i = 0; i < playlistArray.length; i++){
 			libraryPageEmbed.addFields({
 				name: `#${i+1}. ${playlistArray[i].name}`, 
-				value: `\n${playlistArray[i].description}\n\n${playlistArray[i].items.length}곡 저장됨`,
+				value: `\n${playlistArray[i].description} | ${playlistArray[i].items.length}곡 저장됨`,
 				inline: false
 			});
 

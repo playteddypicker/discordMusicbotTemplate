@@ -1,5 +1,5 @@
 const musicserverList = new Map();
-
+const scReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 const ytdl = require('ytdl-core');
 const {
 	MessageEmbed,
@@ -54,12 +54,12 @@ class serverMusicInfo {
 		}
 			
 		const npEmbed = new MessageEmbed()
-					.setColor('#023E8A')
+					.setColor(process.env.DEFAULT_COLOR)
 					.setAuthor(`${author.name}`, `${author.thumbnail}`, `${author.channelURL}`)
 					.setTitle(`${queue.songs[0].title}`)
 					.setURL(`${queue.songs[0].url}`)
 					.setDescription(`${this.connectionHandler.connectionStatus} | ${queue.playinfo.playmode} | 🔉: ${Math.round(queue.playinfo.volume * 100)}% | [${curtime} / ${queue.songs[0].duration}]`)
-					.setFooter(`requested by ${queue.songs[0].request.name}`, `${queue.songs[0].request.avatarURL}`)
+					.setFooter(`requested by ${queue.songs[0].request.name} | ${scReg.test(server.queue.songs[0].url) ? 'Soundcloud' : 'Youtube'}`, `${queue.songs[0].request.avatarURL}`)
 					.setThumbnail(`${queue.songs[0].thumbnail}`)
 
 		if(queue.songs.length > 1) npEmbed.addFields({
@@ -79,7 +79,7 @@ class serverMusicInfo {
 				
 		let queueembed = new MessageEmbed()
 					.setTitle(`대기열 목록 : 총 ${queue.songs.length-1}곡`)
-					.setColor('#023E8A')
+					.setColor(process.env.DEFAULT_COLOR)
 					.setDescription(`${this.connectionHandler.connectionStatus} | ${queue.playinfo.playmode} | 🔉: ${Math.round(queue.playinfo.volume * 100)}% | 러닝타임: ${timestampSec}`);
 
 		for(let i = 0; i < queue.songs.length; i++){
@@ -99,7 +99,7 @@ class serverMusicInfo {
 				pages.push(queueembed);
 				queueembed = new MessageEmbed()
 					.setTitle(`대기열 목록 : 총 ${queue.songs.length-1}곡`)
-					.setColor('#023E8A')
+					.setColor(process.env.DEFAULT_COLOR)
 					.setDescription(`${this.connectionHandler.connectionStatus} | ${queue.playinfo.playmode} | 🔉: ${Math.round(queue.playinfo.volume * 100)}%`)
 			}
 		}	
@@ -175,7 +175,7 @@ class serverMusicInfo {
 					name: '♾️ 자동 재생 모드', value: '유튜브에서 추천 노래를 찾아 대기열에 한곡씩 계속 추가해요', inline: false
 				})
 				.setFooter('아니면 모드를 끌 수도 있어요')
-				.setColor('#023E8A');
+				.setColor(process.env.DEFAULT_COLOR);
 
 			const selectbuttons = new MessageActionRow()
 				.addComponents(
@@ -319,7 +319,7 @@ class serverMusicInfo {
 		//가슴이 웅장해진다..
 		const DeletedSingleEmbed = new MessageEmbed()
 			.setTitle('대기열 편집됨')
-			.setColor('#023E8A');
+			.setColor(process.env.DEFAULT_COLOR);
 			
 		if(!endpoint){
 			if(target1 == 1){ //한곡만 지움

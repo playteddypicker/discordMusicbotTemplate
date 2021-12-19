@@ -14,7 +14,7 @@
     "lodash.clonedeep": "^4.5.0",
     "mongoose": "^6.0.13",
     "soundcloud-downloader": "^1.0.0",
-    "ytdl-core": "^4.9.1",
+    "ytdl-core": "^4.9.2",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"
   },

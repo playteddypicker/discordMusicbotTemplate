@@ -19,7 +19,7 @@ async function pushqueue(interaction, text){ //push만 함
 		}
 
 		const doneEmbed = new MessageEmbed()
-			.setColor('#F4A261')
+			.setColor(process.env.DEFAULT_COLOR)
 			.setTitle(result[0].name)
 			.setURL(result[0].url)
 			.setThumbnail(result[0].thumbnail)
@@ -36,7 +36,7 @@ async function pushqueue(interaction, text){ //push만 함
 		server.queue.songs.push(result);
 
 		const doneEmbed = new MessageEmbed()
-			.setColor('#f4a261')
+			.setColor(process.env.DEFAULT_COLOR)
 			.setTitle(result.title)
 			.setURL(result.url)
 			.setThumbnail(result.thumbnail)

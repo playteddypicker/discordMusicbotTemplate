@@ -14,6 +14,7 @@ const {
 	Interaction
 } = require('discord.js');
 const ytdl = require('ytdl-core');
+const scdl = require('soundcloud-downloader').default;
 
 require('dotenv').config();
 const autoRecommandSearch = require('../structures/autoRecommandSearch.js').autoRecommandSearch;
@@ -47,6 +48,28 @@ async function trigger(interaction, text, requestType){
 		case 'player':
 			server.queue.channel = interaction.channel;
 			require('./searchsong.js').pushqueue(interaction, text).then((rm)=> {
+				if(typeof(rm) == 'string'){
+					let ermsg = '';
+					switch(rm){
+						case 'playlistError':
+							ermsg = 'error at stream.js : playlistError\n플레이리스트 정보를 불러오는데 실패했어요.';
+							break;
+
+						case '410':
+							ermsg = 'error at stream.js : getUrlError\n링크에서 정보를 불러오는데 실패했어요.(연령 제한 영상이나 국가 제한이 걸린 영상입니다)'
+							break;
+
+						case 'searchError':
+						case 'searchfailed':
+							ermsg = 'error at stream.js : searchError\n검색 결과를 불러오는데 실패했어요.';
+							break;
+
+						case 'scError':
+							ermsg = 'error at stream.js : soundcloudError\n사운드클라우드에서 정보를 불러오는데 실패했어요.';
+							break;
+					}
+					return requestType == 'command' ? interaction.editReply(ermsg) : interaction.channel.send(ermsg);
+				}
 				if(requestType == 'command') interaction.editReply(rm);
 				if(!server.connectionHandler.audioPlayer && server.queue.songs.length > 0)
 					startstream(server, interaction);
@@ -88,7 +111,9 @@ async function startstream(server, interaction){
 	let errorhandling = 0;
 	//first playing
 	let song = queue.songs[0];
-	let streamSong = await ytdl(server.queue.songs[0].url + '&bpctr=9999999999', {
+	let streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
+		await scdl.download(server.queue.songs[0].url) : 
+		await ytdl(server.queue.songs[0].url + '&bpctr=9999999999', {
 		filter: 'audioonly',
 		highWaterMark: 1 << 25,
 	});
@@ -182,7 +207,9 @@ async function startstream(server, interaction){
 			server.connectionHandler.audioPlayer = null;
 		}else{
 			song = queue.songs[0];
-			streamSong = await ytdl(server.queue.songs[0].url, {
+			streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
+				await scdl.download(server.queue.songs[0].url) : 
+				await ytdl(server.queue.songs[0].url, {
 				filter: 'audioonly',
 				highWaterMark: 1 << 25,
 			});

@@ -6,9 +6,11 @@ module.exports = {
 		.setName('help')
 		.setDescription('도움말 보기'),
 	async execute(interaction){
-		const version = '슨상이 3.1';
-		const color = '#FF6F61';
-		const patchnote = '음악 검색, 추가 모듈을 갈아엎고 전체 함수를 싹 다시 짰습니다. 그리고 개인별 플레이리스트를 사용할 수 있습니다. 자세한 내용은 다음 페이지에서 직접 확인해 보세요. 이전 버전에 있던 기능(경험치 계산기 등)은 차근차근 추가할 예정입니다.'
+		const version = '슨상이 3.2';
+		const color = process.env.DEFAULT_COLOR;
+		const patchnote = '- 사운드클라우드 지원(플레이리스트, 링크 추가 가능)\n - 여러 버그 고침';
+
+			//3.1 patch : '음악 검색, 추가 모듈을 갈아엎고 전체 함수를 싹 다시 짰습니다. 그리고 개인별 플레이리스트를 사용할 수 있습니다. 자세한 내용은 다음 페이지에서 직접 확인해 보세요. 이전 버전에 있던 기능(경험치 계산기 등)은 차근차근 추가할 예정입니다.'
 		const thumbnail = 'https://static.wikia.nocookie.net/fantendo/images/d/d5/SMM2_Cape_Toadette.png/revision/latest/scale-to-width-down/250?cb=20190726170458';
 
 		const msgEmbed = new MessageEmbed()

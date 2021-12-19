@@ -59,7 +59,7 @@ module.exports = {
 		
 		let resultEmbed = new MessageEmbed()
 			.setTitle(`검색 결과 : ${resultAry.length}개`)
-			.setColor('#03045E');
+			.setColor(process.env.DEFAULT_COLOR);
 		let resultEmbedPages = [];
 
 		for(let i = 0; i < resultAry.length; i++){
@@ -78,7 +78,7 @@ module.exports = {
 				resultEmbedPages.push(resultEmbed);
 				resultEmbed = new MessageEmbed()
 					.setTitle(`검색 결과 : ${resultAry.length}개`)
-					.setColor('#03045E');
+					.setColor(proces.env.DEFAULT_COLOR);
 			}
 		}	
 			

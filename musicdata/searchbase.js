@@ -1,11 +1,17 @@
 const ytpl = require('ytpl');
 const ytsr = require('ytsr');
 const ytdl = require('ytdl-core');
+const scdl = require('soundcloud-downloader').default;
+
+const playlistReg = /^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/;
+const urlReg = /https:?\/\/(www.youtube.com|youtube.com|youtu.be)/;
+const scReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
+const scSetReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)\/(sets)\/(.*)$/;
 
 async function searchandReturn(text){
 	let searchedSong = {};
 	//searchtype: playlist
-	if(text.includes('&list=PL') || text.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)){
+	if(text.includes('&list=PL') || playlistReg.test(text)){
 		console.log('Loading playlist...');
 		try{
 			const res = await ytpl(text, {limit: 1972});
@@ -50,7 +56,7 @@ async function searchandReturn(text){
 			return 'playlistError';
 		}
 		//searchtype: url
-	}else if(text.match(/https:?\/\/(www.youtube.com|youtube.com|youtu.be)/)){
+	}else if(urlReg.test(text)){
 		try{
 			const res = await ytdl.getInfo(text);
 			const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(res.videoDetails.lengthSeconds));
@@ -71,7 +77,72 @@ async function searchandReturn(text){
 			console.log(error);
 			return '410';
 		}
-		//searchtype: keyword
+		//searchtype: soundcloud url
+	}else if(scReg.test(text)){
+		try{
+			if(scSetReg.test(text)){
+				const res = await scdl.getSetInfo(text);
+				const playlistRes = [];
+			
+				const playlistInfo = {
+					name: res.title,
+					url: res.permalink_url,
+					thumbnail: res.artwork_url ?? 'https://play-lh.googleusercontent.com/lvYCdrPNFU0Ar_lXln3JShoE-NaYF_V-DNlp4eLRZhUVkj00wAseSIm-60OoCKznpw',
+					author: {
+						name: res.user.username,
+						thumbnail: res.user.avatar_url,
+						channelURL: res.user.permalink_url,
+					} 
+				}
+				await playlistRes.push(playlistInfo);
+
+				for(let song of res.tracks){
+					const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(parseInt(song.duration/1000)));
+					const thumburl = song.artwork_url ? 
+						song.artwork_url.replace('large.jpg', 't500x500.jpg') :
+						'https://play-lh.googleusercontent.com/lvYCdrPNFU0Ar_lXln3JShoE-NaYF_V-DNlp4eLRZhUVkj00wAseSIm-60OoCKznpw';
+
+					searchedSong = {
+						author: {
+							name: song.user.username,
+							thumbnail: song.user.avatar_url,
+							channelURL: song.user.permalink_url,
+						},
+						title: song.title,
+						url: song.permalink_url,
+						duration: dur,
+						thumbnail: thumburl,
+					}
+					playlistRes.push(searchedSong);
+				}
+				return playlistRes;
+
+			}else{
+				const res = await scdl.getInfo(text);
+				const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(parseInt(res.duration/1000)));
+				const thumburl = res.artwork_url ? 
+						res.artwork_url.replace('large.jpg', 't500x500.jpg') :
+						'https://play-lh.googleusercontent.com/lvYCdrPNFU0Ar_lXln3JShoE-NaYF_V-DNlp4eLRZhUVkj00wAseSIm-60OoCKznpw';
+				searchedSong = {
+					author: {
+						name: res.user.username,
+						thumbnail: res.user.avatar_url,
+						channelURL: res.user.permalink_url,
+					},
+					title: res.title,
+					url: res.permalink_url,
+					thumbnail: thumburl,
+					duration: dur,
+				};
+				
+				return searchedSong;
+					
+			}
+		}catch(error){
+			console.log(error);
+			return 'scError';
+		}
+	//searchType: keyword
 	}else{
 		try{
 			const srres = await ytsr(text, {pages: 1});
