@@ -55,7 +55,7 @@ const wait = require('util').promisify(setTimeout);
 const rest = new REST({
 		version: "9"
 	}).setToken(process.env.DISCORD_TOKEN);
-const announce = '헤헤...';
+const announce = process.env.ANNOUNCE;
 
 //DB Handling section
 client.on('guildCreate', async (guild) => {
@@ -116,7 +116,7 @@ client.once('ready', async () => {
 		try{
 			await console.log(`| Syncing player channel...`);
 			let channel = await guild[1].channels.cache.find(
-				(ch) => ch.type === "GUILD_TEXT" && !!guild[1].client.user && ch.name == '슨상플레이어'
+				(ch) => ch.type === "GUILD_TEXT" && !!guild[1].client.user && ch.name == `${process.env.PLAYERCHANNEL_NAME}`
 			);
 				
 			if(!channel){ //플레이어 이름이 슨상플레이어가 아닌거 로딩
