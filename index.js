@@ -3,11 +3,14 @@
 require('dotenv').config();
 /*
  * dotenv list
+ * 
  * DISCORD_TOKEN = 'some token'
  * CLIENT_ID = 'client id'
  * DEVGUILD_ID = 'devguild id'
+ * DBPASSWORD = asdf
  * ANNOUNCE = '대충 상메'
  * PLAYERCHANNEL_NAME = '대충 기본 플레이어채널 이름'
+ *
  */
 const fs = require('fs');
 const musicserver = require('./structures/musicPreference.js');
