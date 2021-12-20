@@ -2,6 +2,7 @@ const musicserverList = require('../structures/musicPreference.js').musicserverL
 const { 
 	MessageEmbed,
 } = require('discord.js');
+const { searchsongScript } = require('../script.json');
 
 async function pushqueue(interaction, text){ //push만 함
 	const server = musicserverList.get(interaction.guild.id);
@@ -27,7 +28,7 @@ async function pushqueue(interaction, text){ //push만 함
 			.setAuthor(result[0].author.name, result[0].author.thumbnail, result[0].author.channelURL);
 
 		resultMsg = {
-			content: `플레이리스트에서 ${result.length-1}곡을 추가했어요`,
+			content: searchsongScript.addedfromPlaylist.interpolate({ found : `${result.length-1}` }),
 			embeds: [doneEmbed],
 		};
 	}else{ //플레이리스트가 아닌 검색결과
@@ -44,7 +45,7 @@ async function pushqueue(interaction, text){ //push만 함
 		if(result.author) doneEmbed.setAuthor(result.author.name, result.author.thumbnail, result.author.channelURL);
 
 		resultMsg = {
-			content: `대기열 ${server.queue.songs.length -1}번에 추가했어요`,
+			content: searchsongScript.enqueue.interpolate({ locate: `${server.queue.songs.length-1}` }),
 			embeds: [doneEmbed],
 		};
 		if(server.queue.songs.length == 1) resultMsg.content = `재생 시작!`; 

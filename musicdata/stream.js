@@ -13,6 +13,7 @@ const {
 	Message,
 	Interaction
 } = require('discord.js');
+const { streamScript } = require('../script.json');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
 
@@ -24,14 +25,14 @@ async function trigger(interaction, text, requestType){
 	//voice-channel Handling
 	if(!interaction.member.voice.channel)
 		return (interaction instanceof Interaction && interaction.isCommand()) ?
-			interaction.editReply({content: '먼저 음성 채널에 들어가주세요!'}) :
-			interaction.channel.send(`${interaction.member.user}, 먼저 음성 채널에 들어가주세요!`);
+			interaction.editReply({content: streamScript.firstJoinVc}) :
+			interaction.channel.send(`${interaction.member.user}, ` + streamScript.firstJoinVc);
 	if(interaction.guild.me.voice.channel
 		&& (interaction.member.voice.channel.id
 		!= interaction.guild.me.voice.channel.id))
 		return (interaction instanceof Interaction && interaction.isCommand()) ?
-			interaction.editReply({content: `저는 이미 ${interaction.guild.me.voice.channel}에서 스트리밍 중이에요...`, ephemeral: true}) :
-			interaction.channel.send(`${interaction.member.user}, 저는 이미 ${interaction.guild.me.voice.channel}에서 스트리밍 중이에요...!`);
+			interaction.editReply({content: streamScript.alreadyStreaming.interpolate({vc: `${interaction.guild.me.voice.channel}`}), ephemeral: true}) :
+			interaction.channel.send({content: `${interaction.member.user}, ` + streamScript.alreadyStreaming.interpolate({vc: `${interaction.guild.me.voice.channel}`})});
 
 	const server = musicserverList.get(interaction.guild.id);
 
@@ -52,20 +53,20 @@ async function trigger(interaction, text, requestType){
 					let ermsg = '';
 					switch(rm){
 						case 'playlistError':
-							ermsg = 'error at stream.js : playlistError\n플레이리스트 정보를 불러오는데 실패했어요.';
+							ermsg = streamScript.playlistError;
 							break;
 
 						case '410':
-							ermsg = 'error at stream.js : getUrlError\n링크에서 정보를 불러오는데 실패했어요.(연령 제한 영상이나 국가 제한이 걸린 영상입니다)'
+							ermsg = streamScript.getUrlError; 
 							break;
 
 						case 'searchError':
 						case 'searchfailed':
-							ermsg = 'error at stream.js : searchError\n검색 결과를 불러오는데 실패했어요.';
+							ermsg = streamScript.searchError;
 							break;
 
 						case 'scError':
-							ermsg = 'error at stream.js : soundcloudError\n사운드클라우드에서 정보를 불러오는데 실패했어요.';
+							ermsg = streamScript.scError;
 							break;
 					}
 					return requestType == 'command' ? interaction.editReply(ermsg) : interaction.channel.send(ermsg);
@@ -202,7 +203,7 @@ async function startstream(server, interaction){
 		}
 
 		if(server.queue.songs.length == 0){
-			if(!server.playerInfo.isSetupped) server.queue.channel.send('대기열에 노래가 다 떨어졌어요.');
+			if(!server.playerInfo.isSetupped) server.queue.channel.send(streamScript.queueEmpty);
 			server.enterstop();
 			server.connectionHandler.audioPlayer = null;
 		}else{
@@ -237,14 +238,14 @@ async function startstream(server, interaction){
 		errorhandling = 1;
 		if(error.message.includes('410')){
 			console.log(error);
-			queue.channel.send(`error 410: 이 노래는 연령 제한이나 지역 잠금이 설정되어 있어서 사용할 수 없어요. 노래를 스킵합니다..`);
+			queue.channel.send(streamScript.error410);
 			queue.songs.shift();
 		}else if(error.message.includes('403')){
 			console.log(`error 403: 노래 요청을 너무 빨리 했습니다. ${song.title} 다시 재생하는 중..`);
 			
 			wait(500);
 		}else if(error.message.includes('502')){
-			queue.channel.send(`error 502: 불안정한 서버로부터 노래 정보를 불러오는 데 실패했습니다. 노래를 스킵합니다..`);
+			queue.channel.send(streamScript.error502);
 			queue.songs.shift();
 		}else{
 			queue.channel.send(`노래 재생하는 데 에러 발생! \n${error.message}`);	

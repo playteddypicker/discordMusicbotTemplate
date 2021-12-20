@@ -11,6 +11,7 @@ const {
 } = require('@discordjs/voice');
 const autoRecommandSearch = require('./autoRecommandSearch.js').autoRecommandSearch;
 const guildPlayer = require('../musicdata/syncplayer.js').guildPlayer;
+const { musicPreferenceScript } = require('../script.json');
 
 class serverMusicInfo {
 	constructor(guild){
@@ -84,7 +85,7 @@ class serverMusicInfo {
 
 		for(let i = 0; i < queue.songs.length; i++){
 			let title = `#${i}. ${queue.songs[i].title}`;
-			if(i == queue.playinfo.curq){
+			if(i == 0){
 				title = `#NowPlaying>> ${queue.songs[i].title}`;
 				queueembed.addFields({
 					name: title, value: `[${queue.songs[i].duration}] | ${queue.songs[i].url}\nrequested by ${queue.songs[i].request.name}`, inline: false
@@ -119,7 +120,7 @@ class serverMusicInfo {
 			paused = true;
 		}
 
-		const editmsg = !paused ? '▶️ 노래를 다시 틀었어요' : '⏸️ 노래를 일시정지했어요';
+		const editmsg = !paused ? musicPreferenceScript.playmsg : musicPreferenceScript.pausemsg;
 		if(interaction.isCommand()) interaction.editReply(editmsg);
 		//if(this.playerInfo.isSetupped) updatePlayerMsg(); 이거는 cmd랑 button함수 맨 밑에 한번씩만 두기
 		
@@ -128,20 +129,20 @@ class serverMusicInfo {
 
 	async skip(interaction){
 		await this.connectionHandler.audioPlayer.stop();
-		if(interaction.isCommand()) interaction.editReply('⏭ 노래를 스킵했어요');
+		if(interaction.isCommand()) interaction.editReply(musicPreferenceScript.skipmsg);
 	}
 
 	async stop(interaction){
 		await this.enterstop();
 		await this.connectionHandler.audioPlayer.stop(true);
-		if(interaction.isCommand()) interaction.editReply('⏹ 대기열을 초기화하고 노래를 멈췄어요');
+		if(interaction.isCommand()) interaction.editReply(musicPreferenceScript.stopmsg);
 	}
 
 	async eject(interaction){
 		await this.connectionHandler.connection.destroy();
 		await this.enterstop();
 		if(this.connectionHandler.audioPlayer) await this.connectionHandler.audioPlayer.stop(true);
-		if(interaction.isCommand()) interaction.editReply('⏏️ 대기열을 초기화하고 음성 채널을 나갔아요.');
+		if(interaction.isCommand()) interaction.editReply(musicPreferenceScript.ejectmsg);
 	}
 
 	async shuffle(interaction){
@@ -156,25 +157,25 @@ class serverMusicInfo {
 			[this.queue.songs[i], this.queue.songs[j]] = [this.queue.songs[j], this.queue.songs[i]];
 		}
 
-		if(interaction.isCommand()) await interaction.editReply('🔀 대기열에 있는 노래가 섞였어요');
+		if(interaction.isCommand()) await interaction.editReply(musicPreferenceScript.shufmsg);
 	}
 
 	async loop(interaction){
 		if(interaction.isCommand()){ //Command면
-			if(interaction.channel.id == this.playerInfo.playerChannelId) return interaction.channel.send('플레이어 채널에서 반복 모드 설정은 버튼을 이용해 주세요!');
+			if(interaction.channel.id == this.playerInfo.playerChannelId) return interaction.channel.send(musicPreferenceScript.loopwarn);
 			const selectmodeEmbed = new MessageEmbed()
 				.setTitle(`재생 모드를 선택해주세요`)
 				.setDescription(`현재 모드: **${this.queue.playinfo.playmode}**`)
 				.addFields({
-					name: '🔂 싱글 루프 모드', value: '한 곡만 반복해요', inline: false
+					name: '🔂 싱글 루프 모드', value: musicPreferenceScript.loopsingledes, inline: false
 				})
 				.addFields({
-					name: '🔁 대기열 반복 모드', value: '대기열의 노래를 계속 반복해요', inline: false
+					name: '🔁 대기열 반복 모드', value: musicPreferenceScript.loopqueuedes, inline: false
 				})
 				.addFields({
-					name: '♾️ 자동 재생 모드', value: '유튜브에서 추천 노래를 찾아 대기열에 한곡씩 계속 추가해요', inline: false
+					name: '♾️ 자동 재생 모드', value: musicPreferenceScript.loopautodes, inline: false
 				})
-				.setFooter('아니면 모드를 끌 수도 있어요')
+				.setFooter(musicPreferenceScript.loopoffdes)
 				.setColor(process.env.DEFAULT_COLOR);
 
 			const selectbuttons = new MessageActionRow()
@@ -248,10 +249,10 @@ class serverMusicInfo {
 					await collector.stop();
 					if(this.queue.playinfo.playmode == '반복 모드 꺼짐'){
 						await interaction.deleteReply();
-						await interaction.channel.send({content:'반복 모드를 껐어요'})
+						await interaction.channel.send({content: musicPreferenceScript.loopoffmsg})
 					}else{
 						await interaction.deleteReply();
-						await interaction.channel.send({content:`반복 모드를 **${this.queue.playinfo.playmode}**로 설정했어요`});
+						await interaction.channel.send({content: musicPreferenceScript.loopchmsg.interpolate({playmode: this.queue.playinfo.playmode})});
 					}
 			});
 		}else{ //button이면
@@ -294,15 +295,15 @@ class serverMusicInfo {
 	}
 
 	volume(interaction, size){ //얘도 interaction이 무적권 Command임
-		if(size < 1 || size > 100) return interaction.editReply('볼륨 범위는 1부터 100까지의 정수만 가능해요');
+		if(size < 1 || size > 100) return interaction.editReply(musicPreferenceScript.volRangeWarn);
 		this.connectionHandler.audioResource.volume.setVolume(size / 100);
 		this.queue.playinfo.volume = size / 100;
-		return interaction.editReply(`🔉 볼륨을 ${size}%로 설정했어요`);
+		return interaction.editReply(musicPreferenceScript.volset.interpolate({size: `${size}`}));
 	}
 
 	async jump(interaction, goto){ //얘는 interaction이 무조건 Command임
-		if(goto >= this.queue.songs.length) return interaction.editReply('범위를 제대로 설정해 주세요!');
-		await interaction.editReply(`대기열 ${goto}번 **${this.queue.songs[goto].title}**로 스킵했어요!`);
+		if(goto >= this.queue.songs.length) return interaction.editReply(musicPreferenceScript.jumpRangeWarn);
+		await interaction.editReply(musicPreferenceScript.jumped.interpolate({goto: `${goto}`, title: `${this.queue.songs[goto].title}`}));
 		if(this.queue.playinfo.playmode == '🔁 대기열 반복 모드'){
 			this.queue.songs = this.queue.songs.concat(this.queue.songs.splice(0, goto-1));
 		}else{
@@ -312,8 +313,8 @@ class serverMusicInfo {
 	}
 
 	async removequeue(interaction, target1, endpoint){ //얘도
-		if(this.queue.songs.length == 1) return interaction.editReply('대기열에 아무 노래도 없어요..');
-		if(target1 < 1) return interaction.editReply('지울 노래의 번호를 자연수로 입력해주세요');
+		if(this.queue.songs.length == 1) return interaction.editReply(musicPreferenceScript.rmWarn1);
+		if(target1 < 1) return interaction.editReply(musicPreferenceScript.rmWarn2);
 		
 		//노래 지워진거 보여주는 임베드	
 		//가슴이 웅장해진다..
@@ -366,18 +367,18 @@ class serverMusicInfo {
 			}
 
 			if(interaction.channel.id != this.playerInfo.playerChannelId) {
-				await interaction.editReply({content: '대기열에 있는 노래가 이렇게 지워졌어요', embeds:[DeletedSingleEmbed]});
+				await interaction.editReply({content: musicPreferenceScript.rmclear2, embeds:[DeletedSingleEmbed]});
 			}else{
-				await interaction.editReply({content: `대기열 #${target1}번 **${this.queue.songs[target1].title}** 삭제했어요`})
+				await interaction.editReply({content: musicPreferenceScript.rmclear0.interpolate({target: `${target1}`, title: `${this.queue.songs[target1]/title}`})});
 			}
 			this.queue.songs.splice(target1, 1);
 
 		}else{
-			if(endpoint > this.queue.songs.length - 1 || endpoint <= target1) return interaction.editReply('지우는 범위를 제대로 입력해주세요');
+			if(endpoint > this.queue.songs.length - 1 || endpoint <= target1) return interaction.editReply(musicPreferenceScript.rmWarn3);
 
 			if(target1 == 1 && endpoint == this.queue.songs.length -1){
 				//대기열 전부 삭제
-				interaction.editReply(`대기열에 있던 모든 노래 ${this.queue.songs.length-1}개를 지웠어요.`);
+				interaction.editReply(musicPreferenceScript.rmclear1);
 				this.queue.songs.splice(target1, endpoint-target1+1);
 				return;
 
@@ -428,9 +429,9 @@ class serverMusicInfo {
 			}
 
 			if(interaction.channel.id != this.playerInfo.playerChannelId) {
-				await interaction.editReply({content: '대기열에 있는 노래가 이렇게 지워졌어요', embeds:[DeletedSingleEmbed]});
+				await interaction.editReply({content: musicPreferenceScript.rmclear2, embeds:[DeletedSingleEmbed]});
 			}else{
-				await interaction.editReply({content: `대기열 **${target1}**번부터 **${endpoint}**번까지 지웠어요`});
+				await interaction.editReply({content: musicPreferenceScript.rmclear3.interpolate({target: `${target1}`, endpt: `${endpoint}`})});
 			}
 			this.queue.songs.splice(target1, endpoint - target1 + 1);
 			
@@ -438,9 +439,9 @@ class serverMusicInfo {
 	}
 
 	async move(interaction, target, locate){ //얘도
-		if(this.queue.songs.length < 3) return interaction.editReply('노래를 옮길 곳이 없어요!');
-		if(target > this.queue.songs.length-1 || target < 1) return interaction.editReply('대기열 내에 있는 노래를 선택해주세요!');
-		if(locate == target || locate > this.queue.songs.length - 1 || locate < 1) return interaction.editReply('위치 범위를 제대로 설정해주세요!');
+		if(this.queue.songs.length < 3) return interaction.editReply(musicPreferenceScript.moveWarn1);
+		if(target > this.queue.songs.length-1 || target < 1) return interaction.editReply(musicPreferenceScript.moveWarn2);
+		if(locate == target || locate > this.queue.songs.length - 1 || locate < 1) return interaction.editReply(musicPreferenceScript.moveWarn3);
 		function movearray(list, target, moveValue){
 			const newpos = Number(target) + Number(moveValue);
 			const tempList = JSON.parse(JSON.stringify(list));
@@ -448,7 +449,7 @@ class serverMusicInfo {
 			tempList.splice(newpos, 0, totarget);
 			return tempList;
 		}
-		await interaction.editReply(`대기열 ${target}번: **${this.queue.songs[target].title}**의 대기 위치를 **${locate}**번으로 옮겼어요`);
+		await interaction.editReply(musicPreferenceScript.moved.interpolate({target: target, title: this.queue.songs[target].title, locate: locate}));
 		this.queue.songs = movearray(this.queue.songs, target, locate - target);
 	}
 

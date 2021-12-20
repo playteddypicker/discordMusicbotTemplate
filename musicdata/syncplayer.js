@@ -11,6 +11,7 @@ const playerSchema = new shangus.Schema({
 	playermsgId: String,
 	isSetupped: Boolean,
 });
+const { syncplayerScript } = require('../script.json');
 const guildPlayer = shangus.model('serverPlayerList', playerSchema);
 
 //index.js or /setup명령어 쓸때 ㄱㄱ
@@ -76,9 +77,9 @@ async function getPlayerEmbed(server){
 			}
 		})
 		: new MessageEmbed({
-			title: '아무 노래도 틀고 있지 않아요..',
+			title: syncplayerScript.emptyPlayerTitle,
 			color: process.env.DEFAULT_COLOR,
-			description: '다른 채널에서 /play 명령어로 노래를 틀거나\n이곳에 노래 제목이나 유튜브 링크를 써 주세요.\n(사운드클라우드도 가능해요)',
+			description: syncplayerScript.emptyPlayerDescription,
 			image: {
 				url: process.env.PLAYEREMBED_IMAGEURL 
 			},
@@ -95,7 +96,7 @@ async function syncChannel(channel){
 	const toReactEmbed = await getPlayerEmbed(server);
 
 	const playerBannerMsg = await channel.send({
-		content: `**플레이어 사용법**\n\n이 채널에 채팅으로 명령어 접두사 없이 그냥 쌩으로 노래제목/링크/플레이리스트 링크를 치면 노래가 재생돼요.\n\n**기본 기능**\n⏯️ : 노래 일시정지 | 다시재생 \n⏏️ : 노래 멈추고 모든 노래 제거, 초기화, 음성 채널 나감 \n⏹️ : 노래 멈추고 대기 중인 모든 노래 제거, 모든 상태(루프 등) 초기화\n⏭️ : 노래 스킵\n✂️\: 대기열만 초기화\n\n**고급 기능**\n🔀 : 대기열 셔플 \n🔂 : 싱글 루프 모드 활성화/비활성화 \n🔁 : 대기열 반복 모드 활성화/비활성화 \n♾️ : 자동 재생 모드 활성화/비활성화\n\n**추가 기능**\n🔈 : 볼륨 10% 감소 \n🔊 : 볼륨 10% 증가 \n❌ : 대기열 맨 마지막 노래 지우기 \n⤴️ : 다음 곡을 대기열 맨 뒤로 옮기기 \n⤵️ : 대기열 맨 마지막 노래를 맨 앞으로 옮기기`,
+		content: `**플레이어 사용법**\n\n이 채널에 채팅으로 노래제목/링크/플레이리스트 링크를 치면 노래가 재생됩니다.\n\n**기본 기능**\n⏯️ : 노래 일시정지 | 다시재생 \n⏏️ : 노래 멈추고 모든 노래 제거, 초기화, 음성 채널 나감 \n⏹️ : 노래 멈추고 대기 중인 모든 노래 제거, 모든 상태(루프 등) 초기화\n⏭️ : 노래 스킵\n✂️\: 대기열만 초기화\n\n**고급 기능**\n🔀 : 대기열 셔플 \n🔂 : 싱글 루프 모드 활성화/비활성화 \n🔁 : 대기열 반복 모드 활성화/비활성화 \n♾️ : 자동 재생 모드 활성화/비활성화\n⏳: 현재 타임라인 시간 보기\n\n**추가 기능**\n🔈 : 볼륨 10% 감소 \n🔊 : 볼륨 10% 증가 \n❌ : 대기열 맨 마지막 노래 지우기 \n⤴️ : 다음 곡을 대기열 맨 뒤로 옮기기 \n⤵️ : 대기열 맨 마지막 노래를 맨 앞으로 옮기기`,
 		files: ['./attatchments/playerbanner.jpg'],
 	});
 
@@ -176,6 +177,12 @@ async function syncChannel(channel){
 					customId: 'autoplay',
 					emoji: '♾️',
 					style: 'SECONDARY',
+				},
+				{
+					type: 'BUTTON',
+					customId: 'timeline',
+					emoji: '⏳',
+					style: 'SECONDARY',
 				}]
 			},
 			{
@@ -248,11 +255,11 @@ async function syncChannel(channel){
 			if(!interaction.isButton()) return;
 			if(!interaction.member.voice.channel) {
 				updatePlayerMsg(server, interaction);
-				return interaction.channel.send(`${interaction.user}, 먼저 음성 채널에 들어가주세요!`);
+				return interaction.channel.send(`${interaction.user}, ` + syncplayerScript.firstJoinVc);
 			}
 			if(server.queue.songs.length == 0 && interaction.customId != 'eject') {
 				updatePlayerMsg(server, interaction);
-				return interaction.channel.send(`아무 노래도 틀고 있지 않아요...`);
+				return interaction.channel.send(syncplayerScript.nothingPlay);
 			}
 			
 			switch(interaction.customId){
@@ -284,6 +291,30 @@ async function syncChannel(channel){
 				case 'queueloop':
 				case 'autoplay':
 					await server.loop(interaction);
+					break;
+
+				case 'timeline':
+					let timeline = '';
+					const curtime = parseInt(server.connectionHandler.audioResource.playbackDuration / 1000);
+					const parts = server.queue.songs[0].duration.split(':');
+					const songdurSec = parts.length == 3 ? 
+						(Number(parts[0]) * 3600 + Number(parts[1] * 60) + Number(parts[2])) :
+						(Number(parts[0]) * 60 + Number(parts[1]));
+					const timelinelocate = parseInt(curtime / songdurSec * 25);
+
+					for(let i = 0; i < 25; i++){
+						timeline = (i != timelinelocate) ? timeline + '━' : timeline + '➤';
+					}
+
+					const timelineEmbed = new MessageEmbed()
+						.setColor(process.env.DEFAULT_COLOR)
+						.addFields(
+							{
+								name: `타임라인 [${require('../structures/timestampcalculator.js').getTimestamp(curtime)} / ${server.queue.songs[0].duration}]`, value: `${timeline}`, inline: false,
+							}
+						);
+
+					server.playerInfo.playermsg.channel.send({embeds:[timelineEmbed]});
 					break;
 
 				case 'volumereduce':

@@ -38,17 +38,33 @@ const client = new Discord.Client({
 		Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
 	] 
 });
+String.prototype.interpolate = function(params) {
+  const names = Object.keys(params);
+  const vals = Object.values(params);
+  return new Function(...names, `return \`${this}\`;`)(...vals);
+}
 
 //commands handler
 client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const musicCommandFiles = fs.readdirSync('./commands/music').filter(file => file.endsWith('.js'));
+const otherCommandFiles = fs.readdirSync('./commands/others').filter(file => file.endsWith('.js'));
+
 const commands = [];
 
-for(let file of commandFiles){
-	const cmd = require(`./commands/${file}`);
+//음악 커맨드 푸시
+for(let file of musicCommandFiles){
+	const cmd = require(`./commands/music/${file}`);
 	commands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
 }
+
+//기타 커맨드(아무말 등등... => .gitignore에 추가)
+for(let file of otherCommandFiles){
+	const cmd = require(`./commands/others/${file}`);
+	commands.push(cmd.data.toJSON());
+	client.commands.set(cmd.data.name, cmd);
+}
+
 
 //events handler
 client.events = new Discord.Collection();

@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const musicserverList = require('../structures/musicPreference.js').musicserverList;
+const musicserverList = require('../../structures/musicPreference.js').musicserverList;
 const { 
 	MessageEmbed,
 	MessageActionRow,
 	MessageButton
 } = require('discord.js');
+const { defaultmusicCommandScript } = require('../../script.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -99,17 +100,17 @@ module.exports = {
 		const queue = server.queue;
 		const curq = queue.playinfo.curq;
 
-		if(queue.songs.length == 0) return interaction.reply('아무 노래도 틀고 있지 않아요..');
+		if(queue.songs.length == 0) return interaction.reply(defaultmusicCommandScript.nothingPlay);
 
 		//np나 queue는 음성채널 안드가있어도 가능, 나머지는 음성채널 들어가있어야하고 거기에 아리스가 있어야함
 		if(interaction.options.getSubcommand() != 'np' && interaction.options.getSubcommand() != 'q'){
 			if(interaction.member.voice.channel){ //멤버가 음성채널에 있으면
 				//거기에 그 채널에 봇이 들어가있지 않으면
-				if(!interaction.member.voice.channel.members.find( (mem) => mem.user.id == '912152700244860938')){
-					return interaction.reply('저는 이미 다른 음성 채널에 있어요..');
+				if(!interaction.member.voice.channel.members.find( (mem) => mem.user.id == process.env.CLIENT_ID)){
+					return interaction.reply(defaultmusicCommandScript.existOtherVc);
 				}
 			}else{ //멤버가 음성채널에 없으면
-				return interaction.reply('먼저 음성 채널에 들어가주세요!');
+				return interaction.reply(defaultmusicCommandScript.firstJoinVc);
 			}
 		}
 		
@@ -179,7 +180,7 @@ module.exports = {
 					
 		}
 
-		if(server.playerInfo.isSetupped) require('../musicdata/syncplayer.js').updatePlayerMsg(server);
+		if(server.playerInfo.isSetupped) require('../../musicdata/syncplayer.js').updatePlayerMsg(server);
 	}
 }
 

@@ -4,13 +4,13 @@ const {
 	MessageActionRow,
 	MessageButton,
 } = require('discord.js');
-
 const ytsr = require('ytsr');
+const { commandSearchScript } = require('../../script.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription('유튜브에서 검색해요')
+		.setDescription(commandSearchScript.cmdDescription)
 		.addStringOption(option =>
 			option
 				.setName('keyword')
@@ -55,7 +55,7 @@ module.exports = {
 				if(resultAry.length > 99) break;
 			}
 		}
-		if(resultAry.length == 0) return interaction.editReply('검색 결과가 없어요.');
+		if(resultAry.length == 0) return interaction.editReply(commandSearchScript.notfound);
 		
 		let resultEmbed = new MessageEmbed()
 			.setTitle(`검색 결과 : ${resultAry.length}개`)
@@ -78,12 +78,12 @@ module.exports = {
 				resultEmbedPages.push(resultEmbed);
 				resultEmbed = new MessageEmbed()
 					.setTitle(`검색 결과 : ${resultAry.length}개`)
-					.setColor(proces.env.DEFAULT_COLOR);
+					.setColor(process.env.DEFAULT_COLOR);
 			}
 		}	
 			
 		if(resultAry.length % 5 != 0) resultEmbedPages.push(resultEmbed);
 
-		await require('../structures/reactionpages.js').reactionpages(interaction, resultEmbedPages, true);
+		await require('../../structures/reactionpages.js').reactionpages(interaction, resultEmbedPages, true);
 	}
 }

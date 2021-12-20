@@ -10,12 +10,12 @@ const {
 	privatePlaylist,
 	publicPlaylist,
 	globalPlaylist
-} = require('../structures/playlistStructure.js');
+} = require('../../structures/playlistStructure.js');
 
 const privatePlaylistLibraryMap = new Map();
 const publicPlaylistLibraryMap = new Map();
 const wait = require('util').promisify(setTimeout);
-const privatePlaylistModel = require('../structures/playlistStructure.js').privatePlaylistModel;
+const privatePlaylistModel = require('../../structures/playlistStructure.js').privatePlaylistModel;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -572,7 +572,7 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 										embeds: [libraryUIEmbed, Pages[pgnum]], components: [pageButtons, selectModeButtons], fetchReply: true
 									});
 									const msgcollectorG = await awaitMessage(editMessageG);
-									const searchSongRes = await require('../musicdata/searchbase.js').searchandReturn(msgcollectorG.content);
+									const searchSongRes = await require('../../musicdata/searchbase.js').searchandReturn(msgcollectorG.content);
 									msgcollectorG.delete();
 									if(Array.isArray(searchSongRes)){
 										for(let i = 1; i < searchSongRes.length; i++){
@@ -831,7 +831,7 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 				case 'play':
 					//음성채널에 있는지 검사, 없으면 먼저 들어가라고 하고 break
 					if(!interaction.member.voice.channel) {
-						libraryUIembed.setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n음성 채널에 먼저 들어가주세요`); 
+						libraryUIEmbed.setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n음성 채널에 먼저 들어가주세요`); 
 						break;
 					}
 					//있으면 플레이리스트 선택한다음에 url기반 enqueue하기
