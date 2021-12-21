@@ -127,22 +127,23 @@ module.exports = {
 				break;
 
 			case 'pause':
-				server.queue.recentmsg = interaction;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
+				server.queue.channel = interaction.channel;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
 				await server.pause(interaction);
 				break;
 
 			case 'skip':
-				server.queue.recentmsg = interaction;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
+				server.queue.channel = interaction.channel;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
 				await server.skip(interaction);
 				break;
 
 			case 'stop':
 				server.queue.recentmsg = interaction;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
+				server.queue.channel = interaction.channel;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
 				await server.stop(interaction);
 				break;
 
 			case 'eject':
-				server.queue.recentmsg = interaction;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
+				server.queue.channel = interaction.channel;//나중에 sql db로 서버별 봇 명령어 지정채널로 가게끔 바꾸기
 				await server.eject(interaction);
 				break;
 
