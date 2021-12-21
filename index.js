@@ -233,10 +233,6 @@ client.once('ready', async () => {
 		}	
 		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	}
-	await setInterval(function () {
-		client.user.setActivity(`${announce}`, {type: 'PLAYING'});	
-	}, 10e3);
-	
 });
 
 module.exports = {
