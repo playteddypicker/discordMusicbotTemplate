@@ -12,12 +12,12 @@ module.exports = {
 			//플레이어 채널 만들고 sync
 			const createdChannel = await interaction.guild.channels.create(`${process.env.PLAYERCHANNEL_NAME}`, {
 				type: 'GUILD_TEXT',
-			}); //나중에 슨상플레이어로 변경
+			}); 
 			
 			server.playerInfo.isSetupped = true;
 			await require('../../musicdata/syncplayer.js').syncChannel(createdChannel);
 			//db에 추가(syncplayer에서 자동으로 됨)
-			await interaction.editReply(`음악 플레이어 채널 생성됨: ${createdChannel}`);
+			await interaction.editReply(`음악 플레이어 채널 생성됨: ${createdChannel}\n(플레이어 채널의 이름을 마음대로 바꾸지 마세요)`);
 		}else{
 			//채널 삭제
 			const toDeleteChannel = await interaction.guild.channels.fetch(server.playerInfo.playerChannelId);
@@ -25,11 +25,18 @@ module.exports = {
 			
 			await toDeleteChannel.delete();
 			await interaction.editReply(setupPlayerScript.deleted);
+			server.playerInfo = {
+				playerChannelId: '',
+				playermsg: null,
+				isSetupped: false,
+			};
 
-			server.playerInfo.isSetupped = false;
-			//db에서 삭제
+
+			//db에서 삭제 => 일단 킵
+			/*
 			const dbInfo = require('../../musicdata/syncplayer.js').guildPlayer;
 			await dbInfo.deleteOne({guildId: interaction.guild.id}).catch(e => console.log(e));
+			*/
 		}
 	}
 }

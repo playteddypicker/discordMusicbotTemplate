@@ -48,13 +48,14 @@ String.prototype.interpolate = function(params) {
 client.commands = new Discord.Collection();
 const musicCommandFiles = fs.readdirSync('./commands/music').filter(file => file.endsWith('.js'));
 const otherCommandFiles = fs.readdirSync('./commands/others').filter(file => file.endsWith('.js'));
-
+const DevCommandFiles = fs.readdirSync('./commands/Dev').filter(file => file.endsWith('.js'));
 const commands = [];
-
+const DevCommands = [];
 //음악 커맨드 푸시
 for(let file of musicCommandFiles){
 	const cmd = require(`./commands/music/${file}`);
 	commands.push(cmd.data.toJSON());
+	DevCommands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
 }
 
@@ -62,8 +63,17 @@ for(let file of musicCommandFiles){
 for(let file of otherCommandFiles){
 	const cmd = require(`./commands/others/${file}`);
 	commands.push(cmd.data.toJSON());
+	DevCommands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
 }
+
+//devServer Special Commands
+for(let file of DevCommandFiles){
+	const cmd = require(`./commands/Dev/${file}`);
+	DevCommands.push(cmd.data.toJSON());
+	client.commands.set(cmd.data.name, cmd);
+}
+
 
 
 //events handler
@@ -111,17 +121,69 @@ client.on('guildDelete', async guild => {
 	}
 });
 
+client.on('channelDelete', async channel => {
+	if(channel.name === process.env.PLAYERCHANNEL_NAME){
+		console.log(`${channel.guild.name} force-deleted player channel. removing infos..`);
+		musicserver.musicserverList.get(channel.guild.id).playerInfo = {
+			playerChannelId: '',
+			playermsg: null,
+			isSetupped: false,
+		}
+		console.log('removed');
+	}else{
+		return;
+	}
+});
+
 //Releasing Version
 client.once('ready', async () => {
 	await console.log(`${client.user.tag} Logged in successfully`);
 	client.user.setActivity(`${announce}`, {type: 'PLAYING'});
+	await console.log(`DevGuild Loading...`);
+	try{
+		const testguild = client.guilds.cache.find(g => g.id === '841337761431814165');
+		const guild = ['841337761431814165', testguild];
+		await rest.put(
+			Routes.applicationGuildCommands(process.env.CLIENT_ID, guild[1].id),
+			{body: DevCommands}
+		);
+		const musicserverShard = new musicserver.serverMusicInfo(guild[1]);
+		await musicserver.musicserverList.set(guild[0], musicserverShard);
+			await console.log(`| Syncing player channel...`);
+			let channel = await guild[1].channels.cache.find(
+				(ch) => ch.type === "GUILD_TEXT" && !!guild[1].client.user && ch.name == `${process.env.PLAYERCHANNEL_NAME}`
+			);
+				
+			if(!channel){ //플레이어 이름이 슨상플레이어가 아닌거 로딩
+				const guildPlayer = require('./musicdata/syncplayer.js').guildPlayer;
+				const syncPlayer = await guildPlayer.findOne({guildId: guild[0]}); //DB에 플레이어 정보가 있으면 
+				if(syncPlayer){
+					const Getserver = await musicserver.musicserverList.get(guild[0]);
+					Getserver.playerInfo.playerChannelId = syncPlayer.channelId;
+					Getserver.playerInfo.isSetupped = true;
+					channel = await guild[1].channels.cache.find(ch => ch.id == syncPlayer.channelId);
+					Getserver.playerInfo.playermsg = channel.messages.cache.find(m => m.id == syncPlayer.playermsgId);
+					//console.log(pch);
+				}else{
+					await console.log(`DevGuild Loaded(player doesnt exist)`);
+				}
+			}else{
+				await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
+				await console.log(`DevGuild Loaded.`);	
+			}
+		}catch(error){
+			await console.log('DevGuild Loading Failed.');
+			await console.log(error)
+		}	
+
 	await console.log(`${client.guilds.cache.size} guilds found.`);
 	await console.log(`syncing informations to each guilds...`);
-
 	for(let guild of client.guilds.cache){
-	//	const testguild = client.guilds.cache.find(g => g.id === '841337761431814165');
+		if(guild[0] == '841337761431814165') continue;
+		//const testguild = client.guilds.cache.find(g => g.id === '841337761431814165');
 	//{ const guild = ['841337761431814165', testguild];
 		//Slash Commands Loading
+		await client.user.setActivity(`${client.guilds.cache.size}개 서버 로딩`, {type: 'PLAYING'});
 		try{
 			await wait(500);
 			await console.log(`┌---${guild[0]}@${guild[1].name} Loading Started----`);
@@ -161,15 +223,20 @@ client.once('ready', async () => {
 					await console.log(`└---- ${guild[1].name} successfully synced(player doesnt exist) ----\n`);
 					continue;
 				}
+			}else{
+				await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
+				await console.log(`| syncing done.`);	
 			}
-			await require('./musicdata/syncplayer.js').syncChannel(channel); //간격을 주자
-			await console.log(`| syncing done.`);
 		}catch(error){
 			await console.log('| sync failed.');
 			await console.log(error)
 		}	
 		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	}
+	await setInterval(function () {
+		client.user.setActivity(`${announce}`, {type: 'PLAYING'});	
+	}, 10e3);
+	
 });
 
 module.exports = {

@@ -33,7 +33,10 @@ function updatePlayerMsg(server, interaction){
 		if(interaction != undefined){
 			interaction.update({content: queuelist, embeds: [playerEmbed]});
 		}else{
-			server.playerInfo.playermsg.edit({content: queuelist, embeds: [playerEmbed]});
+			server.playerInfo.playermsg.edit({content: queuelist, embeds: [playerEmbed]}).catch(e =>{
+				console.log(`error occured in ${server.guild.name}\n${e}`);
+			}
+			);
 		}
 	});
 }
@@ -349,6 +352,8 @@ async function syncChannel(channel){
 			updatePlayerMsg(server, interaction);
 		});
 	}catch (error){
+		console.log(error);
+		console.log(`error occured in ${interaction.guild.name}@${interaction.guild.id}`);
 
 	}
 }

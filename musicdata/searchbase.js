@@ -25,7 +25,7 @@ async function searchandReturn(text){
 				thumbnail: res.bestThumbnail.url,
 				author: res.author ? {
 					name: res.author.name,
-					thumbnail: res.author.bestAvatar.url,
+					thumbnail: res.author.bestAvatar.url ?? 'https://cdn.icon-icons.com/icons2/730/PNG/512/youtube_icon-icons.com_62771.png',
 					channelURL: res.author.url,
 				} :
 				{ //youtube official music info일때
@@ -63,7 +63,7 @@ async function searchandReturn(text){
 			searchedSong = {
 				author: {
 					name: res.videoDetails.author.name,
-					thumbnail: res.videoDetails.author.thumbnails[0].url,
+					thumbnail: res.videoDetails.author.thumbnails[0].url ?? 'https://cdn.icon-icons.com/icons2/730/PNG/512/youtube_icon-icons.com_62771.png',
 					channelURL: res.videoDetails.author.channel_url,
 				},
 				title: res.videoDetails.title,
@@ -90,7 +90,7 @@ async function searchandReturn(text){
 					thumbnail: res.artwork_url ?? 'https://play-lh.googleusercontent.com/lvYCdrPNFU0Ar_lXln3JShoE-NaYF_V-DNlp4eLRZhUVkj00wAseSIm-60OoCKznpw',
 					author: {
 						name: res.user.username,
-						thumbnail: res.user.avatar_url,
+						thumbnail: res.user.avatar_url ?? 'https://cdn-icons-png.flaticon.com/512/51/51992.png',
 						channelURL: res.user.permalink_url,
 					} 
 				}
@@ -105,7 +105,7 @@ async function searchandReturn(text){
 					searchedSong = {
 						author: {
 							name: song.user.username,
-							thumbnail: song.user.avatar_url,
+							thumbnail: song.user.avatar_url ?? 'https://cdn-icons-png.flaticon.com/512/51/51992.png',
 							channelURL: song.user.permalink_url,
 						},
 						title: song.title,
@@ -126,7 +126,7 @@ async function searchandReturn(text){
 				searchedSong = {
 					author: {
 						name: res.user.username,
-						thumbnail: res.user.avatar_url,
+						thumbnail: res.user.avatar_url ?? 'https://cdn-icons-png.flaticon.com/512/51/51992.png',
 						channelURL: res.user.permalink_url,
 					},
 					title: res.title,
@@ -156,7 +156,7 @@ async function searchandReturn(text){
 			searchedSong = {
 				author: {
 					name: res.author.name,
-					thumbnail: res.author.bestAvatar.url,
+					thumbnail: res.author.bestAvatar.url ?? 'https://cdn.icon-icons.com/icons2/730/PNG/512/youtube_icon-icons.com_62771.png',
 					channelURL: res.author.url,
 				},
 				title: res.title,

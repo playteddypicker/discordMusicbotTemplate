@@ -4,6 +4,7 @@ module.exports = {
 	async execute(newState, oldState, client){
 		if(!newState.channel) return;
 		const curserver = require('../structures/musicPreference.js').musicserverList.get(newState.channel.guild.id);
+		if(!curserver) return;
 		const vmcount = newState.channel.members.filter(member => !member.user.bot).size;
 		const bot = newState.channel.members.filter(member => member.user.bot);
 

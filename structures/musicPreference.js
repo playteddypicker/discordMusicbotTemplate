@@ -60,7 +60,7 @@ class serverMusicInfo {
 					.setTitle(`${queue.songs[0].title}`)
 					.setURL(`${queue.songs[0].url}`)
 					.setDescription(`${this.connectionHandler.connectionStatus} | ${queue.playinfo.playmode} | 🔉: ${Math.round(queue.playinfo.volume * 100)}% | [${curtime} / ${queue.songs[0].duration}]`)
-					.setFooter(`requested by ${queue.songs[0].request.name} | ${scReg.test(server.queue.songs[0].url) ? 'Soundcloud' : 'Youtube'}`, `${queue.songs[0].request.avatarURL}`)
+					.setFooter(`requested by ${queue.songs[0].request.name} | ${scReg.test(queue.songs[0].url) ? 'Soundcloud' : 'Youtube'}`, `${queue.songs[0].request.avatarURL}`)
 					.setThumbnail(`${queue.songs[0].thumbnail}`)
 
 		if(queue.songs.length > 1) npEmbed.addFields({

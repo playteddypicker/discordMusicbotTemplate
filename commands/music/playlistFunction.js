@@ -122,7 +122,7 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 	}
 
 	const userfilterA = i => {
-		return (i.user.id == interaction.member.id) && (
+		return (i.member.id == interaction.member.id) && (
 			i.customId == 'next' ||
 			i.customId == 'previous' ||
 			i.customId == 'toEndPage' ||
@@ -131,7 +131,7 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 		)
 	};
 	const userfilterB = i => {
-		return (i.user.id == interaction.member.id) && !(
+		return (i.member.id == interaction.member.id) && !(
 			i.customId == 'next' ||
 			i.customId == 'previous' ||
 			i.customId == 'toEndPage' ||
@@ -846,13 +846,14 @@ async function customReactionPages(interaction, library, libraryUIEmbed, library
 					const msgcollectorK = await awaitMessageInteger(editMessageK, library.playlistArray.length);
 					try{
 						await require('../../musicdata/stream.js').trigger(interaction, msgcollectorK.content, 'playlist');
-						libraryUIEmbed.setTitle('작업을 선택해주세요').setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n상태: ✅ 상호작용 성공`);
+						libraryUIEmbed.setTitle('작업을 선택해주세요').setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n상태: ✅ 상호작용 성공. 플레이리스트 설정창을 닫습니다..`);
 						selectModeButtons.components[0].disabled = false;
 						selectModeButtons.components[1].disabled = false;
 						selectModeButtons.components[2].disabled = false;
 						selectModeButtons.components[3].disabled = false;
 						await wait(5000);
-						await interaction.deleteReply();
+						await msgcollectorK.delete();
+						return await interaction.deleteReply();
 					}catch(error){
 						console.log(error);
 						libraryUIEmbed.setTitle('작업을 선택해주세요').setDescription(`저장된 플레이리스트 수 : ${library.playlistArray.length}\n상태: ❗️ 상호작용 실패. 오류 : ${error}`);  
