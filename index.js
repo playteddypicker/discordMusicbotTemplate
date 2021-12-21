@@ -233,6 +233,7 @@ client.once('ready', async () => {
 		}	
 		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	}
+	await client.user.setActivity(`${announce}`, {type: 'PLAYING'});
 });
 
 module.exports = {
