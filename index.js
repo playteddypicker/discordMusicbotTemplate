@@ -138,7 +138,7 @@ client.on('channelDelete', async channel => {
 //Releasing Version
 client.once('ready', async () => {
 	await console.log(`${client.user.tag} Logged in successfully`);
-	client.user.setActivity(`${announce}`, {type: 'PLAYING'});
+	await client.user.setActivity(`부팅 시작..`, {type: 'PLAYING'});
 	await console.log(`DevGuild Loading...`);
 	try{
 		const testguild = client.guilds.cache.find(g => g.id === '841337761431814165');

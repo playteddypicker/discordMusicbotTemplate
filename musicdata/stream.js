@@ -249,6 +249,7 @@ async function startstream(server, interaction){
 			queue.songs.shift();
 		}else{
 			queue.channel.send(`노래 재생하는 데 에러 발생! \n${error.message}`);	
+			console.log(error);
 
 			if(server.playerInfo.isSetupped)
 			require('./syncplayer.js').updatePlayerMsg(server);

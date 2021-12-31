@@ -1,66 +1,66 @@
 {
-	"commandSearchScript" : {
-		"cmdDescription": "유튜브에서 검색합니다.",
-		"notfound" : "검색 결과가 없습니다."
-	},
-	"defaultmusicCommandScript" : {
-		"nothingPlay" : "아무 노래도 틀고 있지 않습니다.",
-		"existOtherVc" : "아리스는 이미 다른 음성 채널에 있습니다.",
-		"firstJoinVc" : "먼저 음성 채널에 들어가주세요"
-	},
-	"setupPlayerScript": {
-		"deleteWarn" : "플레이어 채널이 아닌 곳에서 설정해주세요",
-		"deleted" : "음악 플레이어 채널을 지웠습니다"
-	},
-	"searchsongScript" : {
-		"addedfromPlaylist" : "플레이리스트에서 ${found}곡을 추가했습니다",
-		"enqueue" : "대기열 ${locate}번에 추가했습니다"
-	},
-	"streamScript" : {
-		"firstJoinVc": "먼저 음성 채널에 들어가주세요",
-		"alreadyStreaming": "아리스는 이미 ${vc}에서 스트리밍 중입니다.",
-		"playlistError": "error at stream.js : playlistError\n플레이리스트 정보를 불러오는데 실패했습니다.",
-		"getUrlError": "error at stream.js : getUrlError\n링크에서 정보를 불러오는데 실패했습니다.(연령 제한 영상이나 국가 제한이 걸린 영상입니다)",
-		"searchError": "error at stream.js : searchError\n검색 결과를 불러오는데 실패했습니다.",
-		"scError": "error at stream.js : soundcloudError\n사운드클라우드에서 정보를 불러오는데 실패했습니다.",
-		"queueEmpty": "대기열에 노래가 다 떨어졌습니다.",
-		"error410": "error 410: 이 노래는 연령 제한이나 지역 잠금이 설정되어 있어서 사용할 수 없습니다. 노래를 스킵합니다.",
-		"error502": "error 502: 불안정한 서버로부터 노래 정보를 불러오는데 실패했습니다. 노래를 스킵합니다."
-	},
-	"syncplayerScript": {
-		"emptyPlayerTitle": "아무 노래도 틀고 있지 않습니다.",
-		"emptyPlayerDescription": "다른 채널에서 /play 명령어로 노래를 틀거나\n이곳에 노래 제목이나 유튜브 링크를 써 주세요\n(사운드클라우드도 가능합니다)",
-		"firstJoinVc": "먼저 음성 채널에 들어가주세요",
-		"nothingPlay": "아무 노래도 틀고 있지 않습니다."
-	},
-	"musicPreferenceScript": {
-		"playmsg": "▶️ 노래를 다시 틀었습니다",
-		"pausemsg": "⏸️ 노래를 일시정지했습니다",
-		"skipmsg": "⏭ 노래를 스킵했습니다",
-		"stopmsg": "⏹ 대기열을 초기화하고 노래를 멈췄습니다",
-		"ejectmsg": "⏏️ 대기열을 초기화하고 음성 채널을 나갔습니다.",
-		"shufmsg": "🔀 대기열에 있는 노래가 섞였습니다",
-		"loopwarn": "플레이어 채널에서 반복 모드 설정은 버튼을 이용해 주세요!",
-		"loopsingledes": "한 곡만 반복",
-		"loopqueuedes": "대기열의 노래를 계속 반복",
-		"loopautodes": "유튜브에서 추천 노래를 찾아 대기열에 한 곡씩 계속 추가합니다",
-		"loopoffdes": "아니면 반복 모드를 끌 수도 있습니다",
-		"loopoffmsg": "반복 모드를 껐어요",
-		"loopchmsg": "반복 모드를 ${playmode}로 설정했습니다",
-		"volRangeWarn": "볼륨 범위는 1부터 100까지의 자연수만 가능합니다",
-		"volset": "🔉 볼륨을 ${size}%로 설정했습니다",
-		"jumpRangeWarn": "범위를 제대로 설정해주세요!",
-		"jumped": "대기열 ${goto}번 **${title}**로 스킵했습니다",
-		"rmWarn1": "대기열에 아무 노래도 없습니다.",
-		"rmWarn2": "지울 노래의 번호를 자연수로 입력해주세요",
-		"rmWarn3": "지우는 범위를 제대로 입력해주세요",
-		"rmclear0": "대기열 #${target}번 **${title}** 삭제했습니다",
-		"rmclear1": "대기열에 있던 모든 노래를 삭제했습니다",
-		"rmclear2": "대기열에 있는 노래가 이렇게 지워졌습니다",
-		"rmclear3": "대기열 **${target}**번부터 **${endpt}**번까지 지웠습니다",
-		"moveWarn1": "노래를 옮길 곳이 없습니다",
-		"moveWarn2": "대기열 내에 있는 노래를 선택해주세요",
-		"moveWarn3": "위치 범위를 제대로 설정해주세요",
-		"moved": "${target}번: **${title}**의 대기 위치를 **${locate}**번으로 옮겼습니다"
-	}
+        "commandSearchScript" : {
+                "cmdDescription": "유튜브에서 검색해요",
+                "notfound" : "검색 결과가 없어요."
+        },
+        "defaultmusicCommandScript" : {
+                "nothingPlay" : "아무 노래도 틀고 있지 않아요..",
+                "existOtherVc" : "저는 이미 다른 음성 채널에 있어요..",
+                "firstJoinVc" : "먼저 음성 채널에 들어가주세요!"
+        },
+        "setupPlayerScript": {
+                "deleteWarn" : "플레이어 채널이 아닌 곳에서 지워주세요!",
+                "deleted" : "음악 플레이어 채널을 지웠어요"
+        },
+        "searchsongScript" : {
+                "addedfromPlaylist" : "플레이리스트에서 ${found}곡을 추가했어요",
+                "enqueue" : "대기열 ${locate}번에 추가했어요"
+        },
+        "streamScript" : {
+                "firstJoinVc": "먼저 음성 채널에 들어가주세요!",
+                "alreayStreaming": "저는 이미 ${vc}에서 스트리밍 중이에요...",
+                "playlistError": "error at stream.js : playlistError\n플레이리스트 정보를 불러오는데 실패했어요.",
+                "getUrlError": "error at stream.js : getUrlError\n링크에서 정보를 불러오는데 실패했어요.(연령 제한 영상이나 국가 제한이 걸린 영상입니다)",
+                "searchError": "error at stream.js : searchError\n검색 결과를 불러오는데 실패했어요.",
+                "scError": "error at stream.js : soundcloudError\n사운드클라우드에서 정보를 불러오는데 실패했어요.",
+                "queueEmpty": "대기열에 노래가 다 떨어졌어요.",
+                "error410": "error 410: 이 노래는 연령 제한이나 지역 잠금이 설정되어 있어서 사용할 수 없어요. 노래를 스킵합니>다..",
+                "error502": "error 502: 불안정한 서버로부터 노래 정보를 불러오는데 실패했습니다. 노래를 스킵합니다.."
+        },
+        "syncplayerScript": {
+                "emptyPlayerTitle": "아무 노래도 틀고 있지 않아요..",
+                "emptyPlayerDescription": "다른 채널에서 /play 명령어로 노래를 틀거나\n이곳에 노래 제목이나 유튜브 링크를 써 >주세요.\n(사운드클라우드도 가능해요)",
+                "firstJoinVc": "먼저 음성 채널에 들어가주세요!",
+                "nothingPlay": "아무 노래도 틀고 있지 않아요..."
+        },
+        "musicPreferenceScript": {
+                "playmsg": "▶️ 노래를 다시 틀었어요",
+                "pausemsg": "⏸️ 노래를 일시정지했어요",
+                "skipmsg": "⏭ 노래를 스킵했어요",
+                "stopmsg": "⏹ 대기열을 초기화하고 노래를 멈췄어요",
+                "ejectmsg": "⏏️ 대기열을 초기화하고 음성 채널을 나갔아요.",
+                "shufmsg": "🔀 대기열에 있는 노래가 섞였어요",
+                "loopwarn": "플레이어 채널에서 반복 모드 설정은 버튼을 이용해 주세요!",
+                "loopsingledes": "한 곡만 반복해요",
+                "loopqueuedes": "대기열의 노래를 계속 반복해요",
+                "loopautodes": "유튜브에서 추천 노래르 찾아 대기열에 한 곡씩 계속 추가해요",
+                "loopoffdes": "아니면 반복 모드를 끌 수도 있어요",
+                "loopoffmsg": "반복 모드를 껐어요",
+                "loopchmsg": "반복 모드를 ${playmode}로 설정했어요",
+                "volRangeWarn": "볼륨 범위는 1부터 100까지의 자연수만 가능해요",
+                "volset": "🔉 볼륨을 ${size}%로 설정했어요",
+                "jumpRangeWarn": "범위를 제대로 설정해주세요!",
+                "jumped": "대기열 ${goto}번 **${title}**로 스킵했어요!",
+                "rmWarn1": "대기열에 아무 노래도 없어요..",
+                "rmWarn2": "지울 노래의 번호를 자연수로 입력해주세요",
+                "rmWarn3": "지우는 범위를 제대로 입력해주세요",
+                "rmclear0": "대기열 #${target}번 **${title}** 삭제했어요",
+                "rmclear1": "대기열에 있던 모든 노래를 지웠어요.",
+                "rmclear2": "대기열에 있는 노래가 이렇게 지워졌어요",
+                "rmclear3": "대기열 **${target}**번부터 **${endpt}**번까지 지웠어요",
+                "moveWarn1": "노래를 옮길 곳이 없어요!",
+                "moveWarn2": "대기열 내에 있는 노래를 선택해주세요!",
+                "moveWarn3": "위치 범위를 제대로 설정해주세요!",
+                "moved": "${target}번: **${title}**의 대기 위치를 **${locate}**번으로 옮겼어요"
+        }
 }

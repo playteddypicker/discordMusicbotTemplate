@@ -11,7 +11,7 @@ const scSetReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)\/(sets)\/(.*)$/;
 async function searchandReturn(text){
 	let searchedSong = {};
 	//searchtype: playlist
-	if(text.includes('&list=PL') || playlistReg.test(text)){
+	if(text.includes('&list=OL') || text.includes('&list=PL') || playlistReg.test(text)){
 		console.log('Loading playlist...');
 		try{
 			const res = await ytpl(text, {limit: 1972});

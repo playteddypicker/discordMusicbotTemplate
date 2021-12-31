@@ -128,13 +128,13 @@ class serverMusicInfo {
 	}
 
 	async skip(interaction){
-		await this.connectionHandler.audioPlayer.stop();
+		await this.connectionHandler.audioPlayer?.stop();
 		if(interaction.isCommand()) interaction.editReply(musicPreferenceScript.skipmsg);
 	}
 
 	async stop(interaction){
 		await this.enterstop();
-		await this.connectionHandler.audioPlayer.stop(true);
+		await this.connectionHandler.audioPlayer?.stop(true);
 		if(interaction.isCommand()) interaction.editReply(musicPreferenceScript.stopmsg);
 	}
 
