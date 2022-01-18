@@ -264,7 +264,6 @@ async function startstream(server, interaction){
 			queue.songs.shift();
 		}else if(error.message.includes('403')){
 			console.log(`error 403: 노래 요청을 너무 빨리 했습니다. ${song.title} 다시 재생하는 중..`);
-			
 			wait(500);
 		}else if(error.message.includes('502')){
 			queue.channel.send(streamScript.error502);
