@@ -63,8 +63,8 @@ async function searchandReturn(text){
 				requestOptions: {
 					headers: {
 						cookie: process.env.YOUTUBE_COOKIE,
-					}
-				}
+					},
+				},
 			});
 			const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(res.videoDetails.lengthSeconds));
 			searchedSong = {
