@@ -4,17 +4,17 @@
                 "notfound" : "검색 결과가 없어요."
         },
         "defaultmusicCommandScript" : {
-                "nothingPlay" : "아무 노래도 틀고 있지 않아요..",
-                "existOtherVc" : "저는 이미 다른 음성 채널에 있어요..",
+                "nothingPlay" : "아무 노래도 틀고 있지 않는데요..",
+                "existOtherVc" : "저는 이미 다른 음성 채널에 있는데요..",
                 "firstJoinVc" : "먼저 음성 채널에 들어가주세요!"
         },
         "setupPlayerScript": {
                 "deleteWarn" : "플레이어 채널이 아닌 곳에서 지워주세요!",
-                "deleted" : "음악 플레이어 채널을 지웠어요"
+                "deleted" : "음악 플레이어 채널을 지웠어요."
         },
         "searchsongScript" : {
-                "addedfromPlaylist" : "플레이리스트에서 ${found}곡을 추가했어요",
-                "enqueue" : "대기열 ${locate}번에 추가했어요"
+                "addedfromPlaylist" : "플레이리스트에서 ${found}곡을 추가했어요.",
+                "enqueue" : "대기열 ${locate}번에 추가했어요."
         },
         "streamScript" : {
                 "firstJoinVc": "먼저 음성 채널에 들어가주세요!",
@@ -24,11 +24,11 @@
                 "searchError": "error at stream.js : searchError\n검색 결과를 불러오는데 실패했어요.",
                 "scError": "error at stream.js : soundcloudError\n사운드클라우드에서 정보를 불러오는데 실패했어요.",
                 "queueEmpty": "대기열에 노래가 다 떨어졌어요.",
-                "error410": "error 410: 이 노래는 연령 제한이나 지역 잠금이 설정되어 있어서 사용할 수 없어요. 노래를 스킵합니>다..",
+                "error410": "error 410: 이 노래는 연령 제한이나 지역 잠금이 설정되어 있어서 사용할 수 없어요. 노래를 스킵합니다..",
                 "error502": "error 502: 불안정한 서버로부터 노래 정보를 불러오는데 실패했습니다. 노래를 스킵합니다.."
         },
         "syncplayerScript": {
-                "emptyPlayerTitle": "아무 노래도 틀고 있지 않아요..",
+                "emptyPlayerTitle": "아무 노래도 틀고 있지 않는데요..",
                 "emptyPlayerDescription": "다른 채널에서 /play 명령어로 노래를 틀거나\n이곳에 노래 제목이나 유튜브 링크를 써 >주세요.\n(사운드클라우드도 가능해요)",
                 "firstJoinVc": "먼저 음성 채널에 들어가주세요!",
                 "nothingPlay": "아무 노래도 틀고 있지 않아요..."

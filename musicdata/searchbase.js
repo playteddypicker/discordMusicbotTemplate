@@ -2,6 +2,7 @@ const ytpl = require('ytpl');
 const ytsr = require('ytsr');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
+require('dotenv').config();
 
 const playlistReg = /^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/;
 const urlReg = /https:?\/\/(www.youtube.com|youtube.com|youtu.be)/;
@@ -58,7 +59,13 @@ async function searchandReturn(text){
 		//searchtype: url
 	}else if(urlReg.test(text)){
 		try{
-			const res = await ytdl.getInfo(text);
+			const res = await ytdl.getInfo(text, {
+				requestOptions: {
+					headers: {
+						cookie: process.env.YOUTUBE_COOKIE,
+					}
+				}
+			});
 			const dur = await require('../structures/timestampcalculator.js').getTimestamp(Number(res.videoDetails.lengthSeconds));
 			searchedSong = {
 				author: {

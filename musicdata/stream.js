@@ -114,9 +114,14 @@ async function startstream(server, interaction){
 	let song = queue.songs[0];
 	let streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
 		await scdl.download(server.queue.songs[0].url) : 
-		await ytdl(server.queue.songs[0].url + '&bpctr=9999999999', {
-		filter: 'audioonly',
-		highWaterMark: 1 << 25,
+		await ytdl(server.queue.songs[0].url, {
+			filter: 'audioonly',
+			highWaterMark: 1 << 25,
+			requestOptions: {
+				headers: {
+					cookie: process.env.YOUTUBE_COOKIE,
+				}
+			}
 	});
 
 	const audioPlayer = createAudioPlayer();
@@ -151,14 +156,26 @@ async function startstream(server, interaction){
 			const author = server.queue.songs[0].author;
 
 			if(!author){
-				const info = await ytdl.getInfo(server.queue.songs[0].url);
+				const info = await ytdl.getInfo(server.queue.songs[0].url, {
+					requestOptions: {
+						headers: {
+							cookie: process.env.YOUTUBE_COOKIE,
+						},
+					},
+				});
 				server.queue.songs[0].author = {
 					name: info.videoDetails.author.name,
 					thumbnail: info.videoDetails.author.thumbnails[0].url,
 					channelURL: info.videoDetails.author.channel_url,
 				}
 			}else if(!author.thumbnail){
-				const info = await ytdl.getInfo(server.queue.songs[0].url);
+				const info = await ytdl.getInfo(server.queue.songs[0].url, {
+					requestOptions: {
+						headers: {
+							cookie: process.env.YOUTUBE_COOKIE,
+						},
+					},
+				});
 				author.thumbnail = info.videoDetails.author.thumbnails[0].url;
 			}
 		}
@@ -211,9 +228,14 @@ async function startstream(server, interaction){
 			streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
 				await scdl.download(server.queue.songs[0].url) : 
 				await ytdl(server.queue.songs[0].url, {
-				filter: 'audioonly',
-				highWaterMark: 1 << 25,
-			});
+					filter: 'audioonly',
+					highWaterMark: 1 << 25,
+					requestOptions: {
+						headers: {
+							cookie: process.env.YOUTUBE_COOKIE,
+						}
+					}
+				});
 
 			resource = await createAudioResource(streamSong, { inlineVolume: true });
 			server.connectionHandler.audioResource = resource;
