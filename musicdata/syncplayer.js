@@ -26,7 +26,7 @@ function updatePlayerMsg(server, interaction){
 				queuelist = `...이외에 ${Number(server.queue.songs.length) - i - 1}개의 곡 대기 중\n`;
 			}
 			//이뻐짐
-			queuelist += `#${i}.` + '`' + `[${server.queue.songs[i].duration}]` + '`' + ` **${server.queue.songs[i].title}** by` + '`' + `${server.queue.songs[i].request.name}` + '`';
+			queuelist += `#${i}.` + '`' + `[${server.queue.songs[i].duration}]` + '`' + ` **${server.queue.songs[i].title}**` + '`' + `by ${server.queue.songs[i].request.name}` + '`\n';
 		}
 	}
 
