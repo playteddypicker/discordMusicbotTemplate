@@ -243,7 +243,7 @@ async function syncChannel(channel){
 				server.queue.channel = server.playerInfo.playermsg.channel;
 				await require('./stream.js').trigger(message, message.content, 'player');
 				await wait(1000);	
-				await message.delete();
+				await message.delete().catch(e => console.log(e));
 			}
 		});
 
