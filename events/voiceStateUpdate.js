@@ -1,3 +1,5 @@
+const { VoiceConnectionStatus } = require('@discordjs/voice');
+
 module.exports = {
 	name: 'voiceStateUpdate',
 	once: false,
@@ -12,7 +14,18 @@ module.exports = {
 			const connection = curserver.connectionHandler.connection;
 			if(vmcount == 0){
 				if(connection){
-					await connection.destroy();
+					//disconnection handler
+					connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+						try{
+							await Promise.race([
+								entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+								entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+							]);	
+						}catch(error){
+							connection.destroy();
+							server.enterstop();
+						}
+					});
 				}else{
 					curserver.guild.me.voice.channel.disconnect();
 				}
