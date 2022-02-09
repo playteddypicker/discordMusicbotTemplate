@@ -220,7 +220,7 @@ async function startstream(server, interaction){
 		}
 
 		if(server.queue.songs.length == 0){
-			if(!server.playerInfo.isSetupped) server.queue.channel.send(streamScript.queueEmpty);
+			if(!server.playerInfo.isSetupped) interaction.channel.send(streamScript.queueEmpty);
 			server.enterstop();
 			server.connectionHandler.audioPlayer = null;
 		}else{
