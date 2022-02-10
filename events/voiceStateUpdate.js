@@ -23,7 +23,7 @@ module.exports = {
 							]);	
 						}catch(error){
 							connection.destroy();
-							server.enterstop();
+							curserver.enterstop();
 						}
 					});
 				}else{
