@@ -134,20 +134,6 @@ async function startstream(server, interaction){
 	await audioPlayer.play(resource);
 	connection.subscribe(audioPlayer);
 
-	//disconnection handler
-	connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-		try{
-			await Promise.race([
-				entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
-				entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
-			]);	
-		}catch(error){
-			connection.destroy();
-			server.enterstop();
-		}
-	});
-	
-
 	//stream Handler
 	audioPlayer.on(AudioPlayerStatus.Playing, async () => {
 		server.connectionHandler.connectionStatus = '▶️ 지금 재생 중';
