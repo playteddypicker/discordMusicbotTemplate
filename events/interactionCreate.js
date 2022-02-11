@@ -29,7 +29,9 @@ module.exports = {
 		try{
 			await cmd.execute(interaction);
 		}catch (error){
-			console.log(`an error occured in ${interaction.guild.name}@${interaction.guild.id}\n${error}\n`);
+			console.log(`an error occured in ${interaction.guild.name}@${interaction.guild.id}\n`);
+			console.log(error);
+			console.log(`\n`);
 			await interaction.reply({ content: '명령어 처리하는데 오류가 발생했어요!', ephmeral: true }).catch(e => {
 				interaction.editReply({ content: '명령어 처리하는데 오류가 발생했어요!' })
 			});

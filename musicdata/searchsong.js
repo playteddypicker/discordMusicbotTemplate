@@ -31,6 +31,7 @@ async function pushqueue(interaction, text){ //push만 함
 			content: searchsongScript.addedfromPlaylist.interpolate({ found : `${result.length-1}` }),
 			embeds: [doneEmbed],
 		};
+		console.log(`playlist successfully added to\n${interaction.guild.id}@${interaction.guild.name} \nby ${interaction.member.user.tag}.`);
 	}else{ //플레이리스트가 아닌 검색결과
 		result = result[0];
 		if(!result) return 'emptyError';

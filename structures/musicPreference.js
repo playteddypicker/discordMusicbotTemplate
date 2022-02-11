@@ -369,7 +369,7 @@ class serverMusicInfo {
 			if(interaction.channel.id != this.playerInfo.playerChannelId) {
 				await interaction.editReply({content: musicPreferenceScript.rmclear2, embeds:[DeletedSingleEmbed]});
 			}else{
-				await interaction.editReply({content: musicPreferenceScript.rmclear0.interpolate({target: `${target1}`, title: `${this.queue.songs[target1]/title}`})});
+				await interaction.editReply({content: musicPreferenceScript.rmclear0.interpolate({target: `${target1}`, title: `${this.queue.songs[target1].title}`})});
 			}
 			this.queue.songs.splice(target1, 1);
 
