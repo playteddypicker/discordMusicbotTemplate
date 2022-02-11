@@ -1,4 +1,7 @@
-const { VoiceConnectionStatus } = require('@discordjs/voice');
+const { 
+	VoiceConnectionStatus,
+	getVoiceConnection
+} = require('@discordjs/voice');
 
 module.exports = {
 	name: 'voiceStateUpdate',
@@ -15,19 +18,13 @@ module.exports = {
 			if(vmcount == 0){
 				if(connection){
 					//disconnection handler
-					connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-						try{
-							await Promise.race([
-								entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
-								entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
-							]);	
-						}catch(error){
-							connection.destroy();
-							curserver.enterstop();
-						}
-					});
-				}else{
-					curserver.guild.me.voice.channel.disconnect();
+
+					connection.destroy();
+					curserver.enterstop();
+					
+				}else{ //모종의 이유로 connection이 undefined로 되어있을 때
+					getVoiceConnection(newState.channel.guild.id).destroy();
+					curserver.enterstop();
 				}
 				curserver.queue.songs = [];
 					curserver.queue.playinfo = {
@@ -44,6 +41,18 @@ module.exports = {
 					connectionStatus: '⏹ 재생 중이 아님',
 					paused: false,
 				};
+				//final connection error handler
+				getVoiceConnection(newState.channel.guild.id)?.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+					try{
+						await Promise.race([
+							entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+							entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+						]);	
+					}catch(error){
+						connection.destroy();
+						curserver.enterstop();
+					}
+				});		
 				if(curserver.playerInfo.isSetupped){
 					await require('../musicdata/syncplayer.js').updatePlayerMsg(curserver, undefined);
 				} 
