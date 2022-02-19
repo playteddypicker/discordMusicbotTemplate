@@ -235,16 +235,18 @@ client.once('ready', async () => {
 	}
 	await client.user.setActivity(`${announce}`, {type: 'PLAYING'});
 
-	setInterval(() => {
+	setInterval(async () => {
+		const voiceGuilds = [];
 		console.log(`Memory usage : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB`);
-	}, 120e3);
+		for(let voiceGuild of client.voice.adapters){
+			const voiceGuildInfo = await client.guilds.fetch(voiceGuild[0]);
+			voiceGuilds.push(`${voiceGuild[0]}@${voiceGuildInfo.name}`);
+		}
+		await console.log('Now Streaming :');
+		await console.log(voiceGuilds);
+	}, 300e3);
 
 });
 
-module.exports = {
-	client,
-	commands,
-	rest
-}
 shangus.connect(`mongodb+srv://neoxenesis:${process.env.DBPASSWORD}@snowsantbottestcl.havf9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`);
 client.login(process.env.DISCORD_TOKEN);
