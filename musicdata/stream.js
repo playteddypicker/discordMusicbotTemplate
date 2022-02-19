@@ -115,8 +115,8 @@ async function startstream(server, interaction){
 	let streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
 		await scdl.download(server.queue.songs[0].url) : 
 		await ytdl(server.queue.songs[0].url, {
-			filter: 'audioonly',
-			highWaterMark: 1 << 25,
+			quality: 'highestaudio',
+			highWaterMark: 1024  * 1024 * 10,
 			requestOptions: {
 				headers: {
 					cookie: process.env.YOUTUBE_COOKIE,
@@ -214,8 +214,8 @@ async function startstream(server, interaction){
 			streamSong = server.queue.songs[0].url.includes('soundcloud') ? 
 				await scdl.download(server.queue.songs[0].url) : 
 				await ytdl(server.queue.songs[0].url, {
-					filter: 'audioonly',
-					highWaterMark: 1 << 25,
+					quality: 'highestaudio',
+					highWaterMark: 1024  * 1024 * 10,
 					requestOptions: {
 						headers: {
 							cookie: process.env.YOUTUBE_COOKIE,

@@ -234,6 +234,11 @@ client.once('ready', async () => {
 		await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	}
 	await client.user.setActivity(`${announce}`, {type: 'PLAYING'});
+
+	setInterval(() => {
+		console.log(`Memory usage : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB`);
+	}, 120e3);
+
 });
 
 module.exports = {
