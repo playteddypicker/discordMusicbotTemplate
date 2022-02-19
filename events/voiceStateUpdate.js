@@ -23,7 +23,7 @@ module.exports = {
 					curserver.enterstop();
 					
 				}else{ //모종의 이유로 connection이 undefined로 되어있을 때
-					getVoiceConnection(newState.channel.guild.id).destroy();
+					getVoiceConnection(curserver.id)?.destroy();
 					curserver.enterstop();
 				}
 				curserver.queue.songs = [];
