@@ -154,7 +154,7 @@ client.once('ready', async () => {
 				(ch) => ch.type === "GUILD_TEXT" && !!guild[1].client.user && ch.name == `${process.env.PLAYERCHANNEL_NAME}`
 			);
 				
-			if(!channel){ //플레이어 이름이 슨상플레이어가 아닌거 로딩
+		if(!channel){  //커스텀 플레이어 이름 로딩(아직 db구현 안했음)
 				const guildPlayer = require('./musicdata/syncplayer.js').guildPlayer;
 				const syncPlayer = await guildPlayer.findOne({guildId: guild[0]}); //DB에 플레이어 정보가 있으면 
 				if(syncPlayer){
