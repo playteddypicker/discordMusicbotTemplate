@@ -237,7 +237,12 @@ client.once('ready', async () => {
 
 	setInterval(async () => {
 		const voiceGuilds = [];
-		console.log(`Memory usage : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB`);
+		const timestamp = () => {
+			const today = new Date();
+			today.setHours(today.getHours() + 9);
+			return today.toISOString().replace('T', ' ').substring(0, 19);
+		}
+		console.log(`\n[${timestamp()}]\nMemory usage : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB`);
 		for(let voiceGuild of client.voice.adapters){
 			const voiceGuildInfo = await client.guilds.fetch(voiceGuild[0]);
 			voiceGuilds.push(`${voiceGuild[0]}@${voiceGuildInfo.name}`);

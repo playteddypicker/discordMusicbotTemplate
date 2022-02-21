@@ -122,7 +122,11 @@ async function startstream(server, interaction){
 					cookie: process.env.YOUTUBE_COOKIE,
 				}
 			}
-	});
+		}).on('error', (e) => { //eagain, aborted 임시조치
+			console.log(`\nAn error occured at ${server.name}@${server.id}`);
+			console.log(`User ${song.request.tag} sent ${song.title}(${song.url})`);
+			console.log(e);
+		});
 
 	const audioPlayer = createAudioPlayer();
 	server.connectionHandler.audioPlayer = audioPlayer;
@@ -221,6 +225,10 @@ async function startstream(server, interaction){
 							cookie: process.env.YOUTUBE_COOKIE,
 						}
 					}
+				}).on('error', (e) => {//eagain, aborted 임시조치
+					console.log(`\nAn error occured at ${server.name}@${server.id}`);
+					console.log(`User ${song.request.tag} sent ${song.title}(${song.url})`);
+					console.log(e);
 				});
 
 			resource = await createAudioResource(streamSong, { inlineVolume: true });
