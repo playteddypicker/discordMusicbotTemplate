@@ -1,5 +1,6 @@
 const ytdl = require('ytdl-core');
 const scReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
+require('dotenv').config();
 
 async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction 일수도 message일수도 둘다 가능
 
@@ -9,7 +10,13 @@ async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction
 
 	let idresult = '';
 
-	const getinfo = await ytdl.getInfo(url);
+	const getinfo = await ytdl.getInfo(url, {
+		requestOptions: {
+			headers: {
+				cookie: process.env.YOUTUBE_COOKIE,
+			}
+		}
+	});
 	//나중에 서버별로 블랙리스트 키워드 설정 ㄱㄱ
 	let recommandResult = getinfo.related_videos;
 
@@ -34,7 +41,13 @@ async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction
 		if(i == recommandResult.length - 1) {
 			interaction.channel.send('조건에 맞는 노래가 없어요.. 다시 검색하는 중..');
 			i = 0;
-			const newinfo = await ytdl.getInfo(url);
+			const newinfo = await ytdl.getInfo(url, {
+				requestOptions: {
+					headers: {
+						cookie: process.env.YOUTUBE_COOKIE,
+					}
+				}
+			});
 			recommandResult = newinfo.related_videos;
 		}
 		cnt++;
@@ -47,7 +60,13 @@ async function autoRecommandSearch(url, interaction, prevsongUrl){ //interaction
 
 	const selectedsong = 'https://youtu.be/' + idresult; //위에서 하나 뽑은거
 
-	const song = await ytdl.getInfo(selectedsong);
+	const song = await ytdl.getInfo(selectedsong, {
+		requestOptions: {
+			headers: {
+				cookie: process.env.YOUTUBE_COOKIE,
+			}
+		}
+	});
 
 	const searchedsong = {
 		author: {
