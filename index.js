@@ -62,7 +62,6 @@ for(let file of musicCommandFiles){
 	commands.push(cmd.data.toJSON());
 	devCommands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
-	
 }
 
 //1-2. pushing other commands
@@ -71,7 +70,6 @@ for(let file of otherCommandFiles){
 	commands.push(cmd.data.toJSON());
 	devCommands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
-
 }
 
 //1-3. pushing dev commands
@@ -103,7 +101,7 @@ client.on('guildCreate', async (guild) => {
 		console.log(`Slash Commands are loading...`);
 		try{
 			await rest.put(
-				Routes.appliecationGuildCommands(process.env.CLIENT_ID, guild.id),
+				Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
 				{ body: commands }
 			);
 			console.log(`Slash Commands are successfully loaded.`);
@@ -141,9 +139,7 @@ const {
 } = require('./musicdata/structures/musicServerInfo.js');
 
 async function loadGuild(guild){
-	await console.log(`
-	┌---${guild[0]}@${guild[1].name} Loading Started----
-	`);
+	await console.log(`┌---${guild.id}@${guild.name} Loading Started----`);
 	//refresh slash commands.
 	try{
 		await console.log('| Refresing slash commands...');
@@ -171,7 +167,7 @@ async function loadGuild(guild){
 	//sync to the music server player.
 	try{
 		await console.log('| Syncing player infos from db...');
-		if(/*player exists from db*/){
+		if('asdfasdf'){/*player exists from db*/
 
 		}else{
 			await console.log("| Player infos are doesn't exist in this server at db." );
@@ -180,6 +176,8 @@ async function loadGuild(guild){
 		await console.log('| Failed to sync. reason : ');
 		console.log(error);
 	}
+
+	await console.log('done');
 	
 }
 
@@ -207,12 +205,12 @@ client.once('ready', async () => {
 
 		if(guildNumber == client.guilds.cache.size){
 			await client.user.setActivity(
-				`로딩 끝!`
+				`로딩 끝!`,
 				{ type: 'PLAYING' }
 			);
 			await wait(3e3);
 			await client.user.setActivity(
-				`${process.env.ANNOUNCE}`
+				`${process.env.ANNOUNCE}`,
 				{ type: 'PLAYING' }
 			);
 		}

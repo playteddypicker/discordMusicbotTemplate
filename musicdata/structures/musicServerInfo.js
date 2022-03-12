@@ -8,9 +8,9 @@ class serverInfo {
 			connection: null, //assigned by joinVoiceChannel or getVoiceStatus Function.
 			audioPlayer: null, //assigned by createAudioPlayer();
 			audioResource: null, //assigned by createAudioResource();
-			playStatus: 'idle', //playing, idle(stopped, default), buffering, pause, error.
+			playStatus: '⏹ 재생 중이 아님', //playing, idle(stopped, default), buffering, pause, error.
 			playInfo : {
-				loopmode: 'off', //loop mode. off, single, queue, auto
+				loopmode: '반복 모드 꺼짐', //loop mode. off, single, queue, auto
 				volume: 0.3, //default volume. [0, 1].
 				prevsong: [], //save previous songs maximum 10.
 			}
@@ -27,9 +27,9 @@ class serverInfo {
 	}
 
 	enterstop(){
-		this.streamInfo.playStatus = 'idle';
+		this.streamInfo.playStatus = '⏹ 재생 중이 아님';
 		this.streamInfo.audioResource = null;
-		this.streamInfo.playInfo.loopmode = 'off';
+		this.streamInfo.playInfo.loopmode = '반복 모드 꺼짐';
 		this.streamInfo.playInfo.volume = 0.3;
 		this.queue = [];
 	}
