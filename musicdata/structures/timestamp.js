@@ -1,10 +1,7 @@
 function totalSongDuration(queue){
 	let sum = 0;
 	for(let i = 0; i < queue.length; i++){
-		let durtoSec = song[i].duration.split(':');
-		sum += durtoSec.length == 2 ?
-			Number(durtoSec[0])*60 + Number(durtoSec[1]) :
-			Number(durtoSec[0])*3600 + Number(durtoSec[1])*60 +Number(durtoSec[2] ?? 0);	
+		sum += timestamptoSecond(queue[i].duration);
 	}
 	return sum;
 }
@@ -19,7 +16,15 @@ function getTimestamp(seconds){
 	return hr + ':' + min + ':' + sec;
 }
 
+function timestamptoSecond(duration){
+	const ary = duration.split(':');
+	return ary.length == 1 ? Number(ary[0]) 
+		: ary.length == 2 ? Number(ary[0])*60 + Number(ary[1]) 
+		: Number(ary[0])*3600 + Number(ary[1])*60 + Number(ary[2]);
+}
+
 module.exports = {
 	totalSongDuration,
-	getTimestamp
+	getTimestamp,
+	timestamptoSecond
 }

@@ -5,10 +5,15 @@ class serverInfo {
 		this.guild = guild; //get id, name, guild.
 		this.queue = []; //can save songs maximum 1972.
 		this.streamInfo = {
+			streaming: false,
 			connection: null, //assigned by joinVoiceChannel or getVoiceStatus Function.
 			audioPlayer: null, //assigned by createAudioPlayer();
 			audioResource: null, //assigned by createAudioResource();
 			playStatus: '⏹ 재생 중이 아님', //playing, idle(stopped, default), buffering, pause, error.
+			searchFilter: {
+				durationLimit: 0,
+				banKeywords: [],
+			},
 			playInfo : {
 				loopmode: '반복 모드 꺼짐', //loop mode. off, single, queue, auto
 				volume: 0.3, //default volume. [0, 1].
