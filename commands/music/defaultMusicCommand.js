@@ -78,12 +78,12 @@ module.exports = {
 				.setDescription('🗑️ 대기열의 노래를 하나만 지우거나 한꺼번에 지워요')
 				.addIntegerOption(option =>
 					option
-						.setName('range1')
+						.setName('rmrange1')
 						.setDescription('어떤 노래를 지울지 번호를 써 주세요')
 						.setRequired(true)
 				).addIntegerOption(option =>
 					option
-						.setName('range2')
+						.setName('rmrange2')
 						.setDescription('어디까지 지울지 써 주세요')
 						.setRequired(false)
 				))
@@ -93,12 +93,12 @@ module.exports = {
 				.setDescription('↪️ 대기열에 있는 특정 노래의 위치를 옮겨요')
 				.addIntegerOption(option =>
 					option
-						.setName('range1')
+						.setName('mvrange1')
 						.setDescription('옮길 노래를 선택해주세요')
 						.setRequired(true)
 				).addIntegerOption(option =>
 					option
-						.setName('range2')
+						.setName('mvrange2')
 						.setDescription('옮길 위치를 선택해주세요')
 						.setRequired(true)
 				)),
@@ -153,8 +153,8 @@ module.exports = {
 
 			case 'shuffle':
 				interaction.editReply(server.shuffle() ? 
-					defaultMusicCommandScript.shuferr :
-					defaultMusicCommandScript.shufmsg);
+					defaultMusicCommandScript.shufmsg :
+					defaultMusicCommandScript.shuferr);
 				break;
 
 			case 'loop':
@@ -165,19 +165,63 @@ module.exports = {
 
 			case 'volume':
 				await server.volume(interaction.options.getInteger('volume')) ? 
-					interaction.editReply(defaultMusicCommandScript.volRangeWarn) :
 					interaction.editReply(defaultMusicCommandScript.volset.interpolate({
 						size: `${interaction.options.getInteger('volume')}`
-					}));
+					})) :
+					interaction.editReply(defaultMusicCommandScript.volRangeWarn);
 				break;
 
 			case 'jump':
+				const goto = interaction.options.getInteger('goto');
+				const jumpres = await server.jump(goto);
+				jumpres ?
+					interaction.editReply(defaultMusicCommandScript.jumped.interpolate({
+						goto: `${goto}`,
+					})) :
+					interaction.editReply(defaultMusicCommandScript.jumpRangeWarn);
 				break;
 
 			case 'remove':
+				let rmrange1 = interaction.options.getInteger('rmrange1');
+				let rmrange2 = interaction.options.getInteger('rmrange2');
+				if(rmrange2){
+					[rmrange1, rmrange2] = rmrange1 <= rmrange2 ? 
+						[rmrange1, rmrange2] : 
+						[rmrange2, rmrange1];
+				}
+
+				const deletedArray = !rmrange2 ? 
+					server.queue.splice(rmrange1, 1) :
+					server.queue.splice(rmrange1, rmrange2 - rmrange1 + 1);
+
+				server.queue.length == 1 ? interaction.editReply(defaultMusicCommandScript.rmWarn1)
+					: rmrange1 < 1 ? interaction.editReply(defaultMusicCommandScript.rmWarn2)
+					: !rmrange2 ? interaction.editReply(defaultMusicCommandScript.rmclear0.interpolate({
+						target: `${interaction.options.getInteger('rmrange1')}`,
+						title: `${deletedArray[0].title}`
+					}))
+					: (rmrange1 == 1 && rmrange2 == server.queue.length - 1) ? interaction.editReply(defaultMusicCommandScript.rmclear1)
+					: interaction.editReply({
+						content: defaultMusicCommandScript.rmclear2.interpolate({
+							target: `${interaction.options.getInteger('rmrange1')}`,
+							endpt: `${interaction.options.getInteger('rmrange2')}`
+						})
+					});
 				break;
 
 			case 'move':
+				const moveres = await server.move(interaction.options.getInteger('mvrange1'), interaction.options.getInteger('mvrange2'));
+				moveres == 'moveWarn1' ? interaction.editReply(defaultMusicCommandScript.moveWarn1)
+					: moveres == 'moveWarn2' ? interaction.editReply(defaultMusicCommandScript.moveWarn2)
+					: moveres == 'moveWarn3' ? interaction.editReply(defaultMusicCommandScript.moveWarn3)
+					: moveres == 'moveWarn4' ? interaction.editReply(defaultMusicCommandScript.moveWarn4)
+					: interaction.editReply({
+						content: defaultMusicCommandScript.moved.interpolate({
+							target: interaction.options.getInteger('mvrange1'),
+							title: server.queue[interaction.options.getInteger('mvrange1')].title,
+							locate: interaction.options.getInteger('mvrange2')	
+						})
+					});
 				break;
 		}
 

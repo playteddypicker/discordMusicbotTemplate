@@ -132,13 +132,13 @@ class musicFunctions extends serverInfo { //function only.
 		this.streamInfo.playInfo.loopmode == 'queue' ? 
 			this.queue = this.queue.concat(this.queue.splice(0, goto-1)) :
 			this.queue.splice(0, goto-1);
-		this.streamInfo.connection.audioPlayer.stop();
+		this.streamInfo.audioPlayer.stop();
 		return true;
 	}
 
 	remove(range1, range2){
 		if(this.queue.length == 1) return 'rmWarn1';
-		if(target < 1) return 'rmWarn2';
+		if(range1 < 1) return 'rmWarn2';
 
 		if(range2){
 			[range1, range2] = range1 <= range2 ? 
@@ -149,24 +149,25 @@ class musicFunctions extends serverInfo { //function only.
 		!range2 ? 
 			this.queue.splice(range1, 1) :
 			this.queue.splice(range1, range2 - range1 + 1);
-		return range2 || range1 == range2 ? 
-			'rmclear2' : 'rmclear3';
+		return range1 == 1 && range2 == this.queue.length-1 ? 'rmclear1' 
+			: !range2 ? 'rmclear0'
+			: 'rmclear2';
 	}
 
 	move(range1, range2){
-		if(this.queue.length < 3 ) return 'moveWarm1';
-		if(target > this.queue.length-1 || range1 < 1) return 'moveWarn2';
+		if(this.queue.length < 3 ) return 'moveWarn1';
+		if(range1 > this.queue.length-1 || range1 < 1) return 'moveWarn2';
 		if(range2 > this.queue.length-1 || range2 < 1) return 'moveWarn3';
 		if(range1 == range2) return 'moveWarn4';
 
 		function movearray(list, target, moveValue){
 			const newpos = Number(target) + Number(moveValue);
-			const tempList = JSON.parse(JSON>stringify(list));
+			const tempList = JSON.parse(JSON.stringify(list));
 			const totarget = tempList.splice(target, 1)[0];
 			tempList.splice(newpos, 0, totarget);
 			return tempList;
 		}
-		this.queue = movearray(this.queue, range1, ragne2 - range1);
+		this.queue = movearray(this.queue, range1, range2 - range1);
 		return true;
 	}
 }
