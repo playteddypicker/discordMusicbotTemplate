@@ -135,7 +135,8 @@ const rest = new REST({
 }).setToken(process.env.DISCORD_TOKEN);
 const {
 	serverInfoList,
-	serverInfo
+	serverInfo,
+	musicFunctions
 } = require('./musicdata/structures/musicServerInfo.js');
 
 async function loadGuild(guild){
@@ -156,7 +157,7 @@ async function loadGuild(guild){
 	//load default musicserver info.
 	try{
 		await console.log('| Loading default music system info...');
-		const musicserverShard = new serverInfo(guild);
+		const musicserverShard = new musicFunctions(guild);
 		await serverInfoList.set(guild.id, musicserverShard);
 		await console.log('| Successfully loaded.');
 	}catch(error){

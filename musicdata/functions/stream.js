@@ -63,9 +63,13 @@ async function streamTrigger(interaction, text, requestType){
 		case 'player':
 			pushqueue(interaction, text).then(rm => {
 				if(typeof(rm) === 'string') return sendErrorMsg(interaction, rm);
+
+				if(server.queue.length == 1) rm.content = '재생 시작!';
+
 				requestType == 'command' ? 
 					interaction.editReply(rm) :
 					interaction.channel.send(rm);
+
 				if(!server.streamInfo.audioPlayer && server.queue.length > 0)
 					startStream(interaction, server);
 				//refresh player message.
@@ -82,9 +86,12 @@ async function startStream(interaction, server){
 	let errorhandling = 0;
 	
 	//first playing
-	await getSongStream(interaction, server);
+	const audioPlayer = createAudioPlayer();
+	server.streamInfo.audioPlayer = audioPlayer;
 
-	const audioPlayer = server.streamInfo.audioPlayer;
+	await getSongStream(interaction, server);
+	
+
 	//status handler
 	audioPlayer.on(AudioPlayerStatus.Playing, async () => {
 		server.streamInfo.playStatus = '▶️ 지금 재생 중';
@@ -106,6 +113,7 @@ async function startStream(interaction, server){
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Idle, async () => {
+		console.log('asdf');
 		if(errorhandling == 1) {
 			//기타 핸들링..
 			errorhandling = 0;
@@ -134,7 +142,17 @@ async function startStream(interaction, server){
 				break;
 		}
 
-		await getSongStream(interaction, server);
+		console.log(server.queue.length);
+
+		if(server.queue.length > 0) {
+			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
+			server.streamInfo.playStatus = '▶️ 지금 재생 중';
+			interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
+		}		
+		if(server.queue.length == 0 /* && player not created */) {
+			await interaction.channel.send('대기열에 노래가 없습니다.');
+			await server.enterstop();
+		}
 
 		//update player embed
 	});
@@ -181,7 +199,6 @@ async function getSongStream(interaction, server){
 			//aborted는 playbackduration 저장해놔서 거기서부터 다시 틀수 있게끔
 		}) : await scdl.download(server.queue[0].url);
 
-	server.streamInfo.audioPlayer = createAudioPlayer();
 	server.streamInfo.audioResource = await createAudioResource(streamSong, {
 		inlineVolume: true
 	});

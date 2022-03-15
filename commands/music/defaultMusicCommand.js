@@ -207,11 +207,18 @@ async function nowplaying(interaction, server){
 
 	const npEmbed = new MessageEmbed()
 		.setColor(process.env.DEFAULT_COLOR)
-		.setAuthor(`${author.name}`, `${author.thumbnail}`, `${author.channelURL}`)
+		.setAuthor({
+			name: `${author.name}`,
+			url: `${author.thumbnail}`, 
+			iconURL: `${author.channelURL}`
+		})
 		.setTitle(`${queue[0].title}`)
 		.setURL(`${queue[0].url}`)
 		.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]`)
-		.setFooter(`requested by ${queue[0].request.name} | ${ytReg.test(queue[0].url) ? 'Youtube' : 'Soundcloud'}`, `${queue[0].request.avatarURL}`)
+		.setFooter({
+			text:`requested by ${queue[0].request.name} | ${ytReg.test(queue[0].url) ? 'Youtube' : 'Soundcloud'}`,
+			iconURL: `${queue[0].request.avatarURL}`
+		})
 		.setThumbnail(`${queue[0].thumbnail}`)
 
 	if(queue.length > 1) npEmbed.addFields({
@@ -268,20 +275,20 @@ async function loopMessage(interaction, server){
 		.setDescription(`현재 **${server.streamInfo.playInfo.loopmode}**`)
 		.addFields({
 			name: '🔂 싱글 루프 모드',
-			value: defaultmusicCommandScript.loopsingledes,
+			value: defaultMusicCommandScript.loopsingledes,
 			inline: false,
 		})
 		.addFields({
 			name: '🔁 대기열 반복 모드',
-			value: defaultmusicCommandScript.loopqueuedes,
+			value: defaultMusicCommandScript.loopqueuedes,
 			inline: false,
 		})
 		.addFields({
 			name: '♾️ 자동 재생 모드',
-			value: defaultmusicCommandScript.loopautodes,
+			value: defaultMusicCommandScript.loopautodes,
 			inline: false,
 		})
-		.setFooter(defaultMusicCommandScript.loopoffdes)
+		.setFooter({text: defaultMusicCommandScript.loopoffdes})
 		.setColor(process.env.DEFAULT_COLOR);
 
 	const selecbuttons = new MessageActionRow().addComponents(
@@ -328,7 +335,7 @@ async function loopMessage(interaction, server){
 		}
 	}
 	
-	await interaction.reply({embeds: [selectmodeEmbed], components: [selecbuttons]});
+	await interaction.editReply({embeds: [selectmodeEmbed], components: [selecbuttons]});
 	
 	const filter = i => i.user.id == interaction.member.id;
 	const collector = interaction.channel.createMessageComponentCollector({filter, time: 300e3});

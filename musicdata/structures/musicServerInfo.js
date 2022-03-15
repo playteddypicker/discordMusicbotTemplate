@@ -34,6 +34,7 @@ class serverInfo {
 	enterstop(){
 		this.streamInfo.playStatus = '⏹ 재생 중이 아님';
 		this.streamInfo.audioResource = null;
+		this.streamInfo.audioPlayer = null;
 		this.streamInfo.playInfo.loopmode = '반복 모드 꺼짐';
 		this.streamInfo.playInfo.volume = 0.3;
 		this.queue = [];
@@ -47,22 +48,29 @@ class musicFunctions extends serverInfo { //function only.
 	//default funcitons. (dont need arguments.)
 	//np, viewqueue는 command만 가능함. 여따 안넣고 defaultMusicCommands에다 넣기 ㄱ
 	pause() {
-		return this.streamInfo.connection.paused ? 
-			this.streamInfo.connection.audioPlayer.unpause() :
-			this.streamInfo.connection.pause();
-	}
-
-	skip() {
-		this.streamInfo.connection.audioPlayer?.stop();
+		return this.streamInfo.audioPlayer.paused ? 
+			this.streamInfo.audioPlayer.unpause() :
+			this.streamInfo.audioPlayer.pause();
 	}
 
 	async stop() {
-		await super.enterstop();
-		return this.streamInfo.connection.audioPlayer?.stop(true); //force-stop.
+		await this.streamInfo.audioPlayer.stop(true); //force-stop.
+		super.enterstop();
+		return true;
 	}
 
+	skip() {
+		if(this.queue.length == 1) {
+			this.streamInfo.audioPlayer.stop(true);
+			super.enterstop();
+		}
+		else 
+			this.streamInfo.audioPlayer.stop(true);
+	}
+
+
 	async eject() {
-		if(this.streamInfo.connection.audioPlayer) await this.streamInfo.connection.audioPlayer.stop(true); //force-stop.
+		if(this.streamInfo.audioPlayer) await this.streamInfo.audioPlayer.stop(true); //force-stop.
 		await super.enterstop(); //refresh streamInfo.
 		await this.streamInfo.connection.destroy();
 	}
@@ -165,5 +173,6 @@ class musicFunctions extends serverInfo { //function only.
 
 module.exports = {
 	serverInfo,
-	serverInfoList
+	serverInfoList,
+	musicFunctions
 }

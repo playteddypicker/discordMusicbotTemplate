@@ -43,7 +43,7 @@ const {
 const { searchsongScript } = require('../../script.json');
 
 const ytplReg1 = /^https:?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/;
-const ytplReg2 = /^.*(youtu.be\/|list=)([^#\&\?]*).*/
+const ytplReg2 = /^(?!.*\?.*\bv=)https:\/\/www\.youtube\.com\/.*\?.*\blist=.*$/;
 const yturlReg = /^https?:\/\/(www.youtube.com|youtube.com|youtu.be)\/(.*)$/;
 const scurlReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 const scsetReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)\/(sets)\/(.*)$/;
@@ -59,7 +59,7 @@ async function pushqueue(interaction, text){
 
 	let res = (ytplReg1.test(text) || ytplReg2.test(text)) ? await ytplGetInfo(text)
 		: scsetReg.test(text) ? await scsetGetInfo(text)
-		: yturlReg.test(text) ? await yturlGetINfo(text)
+		: yturlReg.test(text) ? await yturlGetInfo(text)
 		: scurlReg.test(text) ? await scurlGetInfo(text)
 		: 'search';
 
@@ -105,7 +105,7 @@ async function pushqueue(interaction, text){
 			});
 
 		resultMessage = {
-			content: searchsongScript.addfromPlaylist.interpolate({found : `${res.items.length}`}),
+			content: searchsongScript.addedfromPlaylist.interpolate({found : `${res.items.length}`}),
 			embeds: [doneEmbed],
 		}
 

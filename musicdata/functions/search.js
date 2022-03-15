@@ -6,6 +6,7 @@ const {
 	timestamptoSecond,
 	getTimestamp,
 } = require('../structures/timestamp.js');
+require('dotenv').config();
 
 async function ytplGetInfo(text){ //filter
 	//searchType : yt-playlist
@@ -13,7 +14,7 @@ async function ytplGetInfo(text){ //filter
 		const plres = await ytpl(text, {
 			limit: 1972
 		});
-		await console.log(`${plres.items.length} songs loaded from ytpl ${res.title}.`);
+		await console.log(`${plres.items.length} songs loaded from ytpl ${plres.title}.`);
 
 		const playlistInfo = {
 			info: {
@@ -73,7 +74,7 @@ async function yturlGetInfo(text){
 		const ytres = await ytdl.getInfo(text, {
 			requestOptions: {
 				headers: {
-					cookie: proecess.env.YOUTUBE_COOKIE,
+					cookie: process.env.YOUTUBE_COOKIE,
 				},
 			},
 		});
@@ -143,7 +144,7 @@ async function scsetGetInfo(text){
 
 async function scurlGetInfo(text){
 	try{
-		const scres = await scdl.getInfo(text);
+		const res = await scdl.getInfo(text);
 		const dur = await getTimestamp(Number(parseInt(res.duration/1000)));
 		
 		return {
@@ -191,7 +192,7 @@ async function ytsearchGetInfo(text, filter){
 			title: res.title,
 			url: res.url,
 			duration: res.duration,
-			thumbnail: res.author.bestAvatar.url ?? 'https://user-images.githubusercontent.com/110469/41812098-71d75190-7714-11e8-81e4-ac4cd3ad111f.png',
+			thumbnail: `https://i.ytimg.com/vi/${res.id}/hqdefault.jpg` ?? 'https://user-images.githubusercontent.com/110469/41812098-71d75190-7714-11e8-81e4-ac4cd3ad111f.png',
 			author: {
 				name: res.author.name,
 				thumbnail: res.author.bestAvatar.url ?? 'https://cdn-icons-png.flaticon.com/512/145/145809.png',
