@@ -11,7 +11,11 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('request')
 				.setDescription('재생할 노래 제목이나 링크를 적어주세요')
-				.setRequired(true)),
+				.setRequired(true))
+		.addBooleanOption(option =>
+			option.setName('playlistsearch')
+				.setDescription('플레이리스트만 검색할건지 선택해요')
+				.setRequired(false)),
 	async execute(interaction){
 		await interaction.deferReply();
 		const server = serverInfoList.get(interaction.guild.id);

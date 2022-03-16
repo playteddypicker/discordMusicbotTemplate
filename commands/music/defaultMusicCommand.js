@@ -130,8 +130,8 @@ module.exports = {
 				break;
 
 			case 'pause':
-				server.pause();
-				interaction.editReply(server.streamInfo.audioPlayer.paused ?
+				await server.pause();
+				interaction.editReply(server.streamInfo.audioPlayer.state.status == 'paused' ?
 					`${defaultMusicCommandScript.pausemsg}` :
 					`${defaultMusicCommandScript.playmsg}`);
 				break;

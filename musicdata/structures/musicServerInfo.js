@@ -1,4 +1,5 @@
 const serverInfoList = new Map();
+const { AudioPlayerStatus } = require('@discordjs/voice');
 
 class serverInfo {
 	constructor(guild){
@@ -48,9 +49,9 @@ class musicFunctions extends serverInfo { //function only.
 	//default funcitons. (dont need arguments.)
 	//np, viewqueue는 command만 가능함. 여따 안넣고 defaultMusicCommands에다 넣기 ㄱ
 	pause() {
-		return this.streamInfo.audioPlayer.paused ? 
+		return this.streamInfo.audioPlayer.state.status == 'paused' ? 
 			this.streamInfo.audioPlayer.unpause() :
-			this.streamInfo.audioPlayer.pause();
+			this.streamInfo.audioPlayer.pause(true);
 	}
 
 	async stop() {

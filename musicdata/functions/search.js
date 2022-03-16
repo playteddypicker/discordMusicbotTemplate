@@ -211,7 +211,7 @@ async function ytplsearchGetInfo(text){
 	try{
 		const defaultFilterOptions = await ytsr.getFilters(text);
 		const filteredUrl = defaultFilterOptions.get('Type').get('Playlist')
-		const searchResult = await ytsr(filteredUrl, {
+		const searchResult = await ytsr(filteredUrl.url, {
 			pages: 1
 		});
 
@@ -220,7 +220,7 @@ async function ytplsearchGetInfo(text){
 		const plres = await ytpl(searchResult.items[0].url, {
 			limit: 1972
 		});
-		await console.log(`${plres.items.length} songs loaded from ytpl ${res.title}.`);
+		await console.log(`${plres.items.length} songs loaded from ytpl ${plres.title}.`);
 
 		const playlistInfo = {
 			info: {

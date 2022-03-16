@@ -34,7 +34,7 @@ const {
 	scsetGetInfo,
 	scurlGetInfo,
 	ytsearchGetInfo,
-	ytplsearchGetinfo
+	ytplsearchGetInfo
 } = require('./search.js');
 const {
 	MessageEmbed,
@@ -42,9 +42,9 @@ const {
 } = require('discord.js');
 const { searchsongScript } = require('../../script.json');
 
-const ytplReg1 = /^https:?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/;
-const ytplReg2 = /^(?!.*\?.*\bv=)https:\/\/www\.youtube\.com\/.*\?.*\blist=.*$/;
-const yturlReg = /^https?:\/\/(www.youtube.com|youtube.com|youtu.be)\/(.*)$/;
+const ytplReg1 = /^https?:\/\/(www\.youtube\.com|youtube\.com|youtu\.be)\/playlist(.*)$/;
+const ytplReg2 = /^https?:\/\/(www\.youtube\.com|youtube\.com|youtu\.be).*(list=PL|list=OL)([^#\&\?]*)/;
+const yturlReg = /^https?:\/\/(www\.youtube\.com|youtube\.com|youtu\.be)\/(.*)$/;
 const scurlReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 const scsetReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)\/(sets)\/(.*)$/;
 
@@ -57,7 +57,7 @@ async function pushqueue(interaction, text){
 		banKeywords: server.streamInfo.searchFilter.banKeywords
 	};
 
-	let res = (ytplReg1.test(text) || ytplReg2.test(text)) ? await ytplGetInfo(text)
+	let res = (ytplReg1.test(text) || (ytplReg2.test(text) && !text.includes('index='))) ? await ytplGetInfo(text)
 		: scsetReg.test(text) ? await scsetGetInfo(text)
 		: yturlReg.test(text) ? await yturlGetInfo(text)
 		: scurlReg.test(text) ? await scurlGetInfo(text)
@@ -65,8 +65,8 @@ async function pushqueue(interaction, text){
 
 	if(res == 'search'){
 		const playlistSearchOption = (interaction instanceof Interaction) ?
-			interaction.options.getString('playlistsearch') :
-			null;
+			interaction.options.getBoolean('playlistsearch') :
+			false;
 
 		res = playlistSearchOption ?
 			await ytplsearchGetInfo(text) :
@@ -100,7 +100,7 @@ async function pushqueue(interaction, text){
 				iconURL: res.info.author.thumbnail
 			})
 			.setFooter({
-				text: `requested by ${interaction.member.displayname}`,
+				text: `requested by ${interaction.member.displayName}`,
 				iconURL: interaction.member.user.avatarURL()
 			});
 
