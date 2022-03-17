@@ -22,6 +22,7 @@ const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
 const yturlReg = /^https?:\/\/(www.youtube.com|youtube.com|youtu.be)\/(.*)$/;
+const scurlReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 
 require('dotenv').config();
 
@@ -73,6 +74,7 @@ async function streamTrigger(interaction, text, requestType){
 
 				if(!server.streamInfo.audioPlayer && server.queue.length > 0)
 					startStream(interaction, server);
+
 				//refresh player message.
 			});
 			break;
@@ -109,7 +111,7 @@ async function startStream(interaction, server){
 				server.queue[0].author.thumbnail = info.videoDetails.author.thumbnails[0].url;
 			}
 		}
-
+				
 		//refresh player embed.
 	});
 
@@ -123,7 +125,7 @@ async function startStream(interaction, server){
 
 		switch(server.streamInfo.playInfo.loopmode){
 			case '반복 모드 꺼짐':
-				server.queue.shift();
+				server.previousqueue.unshift(server.queue.shift());
 				break;
 
 			case '🔂 싱글 루프 모드':
@@ -131,16 +133,19 @@ async function startStream(interaction, server){
 				break;
 
 			case '🔁 대기열 반복 모드':
-				if(server.queue.length > 1) server.queue.push(server.queue.shift());
+				if(server.queue.length > 1) server.queue.unshift(server.queue.shift());
 				break;
 
 			case '♾️ 자동 재생 모드':
 				if(server.queue.length == 2){
-					//autoplaying
+					server.previousqueue.unshift(server.queue.shift());
+					autosearchPush(interaction, server);
 				}else
-					server.queue.shift();
+					server.previousqueue.unshift(server.queue.shift());
 				break;
 		}
+
+		if(server.previousqueue.length > 7) server.previousqueue.pop();
 
 		if(server.queue.length > 0) {
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
@@ -150,8 +155,10 @@ async function startStream(interaction, server){
 
 		if(server.queue.length == 0) {
 			/* if player not created */await interaction.channel.send('대기열에 노래가 없습니다.');
-			await server.enterstop();
 			server.streamInfo.audioPlayer = null;
+			if(server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드') 
+				await interaction.channel.send('⏹️ 플레이어가 초기화되어 자동 재생 모드가 꺼졌습니다.');
+			await server.enterstop();
 		}
 
 		//update player embed
@@ -205,7 +212,6 @@ async function getSongStream(interaction, server){
 				interaction.editReply('이 링크는 사용할 수 없습니다. 스킵합니다..') :
 				interaction.channel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
 		}
-
 	}
 }
 
@@ -246,6 +252,31 @@ async function getSongStream(interaction, server){
 }
 */
 
+const { ytsearchGetInfo, ytRelatedGetInfo } = require('./search.js');
+
+async function autosearchPush(interaction, server){
+
+	await interaction.channel.send('유튜브에서 추천 영상 찾는 중...');
+
+	const related = scurlReg.test(server.queue[0].url) ? //type: queueSong.
+		await ytsearchGetInfo(server.queue[0].title, server.streamInfo.searchFilter) : 
+		await ytRelatedGetInfo(server.queue[0].url, server.streamInfo.searchFilter, server.previousqueue);
+
+	if(typeof(related) === 'number')
+		return interaction.channel.send(streamScript.errormsg[related]);
+
+	related.request = {
+		name: interaction.member.displayName,
+		id: interaction.member.id,
+		avatarURL: interaction.member.user.avatarURL(),
+		tag: interaction.member.user.tag
+	}
+
+	server.queue.push(related);
+	
+	return interaction.channel.send(`**${related.title}** 대기열 **${server.queue.length - 1}**번에 추가됐습니다`);
+}
+
 function sendErrorMsg(interaction, errorCode){
 	/* list of errorMsg
 	 * 0 is not error.
@@ -264,4 +295,5 @@ function sendErrorMsg(interaction, errorCode){
 
 module.exports = {
 	streamTrigger,
+	autosearchPush
 }

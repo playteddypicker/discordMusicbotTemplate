@@ -134,9 +134,10 @@ async function loopMessage(interaction, server){
 					playmode: server.streamInfo.playInfo.loopmode
 				})
 			});
+		if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
+			console.log('auto');
+			require('../../musicdata/functions/stream.js').autosearchPush(interaction, server);
+		}
 	});
 
-	if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
-		//노래 자동추천 받아서 server.queue에 push
-	}
 }

@@ -52,11 +52,6 @@ const scsetReg = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)\/(sets)\/(.*)$/;
 //pushqueue는 기본적으로 음악 정보 수집에 성공하면 MessageEmbed를 return함.
 async function pushqueue(interaction, text){ 	
 	const server = serverInfoList.get(interaction.guild.id);
-	const filter = {
-		durationLimit: server.streamInfo.searchFilter.durationLimit,
-		banKeywords: server.streamInfo.searchFilter.banKeywords
-	};
-
 	let res = (ytplReg1.test(text) || (ytplReg2.test(text) && !text.includes('index='))) ? await ytplGetInfo(text)
 		: scsetReg.test(text) ? await scsetGetInfo(text)
 		: yturlReg.test(text) ? await yturlGetInfo(text)
@@ -70,7 +65,7 @@ async function pushqueue(interaction, text){
 
 		res = playlistSearchOption ?
 			await ytplsearchGetInfo(text) :
-			await ytsearchGetInfo(text, filter);
+			await ytsearchGetInfo(text, server.streamInfo.searchFilter);
 	}
 		
 	if(typeof(res) === 'number' || !res) return res ?? 7; 

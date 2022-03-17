@@ -5,13 +5,14 @@ class serverInfo {
 	constructor(guild){
 		this.guild = guild; //get id, name, guild.
 		this.queue = []; //can save songs maximum 1972.
+		this.previousqueue = []; //maximum : 5 songs.
 		this.streamInfo = {
 			streaming: false,
 			connection: null, //assigned by joinVoiceChannel or getVoiceStatus Function.
 			audioPlayer: null, //assigned by createAudioPlayer();
 			audioResource: null, //assigned by createAudioResource();
 			playStatus: '⏹ 재생 중이 아님', //playing, idle(stopped, default), buffering, pause, error.
-			searchFilter: {
+			searchFilter: { //필터는 DB에서 받아서 봇 켤때 적용
 				durationLimit: 0,
 				banKeywords: [],
 			},
