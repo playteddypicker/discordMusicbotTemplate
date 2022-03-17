@@ -73,8 +73,8 @@ async function pushqueue(interaction, text){
 			await ytsearchGetInfo(text, filter);
 	}
 		
-	if(typeof(res) === 'string' || !res) return res ?? 'error'; 
-	//error나면 string이 그대로 return됨.
+	if(typeof(res) === 'number' || !res) return res ?? 7; 
+	//error나면 errorcode가 그대로 return됨.
 
 	let resultMessage;
 

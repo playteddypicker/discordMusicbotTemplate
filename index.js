@@ -217,6 +217,11 @@ client.once('ready', async () => {
 		}
 	}
 
+	await client.user.setActivity(
+		'점검',
+		{ type: 'PLAYING' }
+	);
+
 	//4-3. show current status of bot on console.
 	setInterval(async () => {
 		const voiceGuilds = [];

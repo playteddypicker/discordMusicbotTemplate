@@ -65,7 +65,7 @@ async function ytplGetInfo(text){ //filter
 	}catch(error){
 		console.log('playlist search failed. reason:');
 		console.log(error);
-		return 'playlistError';
+		return 1;
 	}
 }
 
@@ -95,7 +95,7 @@ async function yturlGetInfo(text){
 	}catch(error){
 		console.log('youtube-url error. reason : ');
 		console.log(error);
-		return 'ytUrlError';
+		return 2;
 	}
 }
 
@@ -138,7 +138,7 @@ async function scsetGetInfo(text){
 	}catch(error){
 		console.log('error from loading soundcloud playlist. reason:');
 		console.log(error);
-		return 'scsetError';
+		return 3;
 	}
 }
 
@@ -162,7 +162,7 @@ async function scurlGetInfo(text){
 	}catch(error){
 		console.log('error from soundcloud url. reason:');
 		console.log(error);
-		return 'scError';
+		return 4;
 	}
 }
 
@@ -175,16 +175,24 @@ async function ytsearchGetInfo(text, filter){
 		});
 
 		let i = -1;
+		let bankeywordCheck = 0;
 		while(1){
 			i++;
+			if(i == 100 || i == searchResult.items.length - 1) return 5;
 
 			//filter 적용
-			if(filter.durationLimit != 0 && filter.durationLimit >= Number(timestamptoSecond(searchResult.items[i].duration))) break;
-			if(!filter.banKeywords.forEach(keyword => {
-				return searchReslt.items[i].title.includes(keyword);
-			})) break;
+			filter.banKeywords.forEach(keyword => {
+				if(searchResult.items[i].title.includes(keyword)) bankeywordCheck = 1;
+			});
+			if(filter.durationLimit != 0 && 
+				(filter.durationLimit < Number(timestamptoSecond(searchResult.items[i].duration)) || 
+				bankeywordCheck == 1)) {
+				bankeywordCheck = 0;
+				continue;
+			}
 
-			if(i == 100) return 'searchFailed';
+			else break;
+
 		}
 		
 		const res = searchResult.items[i];
@@ -203,7 +211,7 @@ async function ytsearchGetInfo(text, filter){
 	}catch(error){
 		console.log('youtube search error. reason : ');
 		console.log(error);
-		return 'searchError';
+		return 6;
 	}
 }
 
@@ -215,7 +223,7 @@ async function ytplsearchGetInfo(text){
 			pages: 1
 		});
 
-		if(searchResult.items.length == 0) return 'searchFailed';
+		if(searchResult.items.length == 0) return 5;
 
 		const plres = await ytpl(searchResult.items[0].url, {
 			limit: 1972
@@ -228,7 +236,7 @@ async function ytplsearchGetInfo(text){
 				url: plres.url,
 				thumbnail: plres.bestThumbnail.url,
 				author: plres.author ? {
-					name: plres.author.name,
+				name: plres.author.name,
 					thumbnail: plres.author.bestAvatar.url ?? 'https://cdn.icons-icons.com/icons2/730/png/512/youtube_icon-icons.com_62771.png',
 					channelURL: plres.author.url,
 				} : null
@@ -271,7 +279,7 @@ async function ytplsearchGetInfo(text){
 	}catch (error){
 		console.log('playlist search failed. reason:');
 		console.log(error);
-		return 'playlistError';
+		return 1;
 	}
 }
 

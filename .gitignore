@@ -5,3 +5,5 @@ commands/others/
 commands/dev/
 package-lock.json
 script.json
+.data/youtube.data
+.data/

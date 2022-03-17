@@ -35,7 +35,6 @@ class serverInfo {
 	enterstop(){
 		this.streamInfo.playStatus = '⏹ 재생 중이 아님';
 		this.streamInfo.audioResource = null;
-		this.streamInfo.audioPlayer = null;
 		this.streamInfo.playInfo.loopmode = '반복 모드 꺼짐';
 		this.streamInfo.playInfo.volume = 0.3;
 		this.queue = [];
@@ -55,25 +54,20 @@ class musicFunctions extends serverInfo { //function only.
 	}
 
 	async stop() {
-		await this.streamInfo.audioPlayer.stop(true); //force-stop.
-		super.enterstop();
+		await super.enterstop();
+		await this.streamInfo.audioPlayer?.stop(true); //force-stop.
 		return true;
 	}
 
 	skip() {
-		if(this.queue.length == 1) {
-			this.streamInfo.audioPlayer.stop(true);
-			super.enterstop();
-		}
-		else 
-			this.streamInfo.audioPlayer.stop(true);
+		this.streamInfo.audioPlayer.stop(true);
 	}
 
 
 	async eject() {
-		if(this.streamInfo.audioPlayer) await this.streamInfo.audioPlayer.stop(true); //force-stop.
-		await super.enterstop(); //refresh streamInfo.
 		await this.streamInfo.connection.destroy();
+		await super.enterstop(); //refresh streamInfo.
+		if(this.streamInfo.audioPlayer) await this.streamInfo.audioPlayer.stop(true); //force-stop.
 	}
 
 	//advanced functions, but dont require arguments.
@@ -170,6 +164,11 @@ class musicFunctions extends serverInfo { //function only.
 		}
 		this.queue = movearray(this.queue, range1, range2 - range1);
 		return true;
+	}
+
+	refresh(){
+		super.enterstop();
+		this.streamInfo.connection?.destroy();
 	}
 }
 

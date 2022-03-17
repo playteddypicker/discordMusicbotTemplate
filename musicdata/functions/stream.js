@@ -8,16 +8,17 @@ const {
 	AudioPlayerStatus,
 	entersState
 } = require('@discordjs/voice');
-
 const {
 	MessageEmbed,
 	Message,
 	Interaction
 } = require('discord.js');
+global.AbortController = require('node-abort-controller').AbortController;
 
 const { streamScript } = require('../../script.json');
 const { pushqueue } = require('./pushqueue.js');
 
+const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
 const yturlReg = /^https?:\/\/(www.youtube.com|youtube.com|youtu.be)\/(.*)$/;
@@ -62,7 +63,7 @@ async function streamTrigger(interaction, text, requestType){
 		case 'command':
 		case 'player':
 			pushqueue(interaction, text).then(rm => {
-				if(typeof(rm) === 'string') return sendErrorMsg(interaction, rm);
+				if(typeof(rm) === 'number') return sendErrorMsg(interaction, rm);
 
 				if(server.queue.length == 1) rm.content = '재생 시작!';
 
@@ -113,7 +114,6 @@ async function startStream(interaction, server){
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Idle, async () => {
-		console.log('asdf');
 		if(errorhandling == 1) {
 			//기타 핸들링..
 			errorhandling = 0;
@@ -131,7 +131,7 @@ async function startStream(interaction, server){
 				break;
 
 			case '🔁 대기열 반복 모드':
-				if(server.queue.length > 1) server.queue.push(queue.shift());
+				if(server.queue.length > 1) server.queue.push(server.queue.shift());
 				break;
 
 			case '♾️ 자동 재생 모드':
@@ -142,16 +142,16 @@ async function startStream(interaction, server){
 				break;
 		}
 
-		console.log(server.queue.length);
-
 		if(server.queue.length > 0) {
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
 			server.streamInfo.playStatus = '▶️ 지금 재생 중';
 			interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
-		}		
-		if(server.queue.length == 0 /* && player not created */) {
-			await interaction.channel.send('대기열에 노래가 없습니다.');
+		}	
+
+		if(server.queue.length == 0) {
+			/* if player not created */await interaction.channel.send('대기열에 노래가 없습니다.');
 			await server.enterstop();
+			server.streamInfo.audioPlayer = null;
 		}
 
 		//update player embed
@@ -172,9 +172,44 @@ async function startStream(interaction, server){
 	audioPlayer.on('error', e => {
 		errorhandling = 1;
 		console.log(e);
-	})
+		getSongStream(interaction, server);
+	});
 }
 
+//play-dl function.
+async function getSongStream(interaction, server){
+	try{
+		let streamSong = yturlReg.test(server.queue[0].url) ?
+			await playdl.stream(server.queue[0].url) : 
+			await scdl.download(server.queue[0].url);
+
+		server.streamInfo.audioResource = yturlReg.test(server.queue[0].url) ? 
+			await createAudioResource(streamSong.stream, {
+				inlineVolume: true,
+				inputType: streamSong.type
+			}) :
+			await createAudioResource(streamSong,{
+				inlineVolume: true,
+			});
+		server.streamInfo.audioResource.volume.setVolume(server.streamInfo.playInfo.volume);
+
+		await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
+		await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);	
+	}catch(error){
+		interaction.editReply('스트리밍 중 오류가 발생했습니다.');
+		console.log(error);
+
+		if(error.message.includes('UnrecoverableError')) {
+			server.queue.shift();
+			(interaction instanceof Interaction) ? 
+				interaction.editReply('이 링크는 사용할 수 없습니다. 스킵합니다..') :
+				interaction.channel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
+		}
+
+	}
+}
+
+/* ytdl version(has aborting issue)
 async function getSongStream(interaction, server){
 	let streamSong = yturlReg.test(server.queue[0].url) ?
 		await ytdl(server.queue[0].url, {
@@ -186,9 +221,11 @@ async function getSongStream(interaction, server){
 				}
 			}
 		}).on('error', (e) => {
-			console.log(`\nStreamingError at ${server.name}@${server.id}.`);
-			console.log(`User ${server.queue[0].request.tag} sent ${server.queue[0].title}(${server.queue[0].url})\nError:`);
+			console.log(`\nStreamingError at ${server.guild.name}@${server.guild.id}.`);
+			console.log(`User ${server.queue[0].request.tag} sent ${server.queue[0].title}(${server.queue[0].url})`);
+			console.log('-----------');
 			console.log(e);
+			console.log('-----------\n');
 
 			if(e.message.includes('UnrecoverableError')) {
 				server.queue.shift();
@@ -196,7 +233,7 @@ async function getSongStream(interaction, server){
 					interaction.editReply('이 링크는 사용할 수 없습니다. 스킵합니다..') :
 					interaction.channel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
 			}
-			//aborted는 playbackduration 저장해놔서 거기서부터 다시 틀수 있게끔
+
 		}) : await scdl.download(server.queue[0].url);
 
 	server.streamInfo.audioResource = await createAudioResource(streamSong, {
@@ -207,9 +244,22 @@ async function getSongStream(interaction, server){
 	await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
 	await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);
 }
+*/
 
-function sendErrorMsg(interaction, errorMsg){
-	console.log(errorMsg);
+function sendErrorMsg(interaction, errorCode){
+	/* list of errorMsg
+	 * 0 is not error.
+	 * errorcode 1 : 'playlistError', 
+	 * errorcode 2 : 'ytUrlError',
+	 * errorcode 3 : 'scsetError',
+	 * errorcode 4 : 'scError',
+	 * errorcode 5 : 'searchFailed',
+	 * erorrcode 6 : 'searchError',
+	 * errorcode 7 : 'error'
+	 */
+	console.log(`this error message was sent to ${interaction.guild.id}@${interaction.guild.name}\n`);
+	if(typeof(errorCode) === 'number') interaction.editReply(streamScript.errormsg[errorCode]);
+	else interaction.editReply(streamScript.errormsg[0]);
 }
 
 module.exports = {
