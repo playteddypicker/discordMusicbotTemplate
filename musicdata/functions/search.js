@@ -182,7 +182,7 @@ async function ytsearchGetInfo(text, filter){
 
 			//filter 적용
 			filter.banKeywords.forEach(keyword => {
-				if(searchResult.items[i].title.includes(keyword)) bankeywordCheck = 1;
+				if(searchResult.items[i].title.toLowerCase().includes(keyword.toLowerCase())) bankeywordCheck = 1;
 			});
 			if(filter.durationLimit != 0 && 
 				(filter.durationLimit < Number(timestamptoSecond(searchResult.items[i].duration)) || 
@@ -307,10 +307,10 @@ async function ytRelatedGetInfo(text, filter, previousqueue){
 		for(let i = 0; i < relatedVideos.length; i++){
 
 			filter.banKeywords.forEach(keyword => {
-				if(relatedVideos[i].title.includes(keyword)) bankeywordCheck = 1;
+				if(relatedVideos[i].title.toLowerCase().includes(keyword.toLowerCase())) bankeywordCheck = 1;
 			});
 
-			previousqueue.forEach(q => {
+			if(previousqueue.length > 0) previousqueue.forEach(q => {
 				if(relatedVideos[i].id == youtube_parser(q.url)) previousidCheck = 1;
 			})
 
@@ -330,7 +330,7 @@ async function ytRelatedGetInfo(text, filter, previousqueue){
 					author: {
 						name: relatedVideos[i].author.name,
 						thumbnail: relatedVideos[i].author.thumbnails[0].url ?? 'https://user-images.githubusercontent.com/110469/41812098-71d75190-7714-11e8-81e4-ac4cd3ad111f.png', 
-						channelURL: relatedVideos[i].author.chanenel_url,
+						channelURL: relatedVideos[i].author.channel_url,
 					}
 				}
 				break;

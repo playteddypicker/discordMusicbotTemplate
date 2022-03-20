@@ -85,6 +85,7 @@ async function streamTrigger(interaction, text, requestType){
 }
 
 async function startStream(interaction, server){
+	server.streamInfo.currentCommandChannel = '#<' + interaction.channel.id + '>';
 	const wait = require('util').promisify(setTimeout);
 	let errorhandling = 0;
 	
@@ -94,7 +95,6 @@ async function startStream(interaction, server){
 
 	await getSongStream(interaction, server);
 	
-
 	//status handler
 	audioPlayer.on(AudioPlayerStatus.Playing, async () => {
 		server.streamInfo.playStatus = '▶️ 지금 재생 중';
@@ -150,7 +150,8 @@ async function startStream(interaction, server){
 		if(server.queue.length > 0) {
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
 			server.streamInfo.playStatus = '▶️ 지금 재생 중';
-			interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
+			if(server.streamInfo.playInfo.loopmode != '🔂 싱글 루프 모드')
+				interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
 		}	
 
 		if(server.queue.length == 0) {

@@ -10,7 +10,7 @@ require('dotenv').config();
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('history')
-		.setDescription('↩️  최근에 틀었던 노래를 최대 5곡까지 보여줘요'),
+		.setDescription('↩️  최근에 틀었던 노래를 최대 7곡까지 보여줘요'),
 	async execute(interaction){
 		await interaction.deferReply();
 		

@@ -5,8 +5,10 @@ class serverInfo {
 	constructor(guild){
 		this.guild = guild; //get id, name, guild.
 		this.queue = []; //can save songs maximum 1972.
-		this.previousqueue = []; //maximum : 5 songs.
-		this.streamInfo = {
+		this.previousqueue = []; //maximum : 7 songs.
+	this.streamInfo = {
+			commandChannel: '0',
+			currentCommandChannel : '',
 			streaming: false,
 			connection: null, //assigned by joinVoiceChannel or getVoiceStatus Function.
 			audioPlayer: null, //assigned by createAudioPlayer();
@@ -19,17 +21,25 @@ class serverInfo {
 			playInfo : {
 				loopmode: '반복 모드 꺼짐', //loop mode. off, single, queue, auto
 				volume: 0.3, //default volume. [0, 1].
-				prevsong: [], //save previous songs maximum 10.
 			}
 		};
 		this.playerInfo = { // *must save db.
-			playerChannelId: '', //fetch by Id, load from database.
-			playerChannelName: '', //load from fetch function.
+			setupped: false,
+			channelId: '941662357829066784',
 			playermsg: {
-				id: '',
-				playerBannerImageUrl : '', //custom player banner, status image.
-				playerEmbedImageUrl : '',
-			} //fetch by Id, load from database. if not exist, refresh the channel.
+				banner: {
+					id: '950407098708164670',
+					message: '',
+					imageURL: [],
+					swapmode: 0, //0: default, 1: 순서대로, 2: 랜덤
+				},
+				embed: {
+					id: '950407100452995072',
+					message: '',
+					imageURL: [],
+					swapmode: 0, //0: default, 1: 순서대로, 2: 랜덤
+				}
+			}
 		};
 	}
 
@@ -42,7 +52,8 @@ class serverInfo {
 	}
 }
 
-class musicFunctions extends serverInfo { //function only.
+//musicserver default commands.
+class musicFunctions extends serverInfo {
 	constructor(guild){
 		super(guild);
 	}

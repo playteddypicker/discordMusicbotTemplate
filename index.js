@@ -138,6 +138,13 @@ const {
 	serverInfo,
 	musicFunctions
 } = require('./musicdata/structures/musicServerInfo.js');
+const {
+	serverData,
+	serverPlayerData
+} = require('./musicdata/structures/schema.js');
+const {
+	syncPlayerChannel
+} = require('./musicdata/functions/syncplayer.js');
 
 async function loadGuild(guild){
 	await console.log(`┌---${guild.id}@${guild.name} Loading Started----`);
@@ -157,22 +164,30 @@ async function loadGuild(guild){
 	//load default musicserver info.
 	try{
 		await console.log('| Loading default music system info...');
-		const musicserverShard = new musicFunctions(guild);
-		await serverInfoList.set(guild.id, musicserverShard);
-		await console.log('| Successfully loaded.');
-	}catch(error){
-		await console.log('| Failed to load. reason : ');
-		await console.log(error);
-	}
+		serverInfoList.set(guild.id, new musicFunctions(guild));
+		const musicserverShard = serverInfoList.get(guild.id);
+		
+		const serverdbInfo = await serverData.findOne({guildId: guild.id});
+		if(serverdbInfo) {
+			musicserverShard.streamInfo.searchFilter = serverdbInfo.searchFilter;
+			musicserverShard.streamInfo.commandChannel = serverdbInfo.commandChannel;
+		}
 
+		await console.log('| Successfully loaded.');
+		
 	//sync to the music server player.
-	try{
 		await console.log('| Syncing player infos from db...');
-		if('asdfasdf'){/*player exists from db*/
+		const serverplayerdbInfo = await serverPlayerData.findOne({guildId: guild.id});
+
+		if(serverplayerdbInfo){/*player exists from db*/
+			musicserverShard.playerInfo = serverplayerdbInfo;
+			syncPlayerChannel(guild.id);
 
 		}else{
+			syncPlayerChannel(guild.id);
 			await console.log("| Player infos are doesn't exist in this server at db." );
 		}
+		
 	}catch(error){
 		await console.log('| Failed to sync. reason : ');
 		console.log(error);

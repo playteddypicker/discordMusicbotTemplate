@@ -47,7 +47,7 @@ module.exports = {
 			})
 			.setTitle(`${queue[0].title}`)
 			.setURL(`${queue[0].url}`)
-			.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]`)
+			.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]\n채널 ${server.streamInfo.currentCommandChannel} | <#${server.streamInfo.connection.joinConfig.channelId}>`)
 			.setFooter({
 				text:`requested by ${queue[0].request.name} | ${ytReg.test(queue[0].url) ? 'Youtube' : 'Soundcloud'}`,
 				iconURL: `${queue[0].request.avatarURL}`
