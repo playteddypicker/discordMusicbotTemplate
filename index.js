@@ -34,7 +34,18 @@ String.prototype.interpolate = function (params){
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const Discord = require('discord.js');
-
+const {
+	serverInfoList,
+	serverInfo,
+	musicFunctions
+} = require('./musicdata/structures/musicServerInfo.js');
+const {
+	serverData,
+	serverPlayerData
+} = require('./musicdata/structures/schema.js');
+const {
+	syncPlayerChannel
+} = require('./musicdata/functions/syncplayer.js');
 const Intents = Discord.Intents;
 const client = new Discord.Client({
 	intents: [
@@ -44,7 +55,21 @@ const client = new Discord.Client({
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 		Intents.FLAGS.DIRECT_MESSAGES,
 		Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
-	]
+	],
+	makeCache: Discord.Options.cacheWithLimits({
+		MessageManager: {
+			sweepInterval: 60,
+			maxSize: 10,
+		},
+		ThreadManager: 0,
+		GuildInviteManager: 0,
+		GulidBanManager: 0,
+		StageInstanceManager: 0,
+		ThreadMemberManager: 0,
+		GuildStickerManager: 0,
+		ReactionUserManager: 0,
+	}),
+	partials: ["CHANNEL"]
 });
 
 //1. commands pre-settings
@@ -100,10 +125,7 @@ client.on('guildCreate', async (guild) => {
 		console.log(`Bot added to guild ${guild.name}@${guild.id}`);
 		console.log(`Slash Commands are loading...`);
 		try{
-			await rest.put(
-				Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
-				{ body: commands }
-			);
+			loadGuild(guild);
 			console.log(`Slash Commands are successfully loaded.`);
 		}catch(e){
 			console.log(`Slash Commands are failed to load. Reason :`);
@@ -122,29 +144,12 @@ client.on('guildDelete', async (guild) => {
 	//removing player info from db.
 })
 
-//3-3. guild admin force-deleted player channel.
-client.on('channelDelete', async (channel) => {
-		//identify by id of player channel in db.
-})
-
-
 //4. assigning informations to each guild.
 const wait = util.promisify(setTimeout);
 const rest = new REST({
 	version: '9'
 }).setToken(process.env.DISCORD_TOKEN);
-const {
-	serverInfoList,
-	serverInfo,
-	musicFunctions
-} = require('./musicdata/structures/musicServerInfo.js');
-const {
-	serverData,
-	serverPlayerData
-} = require('./musicdata/structures/schema.js');
-const {
-	syncPlayerChannel
-} = require('./musicdata/functions/syncplayer.js');
+
 
 async function loadGuild(guild){
 	await console.log(`┌---${guild.id}@${guild.name} Loading Started----`);
@@ -180,11 +185,17 @@ async function loadGuild(guild){
 		const serverplayerdbInfo = await serverPlayerData.findOne({guildId: guild.id});
 
 		if(serverplayerdbInfo){/*player exists from db*/
-			musicserverShard.playerInfo = serverplayerdbInfo;
-			syncPlayerChannel(guild.id);
-
+			const dataplayerchannel = await client.channels.cache.find(ch => ch.id == serverplayerdbInfo.channelId);
+			if(dataplayerchannel){ //DB에 플레이어 정보 있고 그게 실제로 서버에 있으면
+				musicserverShard.playerInfo = serverplayerdbInfo;
+				console.log(musicserverShard.playerInfo);
+				syncPlayerChannel(guild.id);
+				musicserverShard.playerInfo.setupped = true;
+			}else{ //DB상에는 남아있는데 서버에 없는경우 강제삭제
+				await serverPlayerData.deleteMany({guildId: guild.id});
+				console.log('DBerror Detected. deleted db.');
+			}
 		}else{
-			syncPlayerChannel(guild.id);
 			await console.log("| Player infos are doesn't exist in this server at db." );
 		}
 		

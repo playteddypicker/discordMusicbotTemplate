@@ -21,7 +21,10 @@ module.exports = {
 		await interaction.deferReply();
 
 		if(!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR))
-			return interaction.editReply('이 명령어는 관리자 권한을 가진 유저만 쓸 수 있습니다');
+			return interaction.editReply({
+				content: '이 명령어는 관리자 권한을 가진 유저만 쓸 수 있습니다',
+				ephemeral: true,
+			});
 
 		const server = serverInfoList.get(interaction.guild.id);
 		let GetserverData = await serverData.findOne({guildId: interaction.guild.id});

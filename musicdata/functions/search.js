@@ -172,18 +172,21 @@ async function ytsearchGetInfo(text, filter){
 		const filteredUrl = defaultFilterOptions.get('Type').get('Video').url;
 		const searchResult = await ytsr(filteredUrl, {
 			pages: 1
-		});
+		}).catch(e => null);
 
 		let i = -1;
 		let bankeywordCheck = 0;
 		while(1){
 			i++;
-			if(i == 100 || i == searchResult.items.length - 1) return 5;
+			if(i == 100 || i == searchResult.items.length - 1 || !searchResult || !searchResult.items[i]) return 5;
 
 			//filter 적용
-			filter.banKeywords.forEach(keyword => {
-				if(searchResult.items[i].title.toLowerCase().includes(keyword.toLowerCase())) bankeywordCheck = 1;
-			});
+			if(filter.banKeywords.length > 0) //속도 향상을 위한 조건문
+				filter.banKeywords.forEach(keyword => {
+					if(searchResult.items[i].title.toLowerCase()
+						.includes(keyword.toLowerCase())) bankeywordCheck = 1;
+				});
+
 			if(filter.durationLimit != 0 && 
 				(filter.durationLimit < Number(timestamptoSecond(searchResult.items[i].duration)) || 
 				bankeywordCheck == 1)) {
@@ -310,8 +313,10 @@ async function ytRelatedGetInfo(text, filter, previousqueue){
 				if(relatedVideos[i].title.toLowerCase().includes(keyword.toLowerCase())) bankeywordCheck = 1;
 			});
 
+
 			if(previousqueue.length > 0) previousqueue.forEach(q => {
-				if(relatedVideos[i].id == youtube_parser(q.url)) previousidCheck = 1;
+				if(q && relatedVideos[i].id == youtube_parser(q.url)) previousidCheck = 1;
+				console.log(youtube_parser(q.url));
 			})
 
 

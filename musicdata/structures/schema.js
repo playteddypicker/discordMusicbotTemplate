@@ -13,18 +13,14 @@ const playerSchema = new mongoose.Schema({
 	guildId: String,
 	channelId: String,
 	channelName: String,
-	msg: {
+	playermsg: {
 		banner: {
-			id: String,
-			message: String,
+			messageContent: String,
 			imageURL: [String],
-			swapmode: Number,
 		},
 		embed: {
-			id: String,
-			message: String,
+			messageContent: String,
 			imageURL: [String],
-			swapmode: Number,
 		}
 	}
 });

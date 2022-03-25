@@ -6,7 +6,7 @@ class serverInfo {
 		this.guild = guild; //get id, name, guild.
 		this.queue = []; //can save songs maximum 1972.
 		this.previousqueue = []; //maximum : 7 songs.
-	this.streamInfo = {
+		this.streamInfo = {
 			commandChannel: '0',
 			currentCommandChannel : '',
 			streaming: false,
@@ -25,19 +25,20 @@ class serverInfo {
 		};
 		this.playerInfo = { // *must save db.
 			setupped: false,
-			channelId: '941662357829066784',
+			channelId: '',
+			channelName: '',
 			playermsg: {
 				banner: {
-					id: '950407098708164670',
-					message: '',
+					id: '',
+					messageContent: '',
+					message: null,
 					imageURL: [],
-					swapmode: 0, //0: default, 1: 순서대로, 2: 랜덤
 				},
 				embed: {
-					id: '950407100452995072',
-					message: '',
+					id: '',
+					messageContent: '',
+					message: null,
 					imageURL: [],
-					swapmode: 0, //0: default, 1: 순서대로, 2: 랜덤
 				}
 			}
 		};

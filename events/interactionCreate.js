@@ -1,6 +1,6 @@
 const musiccommandFilterList = [
 	'play', 'eject', 'jump', 'loop', 'move', 'pause',
-	'remove', 'shuffle', 'stop', 'volume'
+	'remove', 'shuffle', 'stop', 'volume', 'skip'
 ];
 
 const serverInfoList = require('../musicdata/structures/musicServerInfo.js').serverInfoList;
@@ -14,9 +14,11 @@ module.exports = {
 		if(!cmd) return;
 
 		const server = serverInfoList.get(interaction.guild.id);
-
-		if(musiccommandFilterList.find(el => el === cmd.data.name) && //or interaction.guild.id == server.playerInfo.channel.id
-		   server.streamInfo.commandChannel != '0') 
+		
+		if(musiccommandFilterList.find(el => el === cmd.data.name) && 
+		  (!server.streamInfo.commandChannel.includes(interaction.channel.id) &&
+		   server.streamInfo.commandChannel != '0') &&
+		   server.playerInfo.channelId != interaction.channel.id)
 			return await interaction.reply({
 				content: `음악 명령어는 ${server.streamInfo.commandChannel}에서만 사용 가능합니다`,
 				ephemeral: true

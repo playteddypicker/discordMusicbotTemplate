@@ -135,7 +135,6 @@ async function loopMessage(interaction, server){
 				})
 			});
 		if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
-			console.log('auto');
 			require('../../musicdata/functions/stream.js').autosearchPush(interaction, server);
 		}
 	});

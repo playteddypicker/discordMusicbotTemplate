@@ -17,6 +17,7 @@ global.AbortController = require('node-abort-controller').AbortController;
 
 const { streamScript } = require('../../script.json');
 const { pushqueue } = require('./pushqueue.js');
+const { getPlayerEmbed } = require('./updateplayer.js');
 
 const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
@@ -58,24 +59,28 @@ async function streamTrigger(interaction, text, requestType){
 			adapterCreator: interaction.guild.voiceAdapterCreator
 		});
 	}
+	
+	server.streamInfo.currentCommandChannel = '<#' + interaction.channel.id + '>';
 
 	//seperated by request type. there're three types : command, player, playlist(db).
 	switch(requestType){
 		case 'command':
 		case 'player':
-			pushqueue(interaction, text).then(rm => {
+			await pushqueue(interaction, text).then(rm => {
 				if(typeof(rm) === 'number') return sendErrorMsg(interaction, rm);
 
 				if(server.queue.length == 1) rm.content = '재생 시작!';
 
-				requestType == 'command' ? 
-					interaction.editReply(rm) :
-					interaction.channel.send(rm);
+				if(requestType == 'command') interaction.editReply(rm);
 
 				if(!server.streamInfo.audioPlayer && server.queue.length > 0)
 					startStream(interaction, server);
 
 				//refresh player message.
+				server.playerInfo.playermsg.embed.message?.edit({
+					content: getPlayerEmbed(server).content,
+					embeds: getPlayerEmbed(server).embeds
+				})
 			});
 			break;
 
@@ -85,7 +90,6 @@ async function streamTrigger(interaction, text, requestType){
 }
 
 async function startStream(interaction, server){
-	server.streamInfo.currentCommandChannel = '#<' + interaction.channel.id + '>';
 	const wait = require('util').promisify(setTimeout);
 	let errorhandling = 0;
 	
@@ -113,6 +117,10 @@ async function startStream(interaction, server){
 		}
 				
 		//refresh player embed.
+		server.playerInfo.playermsg.embed.message?.edit({
+			content: getPlayerEmbed(server).content,
+			embeds: getPlayerEmbed(server).embeds
+		})
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Idle, async () => {
@@ -133,7 +141,7 @@ async function startStream(interaction, server){
 				break;
 
 			case '🔁 대기열 반복 모드':
-				if(server.queue.length > 1) server.queue.unshift(server.queue.shift());
+					server.queue.push(server.queue.shift());
 				break;
 
 			case '♾️ 자동 재생 모드':
@@ -150,37 +158,51 @@ async function startStream(interaction, server){
 		if(server.queue.length > 0) {
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
 			server.streamInfo.playStatus = '▶️ 지금 재생 중';
-			if(server.streamInfo.playInfo.loopmode != '🔂 싱글 루프 모드')
+			if(server.streamInfo.playInfo.loopmode != '🔂 싱글 루프 모드' && !server.playerInfo.setupped)
 				interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
 		}	
 
 		if(server.queue.length == 0) {
-			/* if player not created */await interaction.channel.send('대기열에 노래가 없습니다.');
+			if(!server.playerInfo.setupped) await interaction.channel.send('대기열에 노래가 없습니다.');
 			server.streamInfo.audioPlayer = null;
 			if(server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드') 
 				await interaction.channel.send('⏹️ 플레이어가 초기화되어 자동 재생 모드가 꺼졌습니다.');
 			await server.enterstop();
 		}
 
-		//update player embed
+		server.playerInfo.playermsg.embed.message?.edit({
+			content: getPlayerEmbed(server).content,
+			embeds: getPlayerEmbed(server).embeds
+		})
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Buffering, () => {
 		server.streamInfo.playStatus = '*️⃣ 버퍼링 중..';
 
-		//update player embed
+		server.playerInfo.playermsg.embed.message?.edit({
+			content: getPlayerEmbed(server).content,
+			embeds: getPlayerEmbed(server).embeds
+		})
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Paused, () => {
 		server.streamInfo.playStatus = '⏸️ 일시정지됨';
 
-		//update player embed
+		server.playerInfo.playermsg.embed.message?.edit({
+			content: getPlayerEmbed(server).content,
+			embeds: getPlayerEmbed(server).embeds
+		})
 	});
 
 	audioPlayer.on('error', e => {
 		errorhandling = 1;
 		console.log(e);
 		getSongStream(interaction, server);
+		
+		server.playerInfo.playermsg.embed.message?.edit({
+			content: getPlayerEmbed(server).content,
+			embeds: getPlayerEmbed(server).embeds
+		})
 	});
 }
 
@@ -267,13 +289,18 @@ async function autosearchPush(interaction, server){
 		return interaction.channel.send(streamScript.errormsg[related]);
 
 	related.request = {
-		name: interaction.member.displayName,
+		name: '자동 재생 모드',
 		id: interaction.member.id,
 		avatarURL: interaction.member.user.avatarURL(),
 		tag: interaction.member.user.tag
 	}
 
-	server.queue.push(related);
+	await server.queue.push(related);
+	
+	server.playerInfo.playermsg.embed.message?.edit({
+		content: getPlayerEmbed(server).content,
+		embeds: getPlayerEmbed(server).embeds
+	})
 	
 	return interaction.channel.send(`**${related.title}** 대기열 **${server.queue.length - 1}**번에 추가됐습니다`);
 }
@@ -290,7 +317,9 @@ function sendErrorMsg(interaction, errorCode){
 	 * errorcode 7 : 'error'
 	 */
 	console.log(`this error message was sent to ${interaction.guild.id}@${interaction.guild.name}\n`);
-	if(typeof(errorCode) === 'number') interaction.editReply(streamScript.errormsg[errorCode]);
+	if(typeof(errorCode) === 'number') (interaction instanceof Interaction) ? 
+		interaction.editReply(streamScript.errormsg[errorCode]) :
+		interaction.channel.send(streamScript.errormsg[errorCode]);
 	else interaction.editReply(streamScript.errormsg[0]);
 }
 
