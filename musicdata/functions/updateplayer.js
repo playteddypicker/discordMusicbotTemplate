@@ -37,10 +37,11 @@ function getPlayerEmbed(server){
 					title: server.queue[0].title,
 					color: process.env.DEFAULT_COLOR,
 					description: 
-					`${server.streamInfo.playInfo.loopmode} | 🔉 : ${Math.round(server.streamInfo.playInfo.volume * 100)}%
-					⏳ 러닝타임: 현재 ${server.queue[0].duration} | 전체 ${getTimestamp(totalSongDuration(server.queue))}
-					${server.streamInfo.playStatus}: <#${server.streamInfo.connection.joinConfig.channelId}> | 명령어 ${server.streamInfo.commandChannel != '0' ? server.streamInfo.commandChannel : server.streamInfo.currentCommandChannel}
-					`,
+					`${server.playInfo.playStatus[server.playInfo.playStatusCode]} | ` + 
+					`${server.playInfo.loopmode[server.playInfo.loopcode]} | 🔉 : ${Math.round(server.playInfo.volume * 100)}%` + '\n' +
+					`⏳ 러닝타임: 현재 ${server.queue[0].duration} | 전체 ${getTimestamp(totalSongDuration(server.queue))}` + '\n' +
+					`🎵 스트리밍 <#${server.streamInfo.connection.joinConfig.channelId}> | ` +
+					`명령어 ${server.streamInfo.commandChannel != '0' ? server.streamInfo.commandChannel : server.streamInfo.currentCommandChannel}`,
 					url: server.queue[0].url,
 					image: {url: server.queue[0].thumbnail},
 					footer:{
@@ -58,7 +59,9 @@ function getPlayerEmbed(server){
 					color: process.env.DEFAULT_COLOR,
 					description: 
 					`${syncplayerScript.emptyPlayerDescription}
-					연결: ${server.streamInfo.connection ? `<#${server.streamInfo.connection.joinConfig.channelId}>` : '❌'}`,
+					연결: ${server.streamInfo.connection && server.streamInfo.connection?.state.status != 'destroyed' ? 
+							`<#${server.streamInfo.connection.joinConfig.channelId}>` : 
+							'❌'}`,
 					image: {
 						url: process.env.PLAYEREMBED_IMAGEURL 
 					},

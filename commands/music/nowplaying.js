@@ -47,7 +47,10 @@ module.exports = {
 			})
 			.setTitle(`${queue[0].title}`)
 			.setURL(`${queue[0].url}`)
-			.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]\n채널 ${server.streamInfo.currentCommandChannel} | <#${server.streamInfo.connection.joinConfig.channelId}>`)
+			.setDescription(
+				`${server.playInfo.playStatus[server.playInfo.playStatusCode]} | ${server.playInfo.loopmode[server.playInfo.loopcode]} | ` + 
+				`🔉: ${Math.round(server.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]` + `\n`
+				`스트리밍 <#${server.streamInfo.connection.joinConfig.channelId}> | 명령어${server.streamInfo.currentCommandChannel}`)
 			.setFooter({
 				text:`requested by ${queue[0].request.name} | ${ytReg.test(queue[0].url) ? 'Youtube' : 'Soundcloud'}`,
 				iconURL: `${queue[0].request.avatarURL}`

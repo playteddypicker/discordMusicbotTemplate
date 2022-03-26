@@ -50,9 +50,9 @@ module.exports = {
 			);
 
 		let bankeywordString = '';
-		if(server.streamInfo.searchFilter.banKeywords.length != 0){
-			for(let i = 0; i < server.streamInfo.searchFilter.banKeywords.length; i++){
-				bankeywordString += `${server.streamInfo.searchFilter.banKeywords[i]} `;
+		if(server.playInfo.searchFilter.banKeywords.length != 0){
+			for(let i = 0; i < server.playInfo.searchFilter.banKeywords.length; i++){
+				bankeywordString += `${server.playInfo.searchFilter.banKeywords[i]} `;
 			}
 		}else
 			bankeywordString = '없음';
@@ -64,7 +64,7 @@ module.exports = {
 			.addFields(
 				{
 					name: '현재 최대 노래 길이',
-					value: server.streamInfo.searchFilter.durationLimit != 0 ? `${parseInt(server.streamInfo.searchFilter.durationLimit / 60)}분` : '제한 없음',
+					value: server.playInfo.searchFilter.durationLimit != 0 ? `${parseInt(server.playInfo.searchFilter.durationLimit / 60)}분` : '제한 없음',
 					inline: false
 				},
 				{
@@ -151,7 +151,7 @@ module.exports = {
 					});
 					const msgcollectorA = await awaitMessageInteger(editMessageA, 180);
 					//serverinfo에 저장
-					server.streamInfo.searchFilter.durationLimit = Number(msgcollectorA.content) * 60;
+					server.playInfo.searchFilter.durationLimit = Number(msgcollectorA.content) * 60;
 					msgcollectorA.delete();
 					break;
 
@@ -169,23 +169,23 @@ module.exports = {
 					msgcollectorB.delete();
 
 					//비어있으면 그냥 push
-					if(server.streamInfo.searchFilter.banKeywords.length == 0){
-						server.streamInfo.searchFilter.banKeywords.push(msgcollectorB.content.toLowerCase());
+					if(server.playInfo.searchFilter.banKeywords.length == 0){
+						server.playInfo.searchFilter.banKeywords.push(msgcollectorB.content.toLowerCase());
 						break;
 					}
 
 					//같은거 있는지 탐색, serverInfo에 저장
-					for(let i = 0; i < server.streamInfo.searchFilter.banKeywords.length; i++){
+					for(let i = 0; i < server.playInfo.searchFilter.banKeywords.length; i++){
 						//lowercase로만 저장
-						if(server.streamInfo.searchFilter.banKeywords[i] == msgcollectorB.content.toLowerCase()){
-							server.streamInfo.searchFilter.banKeywords.splice(i, 1);
+						if(server.playInfo.searchFilter.banKeywords[i] == msgcollectorB.content.toLowerCase()){
+							server.playInfo.searchFilter.banKeywords.splice(i, 1);
 							break;
 						}
 
 						//탐색 다 돌았는데도 없으면 push
-						if(i == server.streamInfo.searchFilter.banKeywords.length - 1 && 
-						server.streamInfo.searchFilter.banKeywords[i] != msgcollectorB.content.toLowerCase()){
-							server.streamInfo.searchFilter.banKeywords.push(msgcollectorB.content.toLowerCase());
+						if(i == server.playInfo.searchFilter.banKeywords.length - 1 && 
+						server.playInfo.searchFilter.banKeywords[i] != msgcollectorB.content.toLowerCase()){
+							server.playInfo.searchFilter.banKeywords.push(msgcollectorB.content.toLowerCase());
 							//혹시 모르니 break;
 							break;
 						}
@@ -223,22 +223,22 @@ module.exports = {
 					guildId: interaction.guild.id,
 					commandChannel: server.streamInfo.commandChannel,
 					searchFilter: {
-						durationLimit: server.streamInfo.searchFilter.durationLimit,
-						banKeywords: server.streamInfo.searchFilter.banKeywords
+						durationLimit: server.playInfo.searchFilter.durationLimit,
+						banKeywords: server.playInfo.searchFilter.banKeywords
 					}
 				});
 			}else{
 				GetserverData.commandChannel = server.streamInfo.commandChannel;
-				GetserverData.searchFilter.durationLimit = server.streamInfo.searchFilter.durationLimit;
-				GetserverData.searchFilter.banKeywords = server.streamInfo.searchFilter.banKeywords;
+				GetserverData.searchFilter.durationLimit = server.playInfo.searchFilter.durationLimit;
+				GetserverData.searchFilter.banKeywords = server.playInfo.searchFilter.banKeywords;
 			}
 			await GetserverData.save();
 
 			//durationLimit, banKeywords, commandChannel 설정하기
-			if(server.streamInfo.searchFilter.banKeywords.length != 0){
+			if(server.playInfo.searchFilter.banKeywords.length != 0){
 				bankeywordString = '';
-				for(let i = 0; i < server.streamInfo.searchFilter.banKeywords.length; i++){
-					bankeywordString += `${server.streamInfo.searchFilter.banKeywords[i]} `;
+				for(let i = 0; i < server.playInfo.searchFilter.banKeywords.length; i++){
+					bankeywordString += `${server.playInfo.searchFilter.banKeywords[i]} `;
 				}
 			}else
 				bankeywordString = '없음';
@@ -251,8 +251,8 @@ module.exports = {
 				.addFields(
 					{
 						name: '현재 최대 노래 길이',
-						value: (server.streamInfo.searchFilter.durationLimit != 0) ? 
-							`${parseInt(server.streamInfo.searchFilter.durationLimit / 60)}분` : '제한 없음',
+						value: (server.playInfo.searchFilter.durationLimit != 0) ? 
+							`${parseInt(server.playInfo.searchFilter.durationLimit / 60)}분` : '제한 없음',
 						inline: false
 					},
 					{

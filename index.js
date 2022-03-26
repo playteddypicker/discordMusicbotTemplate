@@ -174,7 +174,7 @@ async function loadGuild(guild){
 		
 		const serverdbInfo = await serverData.findOne({guildId: guild.id});
 		if(serverdbInfo) {
-			musicserverShard.streamInfo.searchFilter = serverdbInfo.searchFilter;
+			musicserverShard.playInfo.searchFilter = serverdbInfo.searchFilter;
 			musicserverShard.streamInfo.commandChannel = serverdbInfo.commandChannel;
 		}
 

@@ -101,7 +101,7 @@ async function startStream(interaction, server){
 	
 	//status handler
 	audioPlayer.on(AudioPlayerStatus.Playing, async () => {
-		server.streamInfo.playStatus = '▶️ 지금 재생 중';
+		server.playInfo.playStatusCode = 1;
 
 		if(server.queue.length > 0){
 			if(!server.queue[0].author.thumbnail){
@@ -129,22 +129,22 @@ async function startStream(interaction, server){
 			errorhandling = 0;
 			return;
 		}
-		server.streamInfo.playStatus = '⏹️ 재생 중이 아님';
+		server.playInfo.playStatusCode = 0;
 
-		switch(server.streamInfo.playInfo.loopmode){
-			case '반복 모드 꺼짐':
+		switch(server.playInfo.loopcode){
+			case 0:
 				server.previousqueue.unshift(server.queue.shift());
 				break;
 
-			case '🔂 싱글 루프 모드':
+			case 1:
 				//카운트 세는거 등등.. 지금은 추가 안함ㅅㄱ
 				break;
 
-			case '🔁 대기열 반복 모드':
+			case 2:
 					server.queue.push(server.queue.shift());
 				break;
 
-			case '♾️ 자동 재생 모드':
+			case 3:
 				if(server.queue.length == 2){
 					server.previousqueue.unshift(server.queue.shift());
 					autosearchPush(interaction, server);
@@ -157,15 +157,15 @@ async function startStream(interaction, server){
 
 		if(server.queue.length > 0) {
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
-			server.streamInfo.playStatus = '▶️ 지금 재생 중';
-			if(server.streamInfo.playInfo.loopmode != '🔂 싱글 루프 모드' && !server.playerInfo.setupped)
+			server.playInfo.playStatusCode = 1;
+			if(server.playInfo.loopcode != 1 && !server.playerInfo.setupped)
 				interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
 		}	
 
 		if(server.queue.length == 0) {
 			if(!server.playerInfo.setupped) await interaction.channel.send('대기열에 노래가 없습니다.');
 			server.streamInfo.audioPlayer = null;
-			if(server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드') 
+			if(server.playInfo.loopcode == 3) 
 				await interaction.channel.send('⏹️ 플레이어가 초기화되어 자동 재생 모드가 꺼졌습니다.');
 			await server.enterstop();
 		}
@@ -177,7 +177,7 @@ async function startStream(interaction, server){
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Buffering, () => {
-		server.streamInfo.playStatus = '*️⃣ 버퍼링 중..';
+		server.playInfo.playStatusCode = 2;
 
 		server.playerInfo.playermsg.embed.message?.edit({
 			content: getPlayerEmbed(server).content,
@@ -186,7 +186,7 @@ async function startStream(interaction, server){
 	});
 
 	audioPlayer.on(AudioPlayerStatus.Paused, () => {
-		server.streamInfo.playStatus = '⏸️ 일시정지됨';
+		server.playInfo.playStatusCode = 3;
 
 		server.playerInfo.playermsg.embed.message?.edit({
 			content: getPlayerEmbed(server).content,
@@ -195,6 +195,7 @@ async function startStream(interaction, server){
 	});
 
 	audioPlayer.on('error', e => {
+		server.playInfo.playStatusCode = 4;
 		errorhandling = 1;
 		console.log(e);
 		getSongStream(interaction, server);
@@ -221,12 +222,14 @@ async function getSongStream(interaction, server){
 			await createAudioResource(streamSong,{
 				inlineVolume: true,
 			});
-		server.streamInfo.audioResource.volume.setVolume(server.streamInfo.playInfo.volume);
+		server.streamInfo.audioResource.volume.setVolume(server.playInfo.volume);
 
 		await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
 		await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);	
 	}catch(error){
-		interaction.editReply('스트리밍 중 오류가 발생했습니다.');
+		interaction instanceof Interaction ? 
+			interaction.editReply('스트리밍 중 오류가 발생했습니다.') :
+			interaction.channel.send('스트리밍 중 오류가 발생했습니다.');
 		console.log(error);
 
 		if(error.message.includes('UnrecoverableError')) {
@@ -282,8 +285,8 @@ async function autosearchPush(interaction, server){
 	await interaction.channel.send('유튜브에서 추천 영상 찾는 중...');
 
 	const related = scurlReg.test(server.queue[0].url) ? //type: queueSong.
-		await ytsearchGetInfo(server.queue[0].title, server.streamInfo.searchFilter) : 
-		await ytRelatedGetInfo(server.queue[0].url, server.streamInfo.searchFilter, server.previousqueue);
+		await ytsearchGetInfo(server.queue[0].title, server.playInfo.searchFilter) : 
+		await ytRelatedGetInfo(server.queue[0].url, server.playInfo.searchFilter, server.previousqueue);
 
 	if(typeof(related) === 'number')
 		return interaction.channel.send(streamScript.errormsg[related]);

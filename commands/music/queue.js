@@ -27,7 +27,9 @@ module.exports = {
 		let queueEmbed = new MessageEmbed()
 			.setTitle(`대기 중인 노래 총 ${queue.length - 1}곡`)
 			.setColor(process.env.DEFAULT_COLOR)
-			.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | 러닝타임: ${getTimestamp(sec)}`);
+			.setDescription(
+				`${server.playInfo.playStatus[server.playInfo.playStatusCode]} | ${server.playInfo.loopmode[server.playInfo.loopcode]}` + 
+				` | 🔉: ${Math.round(server.playInfo.volume * 100)}% | 러닝타임: ${getTimestamp(sec)}`);
 
 		for(let i = 0; i < queue.length; i++){
 			let title = `#${i}. ${queue[i].title}`;
@@ -51,7 +53,9 @@ module.exports = {
 				queueEmbed = new MessageEmbed()
 				.setTitle(`대기 중인 노래 총 ${queue.length - 1}곡`)
 				.setColor(process.env.DEFAULT_COLOR)
-				.setDescription(`${server.streamInfo.playStatus} | ${server.streamInfo.playInfo.loopmode} | 🔉: ${Math.round(server.streamInfo.playInfo.volume * 100)}% | 러닝타임: ${getTimestamp(sec)}`);
+				.setDescription(
+					`${server.playInfo.playStatus[server.playInfo.playStatusCode]} | ${server.playInfo.loopmode[server.playInfo.loopcode]}` + 
+					` | 🔉: ${Math.round(server.playInfo.volume * 100)}% | 러닝타임: ${getTimestamp(sec)}`);
 			}
 		}
 		if(queue.length % 10 != 0) pages.push(queueEmbed);

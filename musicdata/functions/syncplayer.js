@@ -157,8 +157,11 @@ async function syncPlayerChannel(guildId){
 			await wait(10e3);
 			if(msg.deletable) msg.delete();
 		}else{
+			const msgs = msg.content.split("\n");
 			if(msg.deletable) await msg.delete().catch(e => null); //오류 좆까
-			await require('./stream.js').streamTrigger(msg, msg.content, 'player');
+			for(let i = 0; i < msgs.length; i++){
+				await require('./stream.js').streamTrigger(msg, msgs[i], 'player');
+			}
 			await playerEmbedMessage.edit({
 				content: getPlayerEmbed(server).content,
 				embeds: getPlayerEmbed(server).embeds
@@ -185,7 +188,7 @@ async function syncPlayerChannel(guildId){
 				}else if(server.queue.length == 1){
 					await server.stop();
 				}else{
-					server.eject();
+					await server.eject();
 				}
 				break;
 
@@ -223,43 +226,43 @@ async function syncPlayerChannel(guildId){
 				break;
 
 			case 'singleloop':
-				server.streamInfo.playInfo.loopmode == '🔂 싱글 루프 모드' ? 
-					server.streamInfo.playInfo.loopmode = '반복 모드 꺼짐' :
-					server.streamInfo.playInfo.loopmode = '🔂 싱글 루프 모드';
+				server.playInfo.loopcode == 1 ? 
+					server.playInfo.loopcode = 0 :
+					server.playInfo.loopcode = 1;
 				break;
 
 			case 'queueloop':
-				server.streamInfo.playInfo.loopmode == '🔁 대기열 반복 모드' ? 
-					server.streamInfo.playInfo.loopmode = '반복 모드 꺼짐' :
-					server.streamInfo.playInfo.loopmode = '🔁 대기열 반복 모드';
+				server.playInfo.loopcode == 2 ? 
+					server.playInfo.loopcode = 0 :
+					server.playInfo.loopcode = 2;
 				break;
 
 			case 'autoplay':
-				server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드' ? 
-					server.streamInfo.playInfo.loopmode = '반복 모드 꺼짐' :
-					server.streamInfo.playInfo.loopmode = '♾️ 자동 재생 모드';
-				if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
+				server.playInfo.loopcode == 3 ? 
+					server.playInfo.loopcode = 0 :
+					server.playInfo.loopcode = 3;
+				if(server.queue.length == 1 && server.playInfo.loopcode == 3){
 					require('../../musicdata/functions/stream.js').autosearchPush(i, server);
 				}
 				break;
 
 			case 'volumereduce':
-				server.streamInfo.playInfo.volume = 
-					(server.streamInfo.playInfo.volume - 0.1 <= 0) ? 0
-					: server.streamInfo.playInfo.volume - 0.1;
-				server.streamInfo.audioResource.volume.setVolume(server.streamInfo.playInfo.volume);
+				server.playInfo.volume = 
+					(server.playInfo.volume - 0.1 <= 0) ? 0
+					: server.playInfo.volume - 0.1;
+				server.streamInfo.audioResource.volume.setVolume(server.playInfo.volume);
 				break;
 
 			case 'volumeincrease':
-				server.streamInfo.playInfo.volume = 
-					(server.streamInfo.playInfo.volume + 0.1 >= 1) ? 1
-					: server.streamInfo.playInfo.volume + 0.1;
-				server.streamInfo.audioResource.volume.setVolume(server.streamInfo.playInfo.volume);
+				server.playInfo.volume = 
+					(server.playInfo.volume + 0.1 >= 1) ? 1
+					: server.playInfo.volume + 0.1;
+				server.streamInfo.audioResource.volume.setVolume(server.playInfo.volume);
 				break;
 
 			case 'deleterecentsong':
 				server.queue.length < 2 ? server.stop() : server.queue.pop();
-				if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
+				if(server.queue.length == 1 && server.playInfo.loopmode == 3){
 					require('../../musicdata/functions/stream.js').autosearchPush(i, server);
 				}
 				break;

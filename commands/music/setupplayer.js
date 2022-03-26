@@ -11,6 +11,7 @@ const {
 	MessageActionRow,
 	Permissions,
 } = require('discord.js');
+require('dotenv').config();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -70,7 +71,6 @@ module.exports = {
 				return;
 			}
 		}else{
-
 			const preferenceButtons = new MessageActionRow().addComponents(
 				new MessageButton()
 					.setCustomId('editplayermessage')
@@ -92,9 +92,38 @@ module.exports = {
 					.setCustomId('closewindow')
 					.setLabel('닫기')
 					.setStyle('DANGER')
-					) 
+					);
 
-			
+			const manuelEmbed = new MessageEmbed()
+				.setTitle('설정하고 싶은 것을 선택해주세요')
+				.addFields(
+					{
+						name: '플레이어 텍스트 설정',
+						value: '배너 위에 표시될 텍스트를 설정합니다.',
+						inline: false,
+					},
+					{
+						name: '플레이어 배너 설정',
+						value: '배너 이미지를 설정합니다.',
+						inline: false,
+					},
+					{
+						name: '플레이어 대기 이미지 설정',
+						value: '노래 재생 중이 아닐 때 플레이어에 표시할 사진을 설정합니다.',
+						inline: false,
+					},
+					{
+						name: '플레이어 지우기',
+						value: '플레이어를 지웁니다. (기존의 설정한게 초기화되니 신중하게 선택해주세요)',
+						inline: false,
+					},
+				)
+				.setColor(process.env.DEFAULT_COLOR)
+
+			await interaction.editReply({
+				embeds: [manuelEmbed],
+				components: [preferenceButtons]
+			})
 		}
 	}
 }

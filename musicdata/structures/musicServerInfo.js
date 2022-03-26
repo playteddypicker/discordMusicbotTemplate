@@ -13,14 +13,17 @@ class serverInfo {
 			connection: null, //assigned by joinVoiceChannel or getVoiceStatus Function.
 			audioPlayer: null, //assigned by createAudioPlayer();
 			audioResource: null, //assigned by createAudioResource();
-			playStatus: '⏹ 재생 중이 아님', //playing, idle(stopped, default), buffering, pause, error.
-			searchFilter: { //필터는 DB에서 받아서 봇 켤때 적용
+		};
+		this.playInfo = {
+			//나중에 script.json에 저장
+			playStatus: ['⏹ 재생 중이 아님', '▶️ 지금 재생 중', '*️⃣ 버퍼링 중..', '⏸️ 일시정지됨', '⚠️ 오류 발생'],
+			playStatusCode: 0, //max 4
+			loopmode: ['➡️ 기본 재생 모드', '🔂 반복 재생 모드', '🔁 대기열 반복 모드', '♾️ 자동 재생 모드'],
+			loopcode: 0, //max 3
+			volume: 0.3,
+			searchFilter: {
 				durationLimit: 0,
 				banKeywords: [],
-			},
-			playInfo : {
-				loopmode: '반복 모드 꺼짐', //loop mode. off, single, queue, auto
-				volume: 0.3, //default volume. [0, 1].
 			}
 		};
 		this.playerInfo = { // *must save db.
@@ -45,10 +48,9 @@ class serverInfo {
 	}
 
 	enterstop(){
-		this.streamInfo.playStatus = '⏹ 재생 중이 아님';
+		this.playInfo.playStatusCode = 0;
+		this.playInfo.loopcode = 0;
 		this.streamInfo.audioResource = null;
-		this.streamInfo.playInfo.loopmode = '반복 모드 꺼짐';
-		this.streamInfo.playInfo.volume = 0.3;
 		this.queue = [];
 	}
 }
@@ -67,8 +69,8 @@ class musicFunctions extends serverInfo {
 	}
 
 	async stop() {
-		await super.enterstop();
 		await this.streamInfo.audioPlayer?.stop(true); //force-stop.
+		await super.enterstop();
 		return true;
 	}
 
@@ -79,8 +81,8 @@ class musicFunctions extends serverInfo {
 
 	async eject() {
 		await this.streamInfo.connection.destroy();
-		await super.enterstop(); //refresh streamInfo.
 		if(this.streamInfo.audioPlayer) await this.streamInfo.audioPlayer.stop(true); //force-stop.
+		await super.enterstop(); //refresh streamInfo.
 	}
 
 	//advanced functions, but dont require arguments.
@@ -98,46 +100,16 @@ class musicFunctions extends serverInfo {
 		return true;
 	}
 
-	async loop(selectedMode) {
-		switch(selectedMode){
-			case 'off':
-				this.streamInfo.playInfo.loopmode = 'off';
-				break;
-				
-			case 'single':
-				this.streamInfo.playInfo.loopmode == 'single' ?
-					this.streamInfo.playInfo.loopmode = 'off' :
-					this.streamInfo.playInfo.loopmode = 'single';
-				break;
-
-			case 'queue':
-				this.streamInfo.playInfo.loopmode == 'queue' ?
-					this.streamInfo.playInfo.loopmode = 'off' :
-					this.streamInfo.playInfo.loopmode = 'queue';
-				break;
-
-			case 'auto':
-				this.streamInfo.playInfo.loopmode == 'auto' ?
-					this.streamInfo.playInfo.loopmode = 'off' :
-					this.streamInfo.playInfo.loopmode = 'auto';
-				break;
-		}
-
-		if(this.streamInfo.playInfo.loopmode == 'auto' && this.streamInfo.playInfo.queue.length == 1){
-			//search recommended song and push to the queue.
-		}
-	}
-
 	volume(size){
 		if(size < 1 || size > 100) return false;
 		this.streamInfo.audioResource.volume.setVolume(size / 100);
-		this.streamInfo.playInfo.volume = size / 100;
+		this.playInfo.volume = size / 100;
 		return true;
 	}
 
 	jump(goto){
 		if(goto >= this.queue.length) return false;
-		this.streamInfo.playInfo.loopmode == 'queue' ? 
+		this.playInfo.loopcode == 2 ? 
 			this.queue = this.queue.concat(this.queue.splice(0, goto-1)) :
 			this.queue.splice(0, goto-1);
 		this.streamInfo.audioPlayer.stop();

@@ -66,7 +66,7 @@ async function pushqueue(interaction, text){
 
 		res = playlistSearchOption ?
 			await ytplsearchGetInfo(text) :
-			await ytsearchGetInfo(text, server.streamInfo.searchFilter);
+			await ytsearchGetInfo(text, server.playInfo.searchFilter);
 	}
 
 	if(typeof(res) === 'number' || !res) return res ?? 7; 

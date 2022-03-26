@@ -27,16 +27,14 @@ module.exports = {
 				
 		if(interaction.channel.id == server.playerInfo.playerChannelId) 
 			return interaction.channel.send(defaultMusicCommandScript.loopwarn);
-		await loopMessage(interaction, server);
-
-		return;
+		return await loopMessage(interaction, server);
 	}
 }
 
 async function loopMessage(interaction, server){
 	const selectmodeEmbed = new MessageEmbed()
 		.setTitle('반복 모드를 선택해주세요')
-		.setDescription(`현재 **${server.streamInfo.playInfo.loopmode}**`)
+		.setDescription(`현재 **${server.playInfo.loopmode[server.playInfo.loopcode]}**`)
 		.addFields({
 			name: '🔂 싱글 루프 모드',
 			value: defaultMusicCommandScript.loopsingledes,
@@ -75,23 +73,23 @@ async function loopMessage(interaction, server){
 			.setDisabled(true),
 	);
 	
-	if(server.streamInfo.playInfo.loopmode == '반복 모드 꺼짐'){
+	if(server.playInfo.loopcode == 0){
 		selecbuttons.components[0].disabled = false;
 		selecbuttons.components[1].disabled = false;
 		selecbuttons.components[2].disabled = false;
 		selecbuttons.components[3].disabled = true;
 	}else{
-		if(server.streamInfo.playInfo.loopmode == '🔂 싱글 루프 모드'){
+		if(server.playInfo.loopcode == 1){
 			selecbuttons.components[0].disabled = true;
 			selecbuttons.components[1].disabled = false;
 			selecbuttons.components[2].disabled = false;
 			selecbuttons.components[3].disabled = false;
-		}else if(server.streamInfo.playInfo.loopmode == '🔁 대기열 반복 모드'){
+		}else if(server.playInfo.loopcode == 2){
 			selecbuttons.components[0].disabled = false;
 			selecbuttons.components[1].disabled = true;
 			selecbuttons.components[2].disabled = false;
 			selecbuttons.components[3].disabled = false;
-		}else if(server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
+		}else if(server.playInfo.loopcode == 3){
 			selecbuttons.components[0].disabled = false;
 			selecbuttons.components[1].disabled = false;
 			selecbuttons.components[2].disabled = true;
@@ -107,34 +105,34 @@ async function loopMessage(interaction, server){
 	collector.on('collect', async button => {
 		switch(button.customId){
 			case 'single':
-				server.streamInfo.playInfo.loopmode = '🔂 싱글 루프 모드';
+				server.playInfo.loopcode = 1;
 				break;
 
 			case 'queue':
-				server.streamInfo.playInfo.loopmode = '🔁 대기열 반복 모드';
+				server.playInfo.loopcode = 2;
 				break;
 
 			case 'autoplay':
-				server.streamInfo.playInfo.loopmode = '♾️ 자동 재생 모드';
+				server.playInfo.loopcode = 3;
 				break;
 
 			case 'off':
-				server.streamInfo.playInfo.loopmode = '반복 모드 꺼짐';
+				server.playInfo.loopcode = 0;
 				break;
 		}
 
 		collector.stop();
 		await interaction.deleteReply();
-		server.streamInfo.playInfo.loopmode == '반복 모드 꺼짐' ?
+		server.playInfo.loopcode == 0 ?
 			await interaction.channel.send({
 				content: defaultMusicCommandScript.loopoffmsg
 			}) :
 			await interaction.channel.send({
 				content: defaultMusicCommandScript.loopchmsg.interpolate({
-					playmode: server.streamInfo.playInfo.loopmode
+					playmode: server.playInfo.loopmode[server.playInfo.loopcode]
 				})
 			});
-		if(server.queue.length == 1 && server.streamInfo.playInfo.loopmode == '♾️ 자동 재생 모드'){
+		if(server.queue.length == 1 && server.playInfo.loopcode == 3){
 			require('../../musicdata/functions/stream.js').autosearchPush(interaction, server);
 		}
 	});
