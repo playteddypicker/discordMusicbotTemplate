@@ -211,7 +211,7 @@ async function loadGuild(guild){
 		console.log(error);
 	}
 
-	await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
+	await console.log(`└---- ${guild.name} successfully loaded. ----\n`);
 	
 }
 
