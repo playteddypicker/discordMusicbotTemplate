@@ -1,5 +1,3 @@
-const musicserver = require('../structures/musicPreference.js');
-
 module.exports = {
 	name: 'guildCreate',
 	once: false,
