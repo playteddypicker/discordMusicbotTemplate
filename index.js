@@ -198,7 +198,6 @@ async function loadGuild(guild){
 				await syncPlayerChannel(guild.id);
 				musicserverShard.playerInfo.setupped = true;
 
-				console.log(musicserverShard.playerInfo);
 			}else{ //DB상에는 남아있는데 서버에 없는경우 강제삭제
 				await serverPlayerData.deleteMany({guildId: guild.id});
 				console.log('DBerror Detected. deleted db.');
@@ -212,7 +211,7 @@ async function loadGuild(guild){
 		console.log(error);
 	}
 
-	await console.log('done');
+	await console.log(`└---- ${guild[1].name} successfully loaded. ----\n`);
 	
 }
 
