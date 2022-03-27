@@ -25,8 +25,8 @@ const playerSchema = new mongoose.Schema({
 	}
 });
 
-const serverData = mongoose.model('serverData', serverSchema);
-const serverPlayerData = mongoose.model('serverPlayerData', playerSchema);
+const serverData = mongoose.model(`${process.env.SERVERDBDIRNAME}`, serverSchema);
+const serverPlayerData = mongoose.model(`${process.env.PLAYERDBDIRNAME}`, playerSchema);
 
 module.exports = {
 	serverData,
