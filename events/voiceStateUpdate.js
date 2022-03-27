@@ -35,7 +35,7 @@ module.exports = {
 				server.playerInfo.setupped ? 
 					await server.playerInfo.playermsg.banner.message.channel.send(
 						"3분 뒤 아무런 활동이 없으면 퇴장합니다.") :
-					await server.recentChannel.send(
+					await server.recentChannel?.send(
 						"3분 뒤 아무런 활동이 없으면 퇴장합니다.");
 			
 			let i = 0;
@@ -76,7 +76,7 @@ module.exports = {
 					server.playerInfo.setupped ? 
 						await server.playerInfo.playermsg.banner.message.channel.send(
 							"아무런 활동이 없어 퇴장했습니다.") :
-						await server.recentChannel.send(
+						await server.recentChannel?.send(
 							"아무런 활동이 없어 퇴장했습니다.");
 					await server.playerInfo.playermsg.embed.message?.edit({
 						content: getPlayerEmbed(server).content,

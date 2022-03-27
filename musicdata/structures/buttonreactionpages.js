@@ -51,7 +51,6 @@ async function buttonreactionpages(button, pages){
 	while(1){
 		let pagebutton = await awaitInteraction();
 		if(!pagebutton){
-			pagebutton.deleteReply();
 			return;
 		}
 
