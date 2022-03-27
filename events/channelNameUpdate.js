@@ -5,7 +5,7 @@ module.exports = {
 	once: false,
 	async execute(oldChannel, newChannel, client){
 		const GetserverPlayerData = await serverPlayerData.findOne({guildId: oldChannel.guild.id});
-		if(!GetserverPlayerData || GetserverPlayerData.channelId != oldChannel.id) return;
+		if(!GetserverPlayerData || GetserverPlayerData.channelId != oldChannel.id || oldChannel.name == newChannel.name) return;
 
 		console.log(`guild ${oldChannel.guild.id}@${oldChannel.guild.name} changed playerchannel name : `);
 		console.log(`${GetserverPlayerData.channelName} => ${newChannel.name}`);

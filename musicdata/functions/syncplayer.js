@@ -133,8 +133,10 @@ async function syncPlayerChannel(guildId){
 	await playerChannel.bulkDelete(10, true);
 
 	const playerBannerMessage = await playerChannel.send({
-		content: defaultBannerMessage,
-		files: ['./imgs/playerbanner.jpg'],
+		content: server.playerInfo.playermsg.banner.messageContent == 'default' ? 
+			defaultBannerMessage : server.playerInfo.playermsg.banner.messageContent,
+		files: [server.playerInfo.playermsg.banner.imageURL.length == 2 ? 
+			server.playerInfo.playermsg.banner.imageURL[1] : server.playerInfo.playermsg.banner.imageURL[0]],
 	});
 
 	const playerEmbedMessage = await playerChannel.send({
@@ -154,11 +156,10 @@ async function syncPlayerChannel(guildId){
 	messageCollector.on('collect', async msg => {
 		//필터
 		if(!msg.type == 'DEFAULT' || msg.member.user.bot){
-			await wait(10e3);
-			if(msg.deletable) msg.delete();
+			setTimeout(() => msg.delete().catch(e => null), 5e3);
 		}else{
 			const msgs = msg.content.split("\n");
-			if(msg.deletable) await msg.delete().catch(e => null); //오류 좆까
+			await msg.delete().catch(e => null); //오류 좆까
 			for(let i = 0; i < msgs.length; i++){
 				await require('./stream.js').streamTrigger(msg, msgs[i], 'player');
 			}
@@ -283,5 +284,7 @@ async function syncPlayerChannel(guildId){
 }
 
 module.exports = {
-	syncPlayerChannel
+	syncPlayerChannel,
+	defaultBannerMessage,
+	defaultButtonComponents
 }

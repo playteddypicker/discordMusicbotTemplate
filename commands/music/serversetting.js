@@ -27,6 +27,13 @@ module.exports = {
 			});
 
 		const server = serverInfoList.get(interaction.guild.id);
+		
+		if(interaction.channel.id == server.playerInfo.channelId)
+			return interaction.editReply({
+				content: '이 명령어는 플레이어 채널이 아닌 곳에서 쓸 수 있습니다',
+				ephemral: true,
+			});
+
 		let GetserverData = await serverData.findOne({guildId: interaction.guild.id});
 
 		const preferenceButtons = new MessageActionRow()
@@ -153,7 +160,7 @@ module.exports = {
 					//serverinfo에 저장
 					server.playInfo.searchFilter.durationLimit = Number(msgcollectorA.content) * 60;
 					msgcollectorA.delete();
-					break;
+				break;
 
 				case 'editblockedkeywords':
 					preferenceEmbed
@@ -161,7 +168,7 @@ module.exports = {
 						.setDescription(`새로운 단어를 입력하면 추가, 이미 저장된 단어를 입력하면 삭제할 수 있어요
 										추가할 단어는 공백 없이 최대 10글자까지 추가 가능해요`);
 
-					const editMessageB = await interaction.editReply({
+				const editMessageB = await interaction.editReply({
 						embeds: [preferenceEmbed],
 						components: [preferenceButtons]
 					});

@@ -1,5 +1,6 @@
 const serverInfoList = new Map();
 const { AudioPlayerStatus } = require('@discordjs/voice');
+require('dotenv').config();
 
 class serverInfo {
 	constructor(guild){
@@ -24,7 +25,8 @@ class serverInfo {
 			searchFilter: {
 				durationLimit: 0,
 				banKeywords: [],
-			}
+			},
+			recentChannel: null,
 		};
 		this.playerInfo = { // *must save db.
 			setupped: false,
@@ -33,15 +35,15 @@ class serverInfo {
 			playermsg: {
 				banner: {
 					id: '',
-					messageContent: '',
+					messageContent: 'default',
 					message: null,
-					imageURL: [],
+					imageURL: ['./imgs/playerbanner.jpg'],
 				},
 				embed: {
 					id: '',
-					messageContent: '',
+					messageContent: 'default',
 					message: null,
-					imageURL: [],
+					imageURL: [`${process.env.PLAYEREMBED_IMAGEURL}`],
 				}
 			}
 		};
@@ -69,6 +71,7 @@ class musicFunctions extends serverInfo {
 	}
 
 	async stop() {
+		this.queue = [];
 		await this.streamInfo.audioPlayer?.stop(true); //force-stop.
 		await super.enterstop();
 		return true;
@@ -80,6 +83,7 @@ class musicFunctions extends serverInfo {
 
 
 	async eject() {
+		this.queue = [];
 		await this.streamInfo.connection.destroy();
 		if(this.streamInfo.audioPlayer) await this.streamInfo.audioPlayer.stop(true); //force-stop.
 		await super.enterstop(); //refresh streamInfo.

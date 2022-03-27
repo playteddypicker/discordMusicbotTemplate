@@ -1,6 +1,6 @@
 const { serverPlayerData } = require('../musicdata/structures/schema.js');
 const { serverInfoList } = require('../musicdata/structures/musicServerInfo.js');
-
+require('dotenv').config();
 module.exports = {
 	name: 'channelDelete',
 	once: false,
@@ -21,15 +21,15 @@ module.exports = {
 				playermsg: {
 					banner: {
 						id: '',
-						messageContent: '',
+						messageContent: 'default',
 						message: null,
-						imageURL: [],
+						imageURL: ['./imgs/playerbanner.jpg'],
 					},
 					embed: {
 						id: '',
-						messageContent: '',
+						messageContent: 'default',
 						message: null,
-						imageURL: [],
+						imageURL: [`${process.env.PLAYEREMBED_IMAGEURL}`],
 					}
 				}
 			};

@@ -187,10 +187,18 @@ async function loadGuild(guild){
 		if(serverplayerdbInfo){/*player exists from db*/
 			const dataplayerchannel = await client.channels.cache.find(ch => ch.id == serverplayerdbInfo.channelId);
 			if(dataplayerchannel){ //DB에 플레이어 정보 있고 그게 실제로 서버에 있으면
-				musicserverShard.playerInfo = serverplayerdbInfo;
-				console.log(musicserverShard.playerInfo);
-				syncPlayerChannel(guild.id);
+
+				musicserverShard.playerInfo.channelId = serverplayerdbInfo.channelId;
+				musicserverShard.playerInfo.channelName = serverplayerdbInfo.channelName;
+				musicserverShard.playerInfo.playermsg.banner.messageContent = serverplayerdbInfo.playermsg.banner.messageContent;
+				musicserverShard.playerInfo.playermsg.banner.imageURL = serverplayerdbInfo.playermsg.banner.imageURL;
+				musicserverShard.playerInfo.playermsg.embed.messageContent = serverplayerdbInfo.playermsg.embed.messageContent;
+				musicserverShard.playerInfo.playermsg.embed.imageURL = serverplayerdbInfo.playermsg.embed.imageURL;
+
+				await syncPlayerChannel(guild.id);
 				musicserverShard.playerInfo.setupped = true;
+
+				console.log(musicserverShard.playerInfo);
 			}else{ //DB상에는 남아있는데 서버에 없는경우 강제삭제
 				await serverPlayerData.deleteMany({guildId: guild.id});
 				console.log('DBerror Detected. deleted db.');

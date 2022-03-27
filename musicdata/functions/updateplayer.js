@@ -63,7 +63,8 @@ function getPlayerEmbed(server){
 							`<#${server.streamInfo.connection.joinConfig.channelId}>` : 
 							'❌'}`,
 					image: {
-						url: process.env.PLAYEREMBED_IMAGEURL 
+						url: server.playerInfo.playermsg.embed.imageURL.length == 1 ? 
+							process.env.PLAYEREMBED_IMAGEURL : server.playerInfo.playermsg.embed.imageURL[1]
 					},
 				})
 			]

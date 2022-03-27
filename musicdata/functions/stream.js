@@ -62,6 +62,8 @@ async function streamTrigger(interaction, text, requestType){
 	
 	server.streamInfo.currentCommandChannel = '<#' + interaction.channel.id + '>';
 
+	server.playInfo.recentChannel = interaction.channel;
+
 	//seperated by request type. there're three types : command, player, playlist(db).
 	switch(requestType){
 		case 'command':
@@ -129,7 +131,6 @@ async function startStream(interaction, server){
 			errorhandling = 0;
 			return;
 		}
-		server.playInfo.playStatusCode = 0;
 
 		switch(server.playInfo.loopcode){
 			case 0:
@@ -159,10 +160,11 @@ async function startStream(interaction, server){
 			await getSongStream(interaction, server); //다음곡 존재하면 새로 틀기
 			server.playInfo.playStatusCode = 1;
 			if(server.playInfo.loopcode != 1 && !server.playerInfo.setupped)
-				interaction.channel.send(`지금 재생 중 : **${server.queue[0].title}**`);
+				server.playInfo.recentChannel.send(`지금 재생 중 : **${server.queue[0].title}**`);
 		}	
 
 		if(server.queue.length == 0) {
+			server.playInfo.playStatusCode = 0;
 			if(!server.playerInfo.setupped) await interaction.channel.send('대기열에 노래가 없습니다.');
 			server.streamInfo.audioPlayer = null;
 			if(server.playInfo.loopcode == 3) 
@@ -198,7 +200,7 @@ async function startStream(interaction, server){
 		server.playInfo.playStatusCode = 4;
 		errorhandling = 1;
 		console.log(e);
-		getSongStream(interaction, server);
+		if(server.queue.length > 0) getSongStream(interaction, server);
 		
 		server.playerInfo.playermsg.embed.message?.edit({
 			content: getPlayerEmbed(server).content,
@@ -227,16 +229,14 @@ async function getSongStream(interaction, server){
 		await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
 		await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);	
 	}catch(error){
-		interaction instanceof Interaction ? 
-			interaction.editReply('스트리밍 중 오류가 발생했습니다.') :
-			interaction.channel.send('스트리밍 중 오류가 발생했습니다.');
+		interaction.channel.send('스트리밍 중 오류가 발생했습니다.');
 		console.log(error);
 
 		if(error.message.includes('UnrecoverableError')) {
 			server.queue.shift();
 			(interaction instanceof Interaction) ? 
 				interaction.editReply('이 링크는 사용할 수 없습니다. 스킵합니다..') :
-				interaction.channel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
+				server.playInfo.recentChannel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
 		}
 	}
 }
@@ -282,7 +282,7 @@ const { ytsearchGetInfo, ytRelatedGetInfo } = require('./search.js');
 
 async function autosearchPush(interaction, server){
 
-	await interaction.channel.send('유튜브에서 추천 영상 찾는 중...');
+	await interaction.channel?.send('유튜브에서 추천 영상 찾는 중...');
 
 	const related = scurlReg.test(server.queue[0].url) ? //type: queueSong.
 		await ytsearchGetInfo(server.queue[0].title, server.playInfo.searchFilter) : 
@@ -293,9 +293,9 @@ async function autosearchPush(interaction, server){
 
 	related.request = {
 		name: '자동 재생 모드',
-		id: interaction.member.id,
-		avatarURL: interaction.member.user.avatarURL(),
-		tag: interaction.member.user.tag
+		id: 0,
+		avatarURL: 'https://images.emojiterra.com/twitter/v13.1/512px/267e.png',
+		tag: 0 
 	}
 
 	await server.queue.push(related);
@@ -305,7 +305,9 @@ async function autosearchPush(interaction, server){
 		embeds: getPlayerEmbed(server).embeds
 	})
 	
-	return interaction.channel.send(`**${related.title}** 대기열 **${server.queue.length - 1}**번에 추가됐습니다`);
+	return interaction.channel ? 
+		interaction.channel?.send(`**${related.title}** 대기열 **${server.queue.length - 1}**번에 추가됐습니다`) :
+		server.playInfo.recentChannel.send(`**${related.title}** 대기열 **${server.queue.length - 1}**번에 추가됐습니다`);
 }
 
 function sendErrorMsg(interaction, errorCode){

@@ -110,7 +110,7 @@ async function scsetGetInfo(text){
 				author: {
 					name: scsetres.user.username,
 					thumbnail: scsetres.user.avatar_url ?? 'https://cdn-icons-png.flaticon.com/512/145/145809.png',
-					channelURL: res.user.permalink_url,
+					channelURL: scsetres.user.permalink_url,
 				}
 			},
 			items: []
@@ -316,7 +316,6 @@ async function ytRelatedGetInfo(text, filter, previousqueue){
 
 			if(previousqueue.length > 0) previousqueue.forEach(q => {
 				if(q && relatedVideos[i].id == youtube_parser(q.url)) previousidCheck = 1;
-				console.log(youtube_parser(q.url));
 			})
 
 

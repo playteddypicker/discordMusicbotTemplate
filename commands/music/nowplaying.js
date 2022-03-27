@@ -49,7 +49,7 @@ module.exports = {
 			.setURL(`${queue[0].url}`)
 			.setDescription(
 				`${server.playInfo.playStatus[server.playInfo.playStatusCode]} | ${server.playInfo.loopmode[server.playInfo.loopcode]} | ` + 
-				`🔉: ${Math.round(server.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]` + `\n`
+				`🔉: ${Math.round(server.playInfo.volume * 100)}% | [${curtime} / ${queue[0].duration}]` + `\n` +
 				`스트리밍 <#${server.streamInfo.connection.joinConfig.channelId}> | 명령어${server.streamInfo.currentCommandChannel}`)
 			.setFooter({
 				text:`requested by ${queue[0].request.name} | ${ytReg.test(queue[0].url) ? 'Youtube' : 'Soundcloud'}`,
