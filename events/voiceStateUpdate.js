@@ -14,6 +14,8 @@ module.exports = {
 			return; //봇이 없으면 거름
 		const memberCount = oldState.channel.members.filter(m => !m.user.bot).size;
 		if(memberCount != 0) return; //사람 나갔는데 봇만 남은게 아니면 거름
+		const clientVoice = client.voice.adapters.get(newState.guild.id);
+		console.log(clientVoice);
 		
 		const server = serverInfoList.get(oldState.guild.id);
 		const connection = server.streamInfo.connection;

@@ -187,8 +187,10 @@ async function syncPlayerChannel(guildId){
 				if(server.queue.length > 1){
 					await server.queue.splice(1);
 				}else if(server.queue.length == 1){
+					server.audioPlayer = null;
 					await server.stop();
 				}else{
+					server.audioPlayer = null;
 					await server.eject();
 				}
 				break;
