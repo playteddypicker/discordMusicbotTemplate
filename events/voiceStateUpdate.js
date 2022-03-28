@@ -4,6 +4,7 @@ const {
 } = require('@discordjs/voice');
 const { serverInfoList } = require('../musicdata/structures/musicServerInfo.js');
 const { getPlayerEmbed } = require('../musicdata/functions/updateplayer.js');
+const { playerLeftScript } = require('../script.json');
 
 module.exports = {
 	name: 'voiceStateUpdate',
@@ -30,15 +31,15 @@ module.exports = {
 
 				server.playerInfo.setupped ? 
 					await server.playerInfo.playermsg.banner.message.channel.send(
-						"모든 유저가 퇴장하여 일시정지 했습니다.") :
+						playerLeftScript.alluserleft) :
 					await server.recentChannel.send(
-						"모든 유저가 퇴장하여 일시정지 했습니다.");
+						playerLeftScript.alluserleft);
 			}
 				server.playerInfo.setupped ? 
 					await server.playerInfo.playermsg.banner.message.channel.send(
-						"3분 뒤 아무런 활동이 없으면 퇴장합니다.") :
+						playerLeftScript.iwillleft) :
 					await server.recentChannel?.send(
-						"3분 뒤 아무런 활동이 없으면 퇴장합니다.");
+						playerLeftScript.iwillleft);
 			
 			let i = 0;
 			//인터벌로 5초마다 유저가 들어왔는지 검사해서
@@ -50,9 +51,9 @@ module.exports = {
 						server.playInfo.playStatusCode = 1;
 						server.playerInfo.setupped ? 
 							await server.playerInfo.playermsg.banner.message.channel.send(
-								"노래를 다시 재생했습니다.") :
+								playerLeftScript.resumed) :
 							await server.recentChannel.send(
-								"노래를 다시 재생했습니다.");
+								playerLeftScript.resumed);
 					}else{
 						server.playInfo.playStatusCode = 0;
 					}
@@ -77,9 +78,9 @@ module.exports = {
 
 					server.playerInfo.setupped ? 
 						await server.playerInfo.playermsg.banner.message.channel.send(
-							"아무런 활동이 없어 퇴장했습니다.") :
+							playerLeftScript.left) :
 						await server.recentChannel?.send(
-							"아무런 활동이 없어 퇴장했습니다.");
+							playerLeftScript.left);
 					await server.playerInfo.playermsg.embed.message?.edit({
 						content: getPlayerEmbed(server).content,
 						embeds: getPlayerEmbed(server).embeds

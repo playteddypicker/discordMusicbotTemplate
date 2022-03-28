@@ -17,12 +17,12 @@ module.exports = {
 		const server = serverInfoList.get(interaction.guild.id);
 
 		if(server.queue.length == 0 || !server.streamInfo.connection || !server.streamInfo.audioResource)
-			return interaction.editReply('현재 노래를 재생하고있지 않습니다.\n/play 명령어를 사용해서 노래를 먼저 틀어주세요.');
+			return interaction.editReply(defaultMusicCommandScript.nothingPlay);
 
 		if(interaction.member.voice.channel){
-			if(!interaction.member.voice.channel.members.find(m => m.user.id == process.env.CLIENT_ID)) return interaction.reply(defaultMusicCommandScript.existOtherVc);
+			if(!interaction.member.voice.channel.members.find(m => m.user.id == process.env.CLIENT_ID)) return interaction.editReply(defaultMusicCommandScript.existOtherVc);
 		}else{
-			return interaction.reply(defaultMusicCommandScript.firstJoinVc);
+			return interaction.editReply(defaultMusicCommandScript.firstJoinVc);
 		}
 				
 

@@ -15,6 +15,8 @@ const {
 	MessageActionRow,
 	Permissions,
 } = require('discord.js');
+const { settingScript } = require('../../script.json');
+
 require('dotenv').config();
 
 module.exports = {
@@ -26,7 +28,7 @@ module.exports = {
 
 		if(!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR))
 			return interaction.editReply({
-				content: '이 명령어는 관리자 권한을 가진 유저만 쓸 수 있습니다',
+				content: settingScript.permissionDenied,
 				ephemeral: true,
 			});
 		
@@ -34,7 +36,7 @@ module.exports = {
 
 		if(interaction.channel.id == server.playerInfo.channelId)
 			return interaction.editReply({
-				content: '이 명령어는 플레이어 채널이 아닌 곳에서 쓸 수 있습니다',
+				content: settingScript.playercmdDenied,
 				ephemral: true,
 			});
 		

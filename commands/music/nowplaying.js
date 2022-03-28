@@ -6,6 +6,7 @@ const ytReg = /^https:?\/\/(www.youtube.com|youtube.com|youtu.be)/;
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
 require('dotenv').config();
+const { defaultMusicCommandScript } = require('../../script.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -17,7 +18,7 @@ module.exports = {
 		const server = serverInfoList.get(interaction.guild.id);
 		
 		if(server.queue.length == 0 || !server.streamInfo.connection || !server.streamInfo.audioResource)
-			return interaction.editReply('현재 노래를 재생하고있지 않습니다.\n/play 명령어를 사용해서 노래를 먼저 틀어주세요.');
+			return interaction.editReply(defaultMusicCommandScript.nothingPlay);
 		
 		const curtime = getTimestamp(parseInt(server.streamInfo.audioResource.playbackDuration / 1000));
 		const queue = server.queue;

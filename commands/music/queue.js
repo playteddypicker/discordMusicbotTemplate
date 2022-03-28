@@ -7,6 +7,7 @@ const {
 } = require('../../musicdata/structures/timestamp.js');
 const { reactionpages } = require('../../musicdata/structures/reactionpages.js');
 require('dotenv').config();
+const { defaultMusicCommandScript } = require('../../script.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ module.exports = {
 		const server = serverInfoList.get(interaction.guild.id);
 		
 		if(server.queue.length == 0 || !server.streamInfo.connection || !server.streamInfo.audioResource)
-			return interaction.editReply('현재 노래를 재생하고있지 않습니다.\n/play 명령어를 사용해서 노래를 먼저 틀어주세요.');
+			return interaction.editReply(defaultMusicCommandScript.nothingPlay);
 
 		const queue = server.queue;
 		const sec = totalSongDuration(queue);
