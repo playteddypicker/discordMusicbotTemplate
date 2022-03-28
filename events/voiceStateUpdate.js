@@ -14,8 +14,8 @@ module.exports = {
 			return; //봇이 없으면 거름
 		const memberCount = oldState.channel.members.filter(m => !m.user.bot).size;
 		if(memberCount != 0) return; //사람 나갔는데 봇만 남은게 아니면 거름
-		const clientVoice = client.voice.adapters.get(newState.guild.id);
-		console.log(clientVoice);
+		if(getVoiceConnection(oldState.guild.id).joinConfig.channelId != oldState.channelId)
+			return;
 		
 		const server = serverInfoList.get(oldState.guild.id);
 		const connection = server.streamInfo.connection;
@@ -45,7 +45,7 @@ module.exports = {
 			//한번 돌때마다 i 증가, 정해진 i값에 도달했는데도 유저가 들어온게 안걸렸으면
 			//인터벌 끝내고 플레이어 초기화 및 음성채팅 퇴장
 			const checker = setInterval(async () => {
-				if(oldState.channel.members.filter(m => !m.user.bot).size){
+				if(oldState.channel?.members.filter(m => !m.user.bot).size){
 					if(server.streamInfo.audioPlayer?.unpause()){
 						server.playInfo.playStatusCode = 1;
 						server.playerInfo.setupped ? 
@@ -66,7 +66,7 @@ module.exports = {
 
 				i++;
 				
-				if(i == 4){ //i == n에서 5n초 후 정지.
+				if(i == 360){ //i == n에서 5n초 후 정지.
 					await server.stop();
 					server.streamInfo.audioPlayer = null;
 					try{
