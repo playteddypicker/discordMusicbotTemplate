@@ -64,8 +64,4 @@ C언어로 알고리즘 문제 푸는거밖에 하질 못했던 컴공 1학년�
   
   
 ![miyu](https://media.discordapp.net/attachments/917014052612481034/957714188959121498/2022-03-28_03.54.12.png)  
-[미유 초대 링크](https://discord.com/api/oauth2/authorize?client_id=957671563656827000&permissions=8&scope=bot%20applications.commands)
-
-
-음악봇 업데이트, 점검 현황과 다른거 개발하는거 보시려면 디스코드 서버로 와주세요  
-[![Discord](https://img.shields.io/discord/841337761431814165.svg?style=for-the-badge?logo=discord&colorB=7289DA)](https://discord.gg/NrXWKynJRB) 
+[미유 초대 링크](https://discord.com/api/oauth2/authorize?client_id=957671563656827000&permissions=8&scope=bot%20applications.commands) 
