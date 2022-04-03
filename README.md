@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DiscordMusicBotTemplate 
 by playteddypicker  
   
@@ -65,3 +66,6 @@ C언어로 알고리즘 문제 푸는거밖에 하질 못했던 컴공 1학년�
   
 ![miyu](https://media.discordapp.net/attachments/917014052612481034/957714188959121498/2022-03-28_03.54.12.png)  
 [미유 초대 링크](https://discord.com/api/oauth2/authorize?client_id=957671563656827000&permissions=8&scope=bot%20applications.commands) 
+=======
+# tptbot0.1v
+>>>>>>> 1.0/main
