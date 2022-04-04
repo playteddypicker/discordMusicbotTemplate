@@ -25,6 +25,7 @@ module.exports = {
 		
 		await connection?.destroy();
 		server.enterstop();
+		server.streamInfo.audioPlayer = null;
 
 		server.playerInfo.setupped ? 
 			await server.playerInfo.playermsg.banner.message.channel.send(
