@@ -159,6 +159,7 @@ async function syncPlayerChannel(guildId){
 			setTimeout(() => msg.delete().catch(e => null), 5e3);
 		}else{
 			const msgs = msg.content.split("\n");
+			await wait(5e2);
 			await msg.delete().catch(e => null); //오류 좆까
 			for(let i = 0; i < msgs.length; i++){
 				await require('./stream.js').streamTrigger(msg, msgs[i], 'player');
@@ -187,11 +188,11 @@ async function syncPlayerChannel(guildId){
 				if(server.queue.length > 1){
 					await server.queue.splice(1);
 				}else if(server.queue.length == 1){
-					server.audioPlayer = null;
 					await server.stop();
+					server.streamInfo.audioPlayer = null;
 				}else{
-					server.audioPlayer = null;
 					await server.eject();
+					server.streamInfo.audioPlayer = null;
 				}
 				break;
 
