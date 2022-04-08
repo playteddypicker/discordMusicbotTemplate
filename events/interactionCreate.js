@@ -4,6 +4,7 @@ const musiccommandFilterList = [
 ];
 
 const serverInfoList = require('../musicdata/structures/musicServerInfo.js').serverInfoList;
+const { getPlayerEmbed } = require('../musicdata/functions/updateplayer.js');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -28,6 +29,10 @@ module.exports = {
 		
 		try{
 			await cmd.execute(interaction);
+			server.playerInfo.playermsg.embed.message?.edit({
+				content: getPlayerEmbed(server).content,
+				embeds: getPlayerEmbed(server).embeds
+			})
 		}catch(error){
 			console.log(`an error occured in ${interaction.guild.name}@${interaction.guild.id}\n`);
 			console.log(error);
