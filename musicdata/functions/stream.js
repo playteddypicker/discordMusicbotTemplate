@@ -209,7 +209,7 @@ async function startStream(interaction, server){
 	});
 }
 
-/* //play-dl function.
+//play-dl function.
 async function getSongStream(interaction, server){
 	try{
 		let streamSong = yturlReg.test(server.queue[0].url) ?
@@ -239,9 +239,9 @@ async function getSongStream(interaction, server){
 				server.playInfo.recentChannel.send('이 링크는 사용할 수 없습니다. 스킵합니다..');
 		}
 	}
-}*/
+}
 
-// ytdl version(has aborting issue)
+/* ytdl version(has aborting issue)
 async function getSongStream(interaction, server){
 	let streamSong = yturlReg.test(server.queue[0].url) ?
 		await ytdl(server.queue[0].url, {
@@ -276,6 +276,7 @@ async function getSongStream(interaction, server){
 	await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
 	await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);
 }
+*/
 
 const { ytsearchGetInfo, ytRelatedGetInfo } = require('./search.js');
 
