@@ -271,7 +271,7 @@ async function getSongStream(interaction, server){
 	server.streamInfo.audioResource = await createAudioResource(streamSong, {
 		inlineVolume: true
 	});
-	server.streamInfo.audioResource.volume.setVolume(server.streamInfo.playInfo.volume);
+	server.streamInfo.audioResource.volume.setVolume(server.playInfo.volume);
 
 	await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
 	await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);
