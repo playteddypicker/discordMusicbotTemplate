@@ -78,12 +78,14 @@ async function streamTrigger(interaction, text, requestType){
 				if(!server.streamInfo.audioPlayer && server.queue.length > 0)
 					startStream(interaction, server);
 
-				//refresh player message.
 				server.playerInfo.playermsg.embed.message?.edit({
 					content: getPlayerEmbed(server).content,
 					embeds: getPlayerEmbed(server).embeds
 				})
+
 			});
+
+			
 			break;
 
 		case 'playlist':
@@ -134,7 +136,7 @@ async function startStream(interaction, server){
 
 		switch(server.playInfo.loopcode){
 			case 0:
-				server.previousqueue.unshift(server.queue.shift());
+				server.queue.shift();
 				break;
 
 			case 1:
@@ -142,15 +144,13 @@ async function startStream(interaction, server){
 				break;
 
 			case 2:
-					server.queue.push(server.queue.shift());
+				server.queue.push(server.queue.shift());
 				break;
 
 			case 3:
 				if(server.queue.length == 2){
-					server.previousqueue.unshift(server.queue.shift());
 					autosearchPush(interaction, server);
-				}else
-					server.previousqueue.unshift(server.queue.shift());
+				}
 				break;
 		}
 
@@ -227,7 +227,8 @@ async function getSongStream(interaction, server){
 		server.streamInfo.audioResource.volume.setVolume(server.playInfo.volume);
 
 		await server.streamInfo.audioPlayer.play(server.streamInfo.audioResource);
-		await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);	
+		await server.streamInfo.connection.subscribe(server.streamInfo.audioPlayer);
+		server.previousqueue.unshift(server.queue[0]);
 	}catch(error){
 		interaction.channel.send('스트리밍 중 오류가 발생했습니다.');
 		console.log(error);
