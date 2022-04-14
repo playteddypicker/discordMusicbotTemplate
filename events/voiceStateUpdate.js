@@ -24,7 +24,7 @@ module.exports = {
 			return;
 		
 		await connection?.destroy();
-		server.enterstop();
+		await server.enterstop();
 		server.streamInfo.audioPlayer = null;
 
 		server.playerInfo.setupped ? 
