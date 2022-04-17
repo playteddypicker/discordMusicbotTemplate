@@ -1,4 +1,5 @@
 //developed by teddypicker
+process.chdir(__dirname);
 //0-1. pre-settings
 
 require('dotenv').config();
