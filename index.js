@@ -251,13 +251,7 @@ client.once('ready', async () => {
 		}
 	}
 
-	let asdf = 0;
-	setInterval(() => {
-		asdf == 0 ? 
-			client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' }) :
-			client.user.setActivity(`/help로 명령어 확인`, { type: 'PLAYING' });
-		asdf = asdf == 0 ? 1 : 0;
-	}, 10e3)
+	client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' });
 
 	//4-3. show current status of bot on console.
 	setInterval(async () => {
