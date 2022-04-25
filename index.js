@@ -251,8 +251,6 @@ client.once('ready', async () => {
 		}
 	}
 
-	client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' });
-
 	//4-3. show current status of bot on console.
 	setInterval(async () => {
 		const voiceGuilds = [];
@@ -268,6 +266,7 @@ client.once('ready', async () => {
 		}
 		await console.log('Now Streaming : ');
 		await console.log(voiceGuilds);
+		await client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' });
 	}, 300e3);
 });
 
