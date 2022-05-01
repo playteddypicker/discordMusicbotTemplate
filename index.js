@@ -101,7 +101,6 @@ for(let file of otherCommandFiles){
 //1-3. pushing dev commands
 for(let file of devCommandFiles){
 	const cmd = require(`./commands/dev/${file}`);
-	commands.push(cmd.data.toJSON());
 	devCommands.push(cmd.data.toJSON());
 	client.commands.set(cmd.data.name, cmd);
 }
