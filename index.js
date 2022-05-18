@@ -263,7 +263,7 @@ client.once('ready', async () => {
 		for(let voiceGuild of client.voice.adapters){
 			const voiceGuildInfo = await client.guilds.fetch(voiceGuild[0]);
 			voiceGuilds.push(`${voiceGuild[0]}@${voiceGuildInfo.name}`);
-			voiceGuilds_formessage += `${voiceGuildInfo.name}\n`;
+			voiceGuilds_formessage += '`' + `${voiceGuildInfo.name}` + '`' + '\n';
 		}
 		voiceGuilds_formessage = `현재 ${voiceGuilds.length}개의 서버에서 스트리밍 중 : \n` + voiceGuilds_formessage;
 
@@ -273,10 +273,12 @@ client.once('ready', async () => {
 
 		client.channels.fetch("976314813326163968").then(ch => {
 			ch.send(
-				`메모리 사용량 : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB\n${voiceGuilds_formessage}`
+				'메모리 사용량 : ' + 
+				'`' + `${Number(process.memoryUsage().rss) / 1024 / 1024}MB` +  
+				`${voiceGuilds_formessage}`
 			);
 		})
-	}, 3e3);
+	}, 300e3);
 });
 
 mongoose.connect(`mongodb+srv://neoxenesis:${process.env.DBPASSWORD}@snowsantbottestcl.havf9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`);
