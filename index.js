@@ -274,7 +274,7 @@ client.once('ready', async () => {
 		client.channels.fetch("976314813326163968").then(ch => {
 			ch.send(
 				'메모리 사용량 : ' + 
-				'`' + `${Number(process.memoryUsage().rss) / 1024 / 1024}MB` +  
+				'`' + `${Number(process.memoryUsage().rss) / 1024 / 1024}MB` +  '`' + '\n' +
 				`${voiceGuilds_formessage}`
 			);
 		})
