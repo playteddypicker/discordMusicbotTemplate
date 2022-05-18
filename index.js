@@ -216,9 +216,6 @@ async function loadGuild(guild){
 }
 
 client.once('ready', async () => {
-	client.channels.fetch("976314813326163968").then(ch => {
-		console.log(ch);
-	});
 	await console.log(`${client.user.tag} Logged in sucessfully`);
 	await console.log(`${client.guilds.cache.size} guilds found.`);
 	await client.user.setActivity(`부팅 시작`, {type: 'PLAYING'});
