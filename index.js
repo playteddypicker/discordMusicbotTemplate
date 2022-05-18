@@ -253,7 +253,7 @@ client.once('ready', async () => {
 	//4-3. show current status of bot on console.
 	setInterval(async () => {
 		const voiceGuilds = [];
-		const voiceGuilds_formessage = '';
+		let voiceGuilds_formessage = '';
 		const timestamp = () => {
 			const today = new Date();
 			today.setHours(today.getHours() + 9);
