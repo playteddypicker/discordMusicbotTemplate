@@ -216,6 +216,9 @@ async function loadGuild(guild){
 }
 
 client.once('ready', async () => {
+	client.channels.fetch("976314813326163968").then(ch => {
+		console.log(ch);
+	}
 	await console.log(`${client.user.tag} Logged in sucessfully`);
 	await console.log(`${client.guilds.cache.size} guilds found.`);
 	await client.user.setActivity(`부팅 시작`, {type: 'PLAYING'});
@@ -271,7 +274,7 @@ client.once('ready', async () => {
 		await console.log(voiceGuilds);
 		await client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' });
 
-		client.channels.fetch(976314813326163968).then(ch => {
+		client.channels.fetch("976314813326163968").then(ch => {
 			ch.send(
 				`메모리 사용량 : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB\n${voiceGuilds_formessage}`
 			);
