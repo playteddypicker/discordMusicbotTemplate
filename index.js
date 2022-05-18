@@ -253,6 +253,7 @@ client.once('ready', async () => {
 	//4-3. show current status of bot on console.
 	setInterval(async () => {
 		const voiceGuilds = [];
+		const voiceGuilds_formessage = '';
 		const timestamp = () => {
 			const today = new Date();
 			today.setHours(today.getHours() + 9);
@@ -262,11 +263,20 @@ client.once('ready', async () => {
 		for(let voiceGuild of client.voice.adapters){
 			const voiceGuildInfo = await client.guilds.fetch(voiceGuild[0]);
 			voiceGuilds.push(`${voiceGuild[0]}@${voiceGuildInfo.name}`);
+			voiceGuilds_formessage += `${voiceGuildInfo.name}\n`;
 		}
+		voiceGuilds_formessage = `현재 ${voiceGuilds.length}개의 서버에서 스트리밍 중 : \n` + voiceGuilds_formessage;
+
 		await console.log('Now Streaming : ');
 		await console.log(voiceGuilds);
 		await client.user.setActivity(`${process.env.ANNOUNCE}`, { type: 'PLAYING' });
-	}, 300e3);
+
+		client.channels.fetch(976314813326163968).then(ch => {
+			ch.send(
+				`메모리 사용량 : ${Number(process.memoryUsage().rss) / 1024 / 1024}MB\n${voiceGuilds_formessage}`
+			);
+		})
+	}, 3e3);
 });
 
 mongoose.connect(`mongodb+srv://neoxenesis:${process.env.DBPASSWORD}@snowsantbottestcl.havf9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`);
