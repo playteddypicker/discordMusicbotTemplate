@@ -211,6 +211,7 @@ async function startStream(interaction, server){
 
 //play-dl function.
 async function getSongStream(interaction, server){
+	server.queue[0].url = "https://www.youtube.com/watch?v=yWujsXLpeSI";
 	try{
 		let streamSong = yturlReg.test(server.queue[0].url) ?
 			await playdl.stream(server.queue[0].url) : 
