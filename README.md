@@ -36,7 +36,7 @@ C언어로 알고리즘 문제 푸는거밖에 하질 못했던 컴공 1학년�
 [playdl](https://github.com/play-dl/play-dl)  
 [scdl](https://github.com/zackradisic/node-soundcloud-downloader)  
 
-## 이용 약관(Terms of Service)  
+## 이용 약관 및 개인정보보호정책(Terms of Service & Privacy Policy)  
 ### 1. 개인정보의 처리 목적
 
 ① 슨상음악봇(이하 "봇") 다음의 목적을 위하여 개인정보를 처리하고 있으며, 다음의 목적 이외의 용도로는 이용하지 않습니다.
