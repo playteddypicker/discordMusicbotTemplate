@@ -25,17 +25,6 @@ C언어로 알고리즘 문제 푸는거밖에 하질 못했던 컴공 1학년�
 코딩뉴비의 조잡한 첫 프로젝트인데도 이렇게나 많은 사람들이 사용해주실 줄은 몰랐습니다.  
 사용해주신 모든 씹덕분들 정말 감사합니다.
 
-## 주요 기능
-
-### 디펜던시 목록
-[discord.js + voice, builders, rest, opus](https://github.com/discordjs/discord.js/)  
-[ffmpeg](https://github.com/FFmpeg/FFmpeg)  
-[node-ytdl-core](https://github.com/fent/node-ytdl-core)  
-[node-ytsr](https://github.com/TimeForANinja/node-ytsr)  
-[node-ytpl](https://github.com/TimeForANinja/node-ytpl)  
-[playdl](https://github.com/play-dl/play-dl)  
-[scdl](https://github.com/zackradisic/node-soundcloud-downloader)  
-
 ## 이용 약관 및 개인정보보호정책(Terms of Service & Privacy Policy)  
 ### 1. 개인정보의 처리 목적
 
