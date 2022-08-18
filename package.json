@@ -14,7 +14,7 @@
     "node-abort-controller": "^3.0.1",
     "play-dl": "^1.9.1",
     "soundcloud-downloader": "^1.0.0",
-    "ytdl-core": "^4.11.0",
+    "ytdl-core": "^4.9.1",
     "ytpl": "^2.3.0",
     "ytsr": "^3.6.0"
   },
